@@ -32,30 +32,26 @@ public class JpaConfig extends BaseJpaConfig
     @Autowired
     Environment env;
 
-    @Bean(name = "cardCoreEntityManagerFactory")
+    @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory()
     {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource());
         entityManagerFactoryBean.setJpaVendorAdapter(jpaAdapter());
-        entityManagerFactoryBean.setPersistenceUnitName("cardCorePersistenceUnit");
+        entityManagerFactoryBean.setPersistenceUnitName("persistenceUnit");
 
         Map<String, String> propertyMap = this.hibernateJpaPropertyMap();
-
-        // set this, so don't scan METADATA
-        // this will break, if we using AUTO ID INCREMENTAL.
-        propertyMap.put("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
         entityManagerFactoryBean.setJpaPropertyMap(propertyMap);
 
         // find and register all @Entity classes within
-        entityManagerFactoryBean.setPackagesToScan("com.sde.biz.scb.fp.emboss.entity.cardcore");
+        entityManagerFactoryBean.setPackagesToScan("com.example.thesis.entity");
 
         return entityManagerFactoryBean;
     }
 
-    @Qualifier("cardCoreDataSource")
-    @Bean(name = "cardCoreDataSource")
+    @Qualifier
+    @Bean
     public DataSource dataSource()
     {
         String activeProfile = getActiveProfie();
@@ -63,43 +59,24 @@ public class JpaConfig extends BaseJpaConfig
         log.error("Datasource 'jdbc/SDEDB_" + activeProfile + "' not loaded from Server, now load from JDBC ...");
 
         org.apache.tomcat.jdbc.pool.DataSource ds = new org.apache.tomcat.jdbc.pool.DataSource();
-        ds.setDriverClassName("org.postgresql.Driver");
 
-        String ip = System.getProperty("db.card.core.ip");
-        String port = System.getProperty("db.card.core.port");
-        String name = System.getProperty("db.card.core.name");
-        String schema = System.getProperty("db.card.core.schema");
-        String username = System.getProperty("db.card.core.username");
-        String password = System.getProperty("db.card.core.password");
-        String dbType = System.getProperty("db.card.core.type");
+        String ip = System.getProperty("db.ip");
+        String port = System.getProperty("db.port");
+        String name = System.getProperty("db.name");
+        String schema = System.getProperty("db.schema");
+        String username = System.getProperty("db.username");
+        String password = System.getProperty("db.password");
 
-        if ("tidb".equals(dbType) || "mysql".equals(dbType))
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        if (StringUtil.hasValue(ip) && StringUtil.hasValue(port))
         {
-            ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            if (StringUtil.hasValue(ip) && StringUtil.hasValue(port))
-            {
-                StringBuilder url = new StringBuilder("jdbc:mysql://" + ip + ":" + port + "/");
-                ds.setUrl(setDataSourceURL(name, schema, url));
-            }
-            else
-            {
-                log.warn("Fallback to local pooled datasource");
-                ds.setUrl("jdbc:mysql://localhost:5432/");
-            }
+            StringBuilder url = new StringBuilder("jdbc:mysql://" + ip + ":" + port + "/");
+            ds.setUrl(setDataSourceURL(name, schema, url));
         }
         else
         {
-            ds.setDriverClassName("org.postgresql.Driver");
-            if (StringUtil.hasValue(ip) && StringUtil.hasValue(port))
-            {
-                StringBuilder url = new StringBuilder("jdbc:postgresql://" + ip + ":" + port + "/");
-                ds.setUrl(setDataSourceURL(name, schema, url));
-            }
-            else
-            {
-                log.debug("Fallback to local pooled datasource");
-                ds.setUrl("jdbc:postgresql://localhost:5432/");
-            }
+            log.warn("Fallback to local pooled datasource");
+            ds.setUrl("jdbc:mysql://localhost:5432/");
         }
 
         log.error("JDBC URL = '" + ds.getUrl() + "'");
@@ -111,8 +88,7 @@ public class JpaConfig extends BaseJpaConfig
         }
         else
         {
-            ds.setUsername("postgres");
-            ds.setPassword("postgres");
+            ds.setUsername("root");
         }
 
         // extra tomcat jdbc properties
@@ -129,7 +105,7 @@ public class JpaConfig extends BaseJpaConfig
         return JdbcWrapper.SINGLETON.createDataSourceProxy(ds);
     }
 
-    @Bean("cardCoreTransactionManager")
+    @Bean
     public PlatformTransactionManager transactionManager()
     {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
@@ -145,18 +121,8 @@ public class JpaConfig extends BaseJpaConfig
     public JpaVendorAdapter jpaAdapter()
     {
         HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        String dbType = System.getProperty("db.card.core.type");
-
-        if ("tidb".equals(dbType) || "mysql".equals(dbType))
-        {
-            adapter.setDatabase(Database.MYSQL);
-            adapter.setDatabasePlatform("org.hibernate.dialect.MySQL8Dialect");
-        }
-        else
-        {
-            adapter.setDatabase(Database.POSTGRESQL);
-            adapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQL94Dialect");
-        }
+        adapter.setDatabase(Database.MYSQL);
+        adapter.setDatabasePlatform("org.hibernate.dialect.MySQL8Dialect");
         return adapter;
     }
 
