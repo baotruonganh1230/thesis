@@ -20,8 +20,8 @@ public class Task {
 
     private String title;
 
-    @Lob
-    private String Content;
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @Id
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Project.class)

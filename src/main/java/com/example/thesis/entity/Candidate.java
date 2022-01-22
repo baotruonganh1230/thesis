@@ -17,8 +17,9 @@ public class Candidate {
 
     private String name;
 
-    @Lob
-    private Blob cv;
+    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Candidate_CV.class)
+    @JoinColumn(name = "cv_file_id", referencedColumnName="id")
+    private Candidate_CV candidate_cv;
 
     private String email;
 
@@ -28,9 +29,4 @@ public class Candidate {
     public Candidate() {
     }
 
-    public Candidate(String name, Blob cv, String email) {
-        this.name = name;
-        this.cv = cv;
-        this.email = email;
-    }
 }
