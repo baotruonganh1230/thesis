@@ -16,12 +16,6 @@ public class Role {
 
     private String name;
 
-    @OneToOne(
-            mappedBy = "role",
-            cascade = CascadeType.ALL
-    )
-    private Account account;
-
     public Role() {
     }
 

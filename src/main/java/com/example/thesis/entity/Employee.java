@@ -43,12 +43,6 @@ public class Employee {
 
     private LocalDate date_of_birth;
 
-    @OneToOne(
-            mappedBy = "employee",
-            cascade = CascadeType.ALL
-    )
-    private Account account;
-
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
