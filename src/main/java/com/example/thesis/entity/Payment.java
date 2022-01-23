@@ -15,6 +15,9 @@ import java.time.LocalDate;
 @EqualsAndHashCode(exclude = {"employee"})
 public class Payment implements Serializable {
     @Id
+    private Long eid;
+
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;

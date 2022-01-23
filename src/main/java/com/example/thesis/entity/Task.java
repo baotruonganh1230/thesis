@@ -16,6 +16,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Id
+    private Long pid;
+
     private String status;
 
     private String title;
@@ -23,7 +26,7 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Id
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Project.class)
     @JoinColumn(name="pid", referencedColumnName="id")
     private Project project;

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,11 +24,11 @@ public class Department {
     )
     private Manage manage;
 
-    @OneToOne(
+    @OneToMany(
             mappedBy = "department",
             cascade = CascadeType.ALL
     )
-    private Works_In works_in;
+    private List<Works_In> works_ins;
 
     public Department() {
     }

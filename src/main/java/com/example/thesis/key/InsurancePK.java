@@ -1,15 +1,12 @@
 package com.example.thesis.key;
 
-import com.example.thesis.entity.Employee;
-import com.example.thesis.entity.Insurance_Type;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class InsurancePK implements Serializable {
     private Long id;
-    private Employee employee;
-    private Insurance_Type type;
+    private Long eid;
+    private Long typeid;
 
     public InsurancePK() {
     }
@@ -20,12 +17,12 @@ public class InsurancePK implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         InsurancePK insurancePK = (InsurancePK) o;
         return id.equals(insurancePK.id) &&
-                employee.equals(insurancePK.employee) &&
-                type.equals(insurancePK.type);
+                eid.equals(insurancePK.eid) &&
+                typeid.equals(insurancePK.typeid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, employee, type);
+        return Objects.hash(id, eid, typeid);
     }
 }

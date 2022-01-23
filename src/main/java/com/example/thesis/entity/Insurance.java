@@ -17,11 +17,19 @@ public class Insurance {
     private Long id;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long eid;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long typeid;
+
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    @Id
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Insurance_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Insurance_Type type;

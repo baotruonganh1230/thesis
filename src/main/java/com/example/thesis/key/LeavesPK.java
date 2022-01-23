@@ -1,14 +1,11 @@
 package com.example.thesis.key;
 
-import com.example.thesis.entity.Employee;
-import com.example.thesis.entity.Leave_Type;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class LeavesPK implements Serializable {
-    private Employee employee;
-    private Leave_Type type;
+    private Long eid;
+    private Long typeid;
 
     public LeavesPK() {
     }
@@ -18,12 +15,12 @@ public class LeavesPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LeavesPK leavesPK = (LeavesPK) o;
-        return employee.equals(leavesPK.employee) &&
-                type.equals(leavesPK.type);
+        return eid.equals(leavesPK.eid) &&
+                typeid.equals(leavesPK.typeid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employee, type);
+        return Objects.hash(eid, typeid);
     }
 }

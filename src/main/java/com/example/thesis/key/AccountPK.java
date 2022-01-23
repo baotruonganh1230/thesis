@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class AccountPK implements Serializable {
-    private Employee employee;
-    private Role role;
+    private Long eid;
+    private Long roleid;
 
     public AccountPK() {
     }
@@ -18,12 +18,12 @@ public class AccountPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AccountPK accountPK = (AccountPK) o;
-        return employee.equals(accountPK.employee) &&
-                role.equals(accountPK.role);
+        return eid.equals(accountPK.eid) &&
+                roleid.equals(accountPK.roleid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employee, role);
+        return Objects.hash(eid, roleid);
     }
 }

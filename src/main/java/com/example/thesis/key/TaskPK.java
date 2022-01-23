@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class TaskPK implements Serializable {
     private Long id;
-    private Project project;
+    private Long pid;
 
     public TaskPK() {
     }
@@ -18,11 +18,11 @@ public class TaskPK implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TaskPK taskPK = (TaskPK) o;
         return id.equals(taskPK.id) &&
-                project.equals(taskPK.project);
+                pid.equals(taskPK.pid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, project);
+        return Objects.hash(id, pid);
     }
 }

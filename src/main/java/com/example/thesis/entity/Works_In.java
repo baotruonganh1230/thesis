@@ -17,7 +17,7 @@ public class Works_In implements Serializable {
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Department.class)
+    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Department.class)
     @JoinColumn(name="did", referencedColumnName="id")
     private Department department;
 }

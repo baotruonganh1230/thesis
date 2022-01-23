@@ -12,11 +12,17 @@ import javax.persistence.*;
 @IdClass(AccountPK.class)
 public class Account {
     @Id
+    private Long eid;
+
+    @Id
+    private Long roleid;
+
+    @MapsId
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    @Id
+    @MapsId
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Role.class)
     @JoinColumn(name="roleid", referencedColumnName="id")
     private Role role;

@@ -15,6 +15,9 @@ import java.time.LocalTime;
 @EqualsAndHashCode(exclude = {"employee"})
 public class Attendance implements Serializable {
     @Id
+    private Long eid;
+
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;

@@ -61,11 +61,11 @@ public class Employee {
     )
     private List<Leaves> leaves = new ArrayList<>();
 
-    @OneToMany(
+    @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
-    private List<Manage> manages;
+    private Manage manage;
 
     @OneToOne(
             mappedBy = "employee",

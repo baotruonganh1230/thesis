@@ -13,11 +13,17 @@ import java.time.LocalDate;
 @IdClass(LeavesPK.class)
 public class Leaves {
     @Id
+    private Long eid;
+
+    @Id
+    private Long typeid;
+
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    @Id
+    @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Leave_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Leave_Type type;
