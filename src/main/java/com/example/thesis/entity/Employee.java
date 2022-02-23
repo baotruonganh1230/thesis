@@ -43,6 +43,17 @@ public class Employee {
 
     private LocalDate date_of_birth;
 
+    public Employee(String first_name, String last_name, String email, String permanent_address, String temporary_address, String phone, String sex, LocalDate date_of_birth) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.email = email;
+        this.permanent_address = permanent_address;
+        this.temporary_address = temporary_address;
+        this.phone = phone;
+        this.sex = sex;
+        this.date_of_birth = date_of_birth;
+    }
+
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
