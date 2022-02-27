@@ -1,6 +1,6 @@
 package com.example.thesis.registration.token;
 
-import com.example.thesis.entity.Account;
+import com.example.thesis.entities.Account;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
