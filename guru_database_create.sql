@@ -10,7 +10,7 @@ create table employee (id bigint not null auto_increment, date_of_birth date, em
 create table has (posid bigint not null, jrecruitid bigint, primary key (posid)) engine=InnoDB;
 create table insurance (eid bigint not null auto_increment, id bigint not null, typeid bigint not null, expired_date date, hospital varchar(255), start_date date, primary key (eid, id, typeid)) engine=InnoDB;
 create table insurance_type (id bigint not null auto_increment, name varchar(255), rate_of_payment decimal(16,2), primary key (id)) engine=InnoDB;
-create table job_recruitment (id bigint not null auto_increment, from_date date, job_description varchar(255), status integer, to_date date, primary key (id)) engine=InnoDB;
+create table job_recruitment (id bigint not null auto_increment, from_date date, job_description TEXT, note TEXT, status integer, title varchar(255), to_date date, primary key (id)) engine=InnoDB;
 create table leave_type (id bigint not null auto_increment, is_paid bit, name varchar(255), primary key (id)) engine=InnoDB;
 create table leaves (eid bigint not null, typeid bigint not null, description longtext, from_date date, to_date date, primary key (eid, typeid)) engine=InnoDB;
 create table manage (did bigint not null, eid bigint, primary key (did)) engine=InnoDB;
