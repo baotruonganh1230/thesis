@@ -4,15 +4,12 @@ import com.example.thesis.entities.Account;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.entities.Role;
 import com.example.thesis.registration.EmailValidator;
-import com.example.thesis.registration.token.ConfirmationToken;
-import com.example.thesis.registration.token.ConfirmationTokenService;
 import com.example.thesis.requests.RegistrationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -24,8 +21,6 @@ public class RegistrationService {
     private final EmployeeService employeeService;
 
     private final RoleService roleService;
-
-    private final ConfirmationTokenService confirmationTokenService;
 
     private final EmailValidator emailValidator;
 
@@ -62,24 +57,6 @@ public class RegistrationService {
 
     @Transactional
     public String confirmToken(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenService
-                .getToken(token)
-                .orElseThrow(() ->
-                        new IllegalStateException("token not found"));
-
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new IllegalStateException("email already confirmed");
-        }
-
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("token expired");
-        }
-
-        confirmationTokenService.setConfirmedAt(token);
-        accountService.enableAccount(
-                confirmationToken.getAccount().getUsername());
         return "confirmed";
     }
 }

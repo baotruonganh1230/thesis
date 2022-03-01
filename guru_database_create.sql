@@ -4,8 +4,7 @@ create table attendance (eid bigint not null, day date, device_id varchar(255), 
 create table bonus_list (id bigint not null auto_increment, amount bigint, name varchar(255), eid bigint, primary key (id)) engine=InnoDB;
 create table candidate (id bigint not null auto_increment, email varchar(255), name varchar(255), cv_file_id bigint, primary key (id)) engine=InnoDB;
 create table candidate_cv (id bigint not null auto_increment, cv_file_content longblob, cv_file_name varchar(255), cv_file_size bigint, cv_file_type varchar(255), primary key (id)) engine=InnoDB;
-create table confirmation_token (id bigint not null auto_increment, confirmed_at datetime, created_at datetime not null, expires_at datetime, token varchar(255) not null, account_eid bigint, account_roleid bigint, primary key (id)) engine=InnoDB;
-create table department (id bigint not null auto_increment, head_unit_id bigint, location varchar(255), name varchar(255), primary key (id)) engine=InnoDB;
+create table department (id bigint not null auto_increment, description TEXT, location varchar(255), name varchar(255), people_number integer, type varchar(255), head_of_unit_id bigint, primary key (id)) engine=InnoDB;
 create table employee (id bigint not null auto_increment, date_of_birth date, email varchar(255), employed_date date, first_name varchar(255), gross_salary decimal(16,2), img_url varchar(255), last_name varchar(255), permanent_address varchar(255), phone varchar(255), sex varchar(255), temporary_address varchar(255), primary key (id)) engine=InnoDB;
 create table has (posid bigint not null, jrecruitid bigint, primary key (posid)) engine=InnoDB;
 create table insurance (eid bigint not null auto_increment, id bigint not null, typeid bigint not null, expired_date date, hospital varchar(255), start_date date, primary key (eid, id, typeid)) engine=InnoDB;
@@ -34,7 +33,7 @@ alter table apply add constraint FKsph002n8dnxk1x4vrl41p7jho foreign key (jrecru
 alter table attendance add constraint FK1ja4jj07t8co2pc74j0ckl59o foreign key (eid) references employee (id);
 alter table bonus_list add constraint FK8oexta4kt1gvxjws78vpwakqg foreign key (eid) references employee (id);
 alter table candidate add constraint FKl5xsqrvwc3sj5hoe8222hbr72 foreign key (cv_file_id) references candidate_cv (id);
-alter table confirmation_token add constraint FKcxwxwungq6sj1yj0280g4aejt foreign key (account_eid, account_roleid) references account (eid, roleid);
+alter table department add constraint FKhwihkrs21tavvykrih45c9oit foreign key (head_of_unit_id) references department (id);
 alter table has add constraint FKfctdmqapnhx5204em7ea0nmbf foreign key (posid) references position (id);
 alter table has add constraint FKghjm0yqnsb5lu2f63t7f3lv67 foreign key (jrecruitid) references job_recruitment (id);
 alter table insurance add constraint FK3s3edx1le2u73ceh5hcscjao5 foreign key (eid) references employee (id);

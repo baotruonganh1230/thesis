@@ -43,8 +43,7 @@ public class JobService {
     }
 
     public void updateJob_RecruitmentById(Long id, Job_Recruitment job) {
-        Job_Recruitment oldJob = repository.getById(id);
-        if (oldJob == null) {
+        if (!repository.existsById(id)) {
             throw new DataReadException("There is no account with that id");
         }
         repository.setJob_RecruitmentById(
@@ -59,12 +58,6 @@ public class JobService {
     }
 
     public void insertJobById(Long id, Job_Recruitment job) {
-        repository.insertJob_RecruitmentById(
-                job.getFrom_date(),
-                job.getJob_description(),
-                job.getStatus(),
-                job.getTo_date(),
-                job.getNote(),
-                job.getTitle());
+        repository.save(job);
     }
 }

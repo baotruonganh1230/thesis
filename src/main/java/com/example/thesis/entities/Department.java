@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,7 +20,19 @@ public class Department {
 
     private String name;
 
-    private Long head_unit_id;
+    private Integer peopleNumber;
+
+    private String type;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @OneToMany(mappedBy = "headOfUnit")
+    private Set<Department> subUnits = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    @JoinColumn()
+    private Department headOfUnit;
 
     @OneToOne(
             mappedBy = "department",
@@ -35,8 +49,16 @@ public class Department {
     public Department() {
     }
 
-    public Department(String location, String name) {
-        this.location = location;
+    public Department(Long id) {
+        this.id = id;
+    }
+
+    public Department(String name, Integer peopleNumber, String type, String description, Set<Department> subUnits, Department headOfUnit) {
         this.name = name;
+        this.peopleNumber = peopleNumber;
+        this.type = type;
+        this.description = description;
+        this.subUnits = subUnits;
+        this.headOfUnit = headOfUnit;
     }
 }

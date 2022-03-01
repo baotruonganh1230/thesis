@@ -107,12 +107,7 @@ public class AccountService implements UserDetailsService {
         if (oldAccount != null) {
             throw new EntityExistsException("Key already exists!");
         }
-        accountRepository.insertAccountByEidAndRoleid(
-                account.getEid(),
-                account.getRoleid(),
-                account.getPassword(),
-                account.getStatus(),
-                account.getUsername());
+        accountRepository.save(account);
     }
 
     public Long count() {
