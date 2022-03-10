@@ -24,6 +24,8 @@ public class Position {
     @Column(precision = 16, scale = 2)
     private BigDecimal max_salary;
 
+    private Integer salaryGroup;
+
     private String description;
 
     @OneToOne(
@@ -36,7 +38,7 @@ public class Position {
             mappedBy = "position",
             cascade = CascadeType.ALL
     )
-    private List<Works_As> works_as_list = new ArrayList<>();
+    private List<Employee> employees = new ArrayList<>();
 
     public Position() {
     }

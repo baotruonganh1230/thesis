@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,5 +50,19 @@ public class Job_Recruitment {
         this.job_description = job_description;
         this.from_date = from_date;
         this.to_date = to_date;
+    }
+
+    public void setFrom_date(String from_dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        this.from_date = LocalDate.parse(from_dateString, formatter);
+    }
+
+    public void setTo_date(String to_dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        this.to_date = LocalDate.parse(to_dateString, formatter);
     }
 }

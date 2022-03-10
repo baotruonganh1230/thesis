@@ -3,6 +3,20 @@ jwt:
     app: Hrms-App
     secret_key: thesecretreveal#Abc1230g
     expires_in: 300
+google:
+  service_account_email: hrms-drive@hrms-drive.iam.gserviceaccount.com
+  application_name: hrms drive
+  folder_id: 1OodDM7p6fa-xVUnBv5Qpa91uCYxhpiRz
+  service_account_key: hrms-drive-c2daac40864c.p12
+  secret:
+    key:
+      path: classpath:keys/client_secret_gd.json
+  oauth:
+    callback:
+      uri: http://192.168.56.1.nip.io:8080/oauth
+  credentials:
+    folder:
+      path: file:D\\pratice\\sbt-gd\\workspace\\credentials
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/hrms_dev
@@ -25,3 +39,5 @@ spring:
   sql:
     init:
       platform: mysql
+  #google drive api
+

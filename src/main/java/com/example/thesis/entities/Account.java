@@ -2,6 +2,7 @@ package com.example.thesis.entities;
 
 import com.example.thesis.keys.AccountPK;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.Collections;
 @Setter
 @Entity
 @IdClass(AccountPK.class)
+@NoArgsConstructor
 public class Account implements UserDetails {
     @Id
     private Long eid;
@@ -38,15 +40,6 @@ public class Account implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private AccountStatus status;
 
-    public Account(Long eid, Long roleid, Employee employee, Role role, String username, String password) {
-        this.eid = eid;
-        this.roleid = roleid;
-        this.employee = employee;
-        this.role = role;
-        this.username = username;
-        this.password = password;
-    }
-
     public Account(Long eid, Long roleid, Employee employee, Role role, String username, String password, AccountStatus status) {
         this.eid = eid;
         this.roleid = roleid;
@@ -55,10 +48,6 @@ public class Account implements UserDetails {
         this.username = username;
         this.password = password;
         this.status = status;
-    }
-
-    public Account() {
-
     }
 
     @Override

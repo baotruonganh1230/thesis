@@ -1,7 +1,9 @@
 package com.example.thesis.entities;
 
 import com.example.thesis.keys.InsurancePK;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @IdClass(InsurancePK.class)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Insurance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +38,16 @@ public class Insurance {
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Insurance_Type type;
 
-    private LocalDate start_date;
+    private LocalDate from_date;
 
-    private LocalDate expired_date;
+    private LocalDate to_date;
 
-    private String hospital;
+    private LocalDate issue_date;
+
+    private String number;
+
+    private Long cityId;
+
+    private Long kcbId;
+
 }

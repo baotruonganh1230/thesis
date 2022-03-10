@@ -1,8 +1,6 @@
 package com.example.thesis.entities;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,8 +9,14 @@ import java.io.Serializable;
 @Setter
 @Entity
 @EqualsAndHashCode(exclude = {"employee"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class Works_In implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long eid;
+
+    @MapsId
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;

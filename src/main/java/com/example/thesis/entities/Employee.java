@@ -2,10 +2,13 @@ package com.example.thesis.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +43,10 @@ public class Employee {
 
     private LocalDate date_of_birth;
 
-    private String img_url;
+    private String pit;
+
+    @Column(columnDefinition = "TEXT")
+    private String avatar;
 
     public Employee(String first_name, String last_name, String email, String permanent_address, String temporary_address, String phone, String sex, LocalDate date_of_birth) {
         this.first_name = first_name;
@@ -71,6 +77,11 @@ public class Employee {
     )
     private List<Leaves> leaves = new ArrayList<>();
 
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL, targetEntity = Position.class)
+    @JoinColumn(referencedColumnName="id")
+    private Position position;
+
     @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL
@@ -99,12 +110,7 @@ public class Employee {
     )
     private Set<Task> tasks = new HashSet<>();
 
-    @OneToOne(
-            mappedBy = "employee",
-            cascade = CascadeType.ALL
-    )
-    private Works_As works_as;
-
+    @Fetch(FetchMode.JOIN)
     @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL
@@ -117,6 +123,7 @@ public class Employee {
     )
     private Works_On works_on;
 
+    @Fetch(FetchMode.JOIN)
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
@@ -125,5 +132,19 @@ public class Employee {
 
     public Employee() {
 
+    }
+
+    public void setDate_of_birth(String dateOfBirthString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        this.date_of_birth = LocalDate.parse(dateOfBirthString, formatter);
+    }
+
+    public void setEmployed_date(String employed_dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        this.employed_date = LocalDate.parse(employed_dateString, formatter);
     }
 }

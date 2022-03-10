@@ -1,15 +1,16 @@
 package com.example.thesis.entities;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
 @Entity
 @EqualsAndHashCode(exclude = {"employee"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class Bonus_List {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +18,8 @@ public class Bonus_List {
 
     private String name;
 
-    private Long amount;
+    @Column(precision = 16, scale = 2)
+    private BigDecimal amount;
 
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")

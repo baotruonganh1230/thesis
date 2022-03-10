@@ -1,6 +1,7 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Account;
+import com.example.thesis.entities.AccountStatus;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.entities.Role;
 import com.example.thesis.registration.EmailValidator;
@@ -29,7 +30,7 @@ public class RegistrationService {
         if (!isValidEmail) {
             throw new IllegalStateException("email not valid!");
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         formatter = formatter.withLocale(Locale.US);
 
         Employee savedEmployee = employeeService.save(
@@ -52,7 +53,8 @@ public class RegistrationService {
                 savedEmployee,
                 savedRole,
                 request.getUsername(),
-                request.getPassword()));
+                request.getPassword(),
+                AccountStatus.ENABLE));
     }
 
     @Transactional

@@ -31,7 +31,6 @@ public class Department {
     private Set<Department> subUnits = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
-    @JoinColumn()
     private Department headOfUnit;
 
     @OneToOne(
