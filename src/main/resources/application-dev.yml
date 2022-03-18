@@ -21,7 +21,7 @@ google:
       path: file:D\\pratice\\sbt-gd\\workspace\\credentials
 spring:
   datasource:
-    url: jdbc:mysql://aa1x0pzg7yx5ek0.cdaeblcvdffm.ap-southeast-1.rds.amazonaws.com:3306
+    url: jdbc:mysql://aa1x0pzg7yx5ek0.cdaeblcvdffm.ap-southeast-1.rds.amazonaws.com:3306/hrmsdev
     username: hrmsdev
     password: Abc1230g
   jpa:
