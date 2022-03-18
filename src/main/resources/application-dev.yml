@@ -27,12 +27,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     database: mysql
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
 #      javax:
 #        persistence:
 #          schema-generation:
