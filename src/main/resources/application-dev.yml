@@ -44,4 +44,7 @@ spring:
     init:
       platform: mysql
       mode: always
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
