@@ -1,3 +1,5 @@
+server:
+  port: 5000
 jwt:
   auth:
     app: Hrms-App
@@ -28,7 +30,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     database: mysql
     show-sql: true
-#    properties:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 #      javax:
 #        persistence:
 #          schema-generation:

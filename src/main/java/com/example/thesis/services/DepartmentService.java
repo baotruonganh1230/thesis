@@ -21,7 +21,7 @@ public class DepartmentService {
         if (department != null) {
             Set<DepartmentResponse> departmentResponses = new HashSet<>();
             List<Department> subDepartments = repository.findAllByHeadOfUnit(department);
-            for (var subDepartment : subDepartments) {
+            for (Department subDepartment : subDepartments) {
                 departmentResponses.add(convertFromDepartmentToDepartmentResponse(subDepartment));
             }
             return new DepartmentResponse(
@@ -53,7 +53,7 @@ public class DepartmentService {
             List<Department> subDepartments = repository.findAllByHeadOfUnit(department);
 
             if (subDepartments != null) {
-                for (var subDepartment : subDepartments) {
+                for (Department subDepartment : subDepartments) {
                     if (!idExistedInSet(departmentResponses, subDepartment.getId())) {
                         addToDepartmentResponseSetNoNested(
                                 departmentResponses, subDepartment);
@@ -64,7 +64,7 @@ public class DepartmentService {
     }
 
     private boolean idExistedInSet(Set<DepartmentResponse> departmentResponses, Long id) {
-        for (var departmentResponse : departmentResponses) {
+        for (DepartmentResponse departmentResponse : departmentResponses) {
             if (departmentResponse.getId() == id) {
                 return true;
             }
@@ -107,7 +107,7 @@ public class DepartmentService {
                 departmentRequest.getHeadOfUnitId());
 
         if (departmentRequest.getSubUnits() != null) {
-            for (var subDepartment : departmentRequest.getSubUnits()) {
+            for (DepartmentRequest subDepartment : departmentRequest.getSubUnits()) {
                 updateDepartmentById(subDepartment.getId(), subDepartment);
                 repository.setHeadOfUnit(subDepartment.getId(), departmentRequest.getId());
             }
@@ -129,7 +129,7 @@ public class DepartmentService {
                 departmentRequest.getHeadOfUnitId());
 
         if (departmentRequest.getSubUnits() != null) {
-            for (var subDepartment : departmentRequest.getSubUnits()) {
+            for (DepartmentRequest subDepartment : departmentRequest.getSubUnits()) {
                 insertDepartmentById(subDepartment.getId(), subDepartment);
                 repository.setHeadOfUnit(subDepartment.getId(), departmentRequest.getId());
             }
