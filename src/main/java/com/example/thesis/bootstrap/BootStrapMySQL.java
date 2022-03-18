@@ -62,9 +62,11 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
                     savedEmployee,
                     savedRole,
                     "anhbao1230",
-                    ("Abc1230g"),
+                    "Abc1230g",
                     AccountStatus.ENABLE));
         }
+
+
 
         if (departmentService.count() == 0L) {
             Department department1 = new Department("Dev", 2, "sub", "SD", null, null);

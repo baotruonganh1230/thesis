@@ -6,9 +6,11 @@ import com.example.thesis.responses.AccountResponse;
 import com.google.common.collect.Lists;
 import com.mysql.cj.exceptions.DataReadException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ public class AccountService implements UserDetailsService {
     private static final String USER_NOT_FOUND_MSG = "user with email %s not found";
 
     private final AccountRepository accountRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -55,6 +59,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account save(Account account) {
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
 

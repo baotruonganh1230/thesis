@@ -32,6 +32,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
@@ -45,19 +48,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "    else null " +
                         "end " +
                         "as enabled " +
-                        "from hrms_dev.account where username = ?")
+                        "from hrmsdev.account where username = ?")
                 .authoritiesByUsernameQuery("select a.username, " +
-                        "b.name as authority from hrms_dev.account a " +
-                        "left join hrms_dev.role b " +
+                        "b.name as authority from hrmsdev.account a " +
+                        "left join hrmsdev.role b " +
                         "on a.roleid = b.id " +
                         "where username = ?");
 
-        auth.userDetailsService(accountService).passwordEncoder(passwordEncoder());
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        auth.userDetailsService(accountService).passwordEncoder(passwordEncoder);
     }
 
     @Bean
