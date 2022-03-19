@@ -15,7 +15,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @GetMapping("attendances")
-    public ResponseEntity<?> getAttendances(@RequestParam String week, @RequestParam Long departmentId) {
+    public ResponseEntity<?> getAttendances(@RequestParam(required = false) String week, @RequestParam(required = false) Long departmentId) {
         return new ResponseEntity<>(new AttendanceList(attendanceService.getAllAttendances(week, departmentId)),
                 HttpStatus.OK);
     }

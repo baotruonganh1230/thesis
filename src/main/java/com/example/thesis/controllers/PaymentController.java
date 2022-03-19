@@ -14,7 +14,7 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @GetMapping("payment")
-    public ResponseEntity<?> getPayment(@RequestParam String month, @RequestParam Long employeeId) {
+    public ResponseEntity<?> getPayment(@RequestParam(required=false) String month, @RequestParam(required=false) Long employeeId) {
         return new ResponseEntity<>(paymentService.getPayment(month, employeeId),
                 HttpStatus.OK);
     }
