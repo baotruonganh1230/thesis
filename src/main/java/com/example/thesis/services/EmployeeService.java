@@ -47,11 +47,11 @@ public class EmployeeService {
                     employee.getPermanent_address(),
                     employee.getTemporary_address(),
                     employee.getPhone(),
-                    employee.getWorks_in().getDepartment().getName(),
-                    employee.getPosition().getName(),
+                    employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getName(),
+                    employee.getPosition() == null ? null : employee.getPosition().getName(),
                     employee.getDate_of_birth(),
                     employee.getPit(),
-                    employee.getPosition().getSalaryGroup(),
+                    employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
                     employee.getGross_salary(),
                     employee.getBonus_lists().stream().map((Bonus_List bonus_list) -> {
                         return new Bonus(bonus_list.getId(), bonus_list.getName(), bonus_list.getAmount());
