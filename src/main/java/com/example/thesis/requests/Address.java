@@ -10,13 +10,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address {
-    private String city;
-    private String district;
-    private String ward;
+    private Long cityId;
+    private Long districtId;
+    private Long wardId;
     private String address;
 
     @Override
     public String toString() {
-        return address + ", " + city + ", " + ward + ", " + district;
+        return "Address{" +
+                "cityId=" + cityId +
+                ", districtId=" + districtId +
+                ", wardId=" + wardId +
+                ", address='" + address + '\'' +
+                '}';
     }
 }
