@@ -606,7 +606,7 @@
           {
             "name": "month",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -614,7 +614,7 @@
           {
             "name": "employeeId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -645,7 +645,7 @@
           {
             "name": "departmentId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -746,7 +746,7 @@
           {
             "name": "jobRecruitmentId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -777,7 +777,7 @@
           {
             "name": "week",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -785,7 +785,7 @@
           {
             "name": "departmentId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -953,7 +953,7 @@
               "disable"
             ]
           },
-          "accountNonLocked": {
+          "enabled": {
             "type": "boolean"
           },
           "authorities": {
@@ -962,13 +962,13 @@
               "$ref": "#/components/schemas/GrantedAuthority"
             }
           },
+          "accountNonLocked": {
+            "type": "boolean"
+          },
           "credentialsNonExpired": {
             "type": "boolean"
           },
           "accountNonExpired": {
-            "type": "boolean"
-          },
-          "enabled": {
             "type": "boolean"
           }
         }
