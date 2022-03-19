@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,7 @@ public class PositionResponse {
     private String title;
     private String description;
     private String note;
+    private BigDecimal min_salary;
+    private BigDecimal max_salary;
+    private Integer salary_group;
 }

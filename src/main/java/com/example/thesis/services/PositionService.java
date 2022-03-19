@@ -24,7 +24,10 @@ public class PositionService {
                     position.getId(),
                     position.getName(),
                     position.getDescription(),
-                    position.getNote());
+                    position.getNote(),
+                    position.getMin_salary(),
+                    position.getMax_salary(),
+                    position.getSalaryGroup());
             positionResponses.add(positionResponse);
         });
 
@@ -37,7 +40,10 @@ public class PositionService {
                 position.getId(),
                 position.getName(),
                 position.getDescription(),
-                position.getNote());
+                position.getNote(),
+                position.getMin_salary(),
+                position.getMax_salary(),
+                position.getSalaryGroup());
     }
 
     public void updatePositionById(Long id, Position position) {
@@ -48,7 +54,10 @@ public class PositionService {
                 id,
                 position.getName(),
                 position.getDescription(),
-                position.getNote());
+                position.getNote(),
+                position.getMin_salary(),
+                position.getMax_salary(),
+                position.getSalaryGroup());
     }
 
     public void insertPositionById(Position position) {
