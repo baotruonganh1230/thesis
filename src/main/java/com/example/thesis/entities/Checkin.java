@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class Checkin {
     private LocalTime time_in;
     private LocalTime time_out;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Attendance.class)
     @JoinColumn(name="attendanceId", referencedColumnName="eid")

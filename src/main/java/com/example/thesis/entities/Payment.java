@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Payment implements Serializable {
     @Id
     private Long eid;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
@@ -53,6 +55,7 @@ public class Payment implements Serializable {
 
     private String unpaidLeave;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Payroll.class)
     @JoinColumn(name="payroll_id", referencedColumnName="id")
     private Payroll payroll;

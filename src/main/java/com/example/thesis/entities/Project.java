@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,18 +23,21 @@ public class Project {
 
     private LocalDate end_date;
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "project",
             cascade = CascadeType.ALL
     )
     private Managed_By managed_by;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "project",
             cascade = CascadeType.ALL
     )
     private List<Task> tasks = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "project",
             cascade = CascadeType.ALL

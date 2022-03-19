@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,18 +35,21 @@ public class Department {
     @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
     private Department headOfUnit;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "department",
             cascade = CascadeType.ALL
     )
     private List<Job_Recruitment> job_recruitments = new ArrayList<>();
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "department",
             cascade = CascadeType.ALL
     )
     private Manage manage;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "department",
             cascade = CascadeType.ALL

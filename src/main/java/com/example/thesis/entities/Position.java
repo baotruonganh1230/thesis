@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,12 +31,14 @@ public class Position {
 
     private String note;
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "position",
             cascade = CascadeType.ALL
     )
     private Has has;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "position",
             cascade = CascadeType.ALL

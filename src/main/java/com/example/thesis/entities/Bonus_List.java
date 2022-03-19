@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class Bonus_List {
     @Column(precision = 16, scale = 2)
     private BigDecimal amount;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;

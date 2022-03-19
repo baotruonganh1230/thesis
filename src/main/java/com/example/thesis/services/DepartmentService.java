@@ -17,12 +17,15 @@ import java.util.Set;
 public class DepartmentService {
     private final DepartmentRepository repository;
 
-    private DepartmentResponse convertFromDepartmentToDepartmentResponse(Department department) {
+    private DepartmentResponse convertFromDepartmentToDepartmentResponse(Set<Long> idSet, Department department) {
         if (department != null) {
             Set<DepartmentResponse> departmentResponses = new HashSet<>();
             List<Department> subDepartments = repository.findAllByHeadOfUnit(department);
             for (Department subDepartment : subDepartments) {
-                departmentResponses.add(convertFromDepartmentToDepartmentResponse(subDepartment));
+                if (!idSet.contains(subDepartment.getId())) {
+                    departmentResponses.add(convertFromDepartmentToDepartmentResponse(idSet, subDepartment));
+                    idSet.add(subDepartment.getId());
+                }
             }
             return new DepartmentResponse(
                     department.getId(),
@@ -76,8 +79,13 @@ public class DepartmentService {
         Set<DepartmentResponse> departmentResponses = new HashSet<>();
 
         if (nested) {
+            Set<Long> idSet = new HashSet<>();
             Lists.newArrayList(repository.findAll()).forEach((Department department) -> {
-                departmentResponses.add(convertFromDepartmentToDepartmentResponse(department));
+                if (!idSet.contains(department.getId())) {
+                    idSet.add(department.getId());
+                    departmentResponses.add(convertFromDepartmentToDepartmentResponse(idSet, department));
+                }
+
             });
         } else {
             Lists.newArrayList(repository.findAll()).forEach((Department department) -> {
@@ -90,7 +98,9 @@ public class DepartmentService {
 
     public DepartmentResponse getDepartment(Long id) {
         Department department = repository.getById(id);
-        return convertFromDepartmentToDepartmentResponse(department);
+        Set<Long> idSet = new HashSet<>();
+        idSet.add(department.getId());
+        return convertFromDepartmentToDepartmentResponse(idSet, department);
     }
 
     public void updateDepartmentById(Long id, DepartmentRequest departmentRequest) {

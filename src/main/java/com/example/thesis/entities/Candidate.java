@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -28,6 +29,7 @@ public class Candidate {
 
     private String contact;
 
+    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade=CascadeType.ALL, targetEntity = Job_Recruitment.class)
     @JoinColumn(referencedColumnName="id")

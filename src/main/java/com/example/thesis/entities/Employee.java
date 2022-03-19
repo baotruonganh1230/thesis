@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -75,18 +76,21 @@ public class Employee {
         this.position = position;
     }
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
     private List<Attendance> attendances = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
     private List<Payment> payments = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
@@ -98,24 +102,28 @@ public class Employee {
     @JoinColumn(referencedColumnName="id")
     private Position position;
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
     private Manage manage;
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
     private Managed_By managed_by;
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
     private List<Insurance> insurances = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "Performs",
             joinColumns = @JoinColumn(name = "eid"),
@@ -126,6 +134,7 @@ public class Employee {
     )
     private Set<Task> tasks = new HashSet<>();
 
+    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @OneToOne(
             mappedBy = "employee",
@@ -133,6 +142,7 @@ public class Employee {
     )
     private Works_In works_in;
 
+    @JsonIgnore
     @OneToOne(
             mappedBy = "employee",
             cascade = CascadeType.ALL

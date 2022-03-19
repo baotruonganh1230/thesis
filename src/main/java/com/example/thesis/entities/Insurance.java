@@ -1,6 +1,7 @@
 package com.example.thesis.entities;
 
 import com.example.thesis.keys.InsurancePK;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,11 +29,13 @@ public class Insurance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long typeid;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Insurance_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")

@@ -1,6 +1,7 @@
 package com.example.thesis.entities;
 
 import com.example.thesis.keys.TaskPK;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,11 +27,13 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Project.class)
     @JoinColumn(name="pid", referencedColumnName="id")
     private Project project;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "tasks")
     private Set<Employee> employees;
 }

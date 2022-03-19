@@ -1,6 +1,7 @@
 package com.example.thesis.entities;
 
 import com.example.thesis.keys.LeavesPK;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,11 +23,13 @@ public class Leaves {
     @Id
     private Long typeid;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
+    @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Leave_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")

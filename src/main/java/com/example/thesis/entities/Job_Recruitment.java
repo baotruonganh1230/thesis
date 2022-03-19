@@ -36,11 +36,13 @@ public class Job_Recruitment {
 
     private Integer quantity;
 
+    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="hiring_manager_id", referencedColumnName="id")
     private Employee employee;
 
+    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade=CascadeType.ALL, targetEntity = Department.class)
     @JoinColumn(name = "department_id", referencedColumnName="id")
