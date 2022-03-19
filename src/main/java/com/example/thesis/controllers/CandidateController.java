@@ -16,7 +16,7 @@ public class CandidateController {
     private final CandidateService candidateService;
 
     @GetMapping("candidates")
-    public ResponseEntity<?> getCandidates(@RequestParam Long jobRecruitmentId) {
+    public ResponseEntity<?> getCandidates(@RequestParam(required=false) Long jobRecruitmentId) {
         return new ResponseEntity<>(
                 new Candidates(candidateService.getCandidatesByJob_RecruitmentId(jobRecruitmentId)),
                 HttpStatus.OK);
