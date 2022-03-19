@@ -3,11 +3,13 @@ package com.example.thesis.entities;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,15 +19,16 @@ public class Attendance implements Serializable {
     @Id
     private Long eid;
 
+    @Fetch(FetchMode.JOIN)
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    private LocalDate day;
-
-    private LocalTime time_in;
-    private LocalTime time_out;
-
-    private String deviceId;
+    @Fetch(FetchMode.JOIN)
+    @OneToMany(
+            mappedBy = "attendance",
+            cascade = CascadeType.ALL
+    )
+    private List<Checkin> checkins =  new ArrayList<>();
 }

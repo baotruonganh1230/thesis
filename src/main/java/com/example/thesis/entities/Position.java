@@ -28,6 +28,8 @@ public class Position {
 
     private String description;
 
+    private String note;
+
     @OneToOne(
             mappedBy = "position",
             cascade = CascadeType.ALL

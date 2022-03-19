@@ -23,18 +23,35 @@ public class Payment implements Serializable {
     private Employee employee;
 
     @Column(precision = 16, scale = 2)
-    private BigDecimal personal_tax;
+    private BigDecimal basicSalary;
 
     @Column(precision = 16, scale = 2)
-    private BigDecimal derived_salary;
+    private BigDecimal derivedSalary;
+
+    @Column(precision = 16, scale = 2)
+    private BigDecimal totalBonus;
+
+    @Column(precision = 16, scale = 2)
+    private BigDecimal mandatoryInsurance;
+
+    @Column(precision = 16, scale = 2)
+    private BigDecimal taxableIncome;
+
+    @Column(precision = 16, scale = 2)
+    private BigDecimal personalIncomeTax;
+
+    @Column(precision = 16, scale = 2)
+    private BigDecimal netIncome;
 
     private LocalDate payment_date;
 
-    @Column(precision = 16, scale = 2)
-    private BigDecimal other_income;
+    private String actualDay;
 
-    @Column(precision = 16, scale = 2)
-    private BigDecimal mandatory_insurance;
+    private String standardDay;
+
+    private String paidLeave;
+
+    private String unpaidLeave;
 
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Payroll.class)
     @JoinColumn(name="payroll_id", referencedColumnName="id")

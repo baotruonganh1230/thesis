@@ -1,6 +1,7 @@
 package com.example.thesis.controllers;
 
 import com.example.thesis.config.JWTTokenHelper;
+import com.example.thesis.entities.Account;
 import com.example.thesis.requests.AuthenticationRequest;
 import com.example.thesis.responses.LoginResponse;
 import com.example.thesis.services.AccountService;
@@ -18,9 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin
 public class AuthenticationController {
 
     @Autowired
@@ -44,6 +45,9 @@ public class AuthenticationController {
 
         LoginResponse loginResponse=new LoginResponse();
         loginResponse.setToken(jwtToken);
+        Account account = accountService.findByUsername(authenticationRequest.getUsername());
+        loginResponse.setEid(account.getEid());
+        loginResponse.setRoleid(account.getRoleid());
 
         Cookie cookie = new Cookie("jwt_token", jwtToken);
         cookie.setMaxAge(5 * 60); // expires in 5 minutes

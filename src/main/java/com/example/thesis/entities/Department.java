@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,12 @@ public class Department {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
     private Department headOfUnit;
+
+    @OneToMany(
+            mappedBy = "department",
+            cascade = CascadeType.ALL
+    )
+    private List<Job_Recruitment> job_recruitments = new ArrayList<>();
 
     @OneToOne(
             mappedBy = "department",

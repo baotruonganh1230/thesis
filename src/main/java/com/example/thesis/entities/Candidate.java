@@ -2,9 +2,11 @@ package com.example.thesis.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,10 +22,16 @@ public class Candidate {
     @JoinColumn(name = "cv_file_id", referencedColumnName="id")
     private Candidate_CV candidate_cv;
 
+    private LocalDate appliedDate;
+
     private String email;
 
-    @ManyToMany(mappedBy = "candidates")
-    private Set<Job_Recruitment> job_recruitments;
+    private String contact;
+
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(cascade=CascadeType.ALL, targetEntity = Job_Recruitment.class)
+    @JoinColumn(referencedColumnName="id")
+    private Job_Recruitment job_recruitment;
 
     public Candidate() {
     }

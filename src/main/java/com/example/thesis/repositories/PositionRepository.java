@@ -11,7 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PositionRepository extends JpaRepository<Position, Long> {
     @Transactional
     @Modifying
-    @Query(value = "update Position p set p.salary_group = ?2, where p.id = ?1", nativeQuery = true)
+    @Query(value = "update Position p set p.salary_group = ?2 where p.id = ?1", nativeQuery = true)
     void setSalaryGroupById(Long id, Integer salaryGroup);
 
+    @Transactional
+    @Modifying
+    @Query(value = "update Position p set p.title = ?2, p.description = ?3, p.note = ?4 where p.id = ?1", nativeQuery = true)
+    void setPositionById(Long id, String title, String description, String note);
 }

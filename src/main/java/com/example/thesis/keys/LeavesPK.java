@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class LeavesPK implements Serializable {
+    private Long id;
     private Long eid;
     private Long typeid;
 
@@ -15,12 +16,12 @@ public class LeavesPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LeavesPK leavesPK = (LeavesPK) o;
-        return eid.equals(leavesPK.eid) &&
+        return id.equals(leavesPK.id) && eid.equals(leavesPK.eid) &&
                 typeid.equals(leavesPK.typeid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(eid, typeid);
+        return Objects.hash(id, eid, typeid);
     }
 }

@@ -13,6 +13,10 @@ import java.time.LocalDate;
 @IdClass(LeavesPK.class)
 public class Leaves {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Id
     private Long eid;
 
     @Id
@@ -32,6 +36,9 @@ public class Leaves {
 
     private LocalDate to_date;
 
-    @Lob
-    private String description;
+    private LocalDate application_date;
+
+    private Integer total;
+
+    private Integer status;
 }

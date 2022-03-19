@@ -9,8 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
-    private String token;
-    private Long eid;
-    private Long roleid;
+public class PositionResponse {
+    private Long id;
+    private String title;
+    private String description;
+    private String note;
 }

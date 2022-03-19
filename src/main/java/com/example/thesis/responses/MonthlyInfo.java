@@ -9,8 +9,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
-    private String token;
-    private Long eid;
-    private Long roleid;
+public class MonthlyInfo {
+    private String actualDay;
+
+    private String standardDay;
+
+    private String paidLeave;
+
+    private String unpaidLeave;
 }
