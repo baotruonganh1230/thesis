@@ -24,26 +24,23 @@ public class AccountController {
         return new ResponseEntity<>(acccountService.getAccountResponses(), HttpStatus.OK);
     }
 
-    @GetMapping("account/{eid}/{roleid}")
-    public ResponseEntity<?> getAccount(@PathVariable Long eid, @PathVariable Long roleid) {
-        return new ResponseEntity<>(acccountService.getAccountByEidAndRoleid(eid, roleid), HttpStatus.OK);
+    @GetMapping("account/{id}")
+    public ResponseEntity<?> getAccount(@PathVariable Long id) {
+        return new ResponseEntity<>(acccountService.getAccountById(id), HttpStatus.OK);
     }
 
-    @PutMapping("account/{eid}/{roleid}")
-    public ResponseEntity<?> updateAccount(@PathVariable Long eid,
-                                           @PathVariable Long roleid,
+    @PutMapping("account/{id}")
+    public ResponseEntity<?> updateAccount(@PathVariable Long id,
                                            @RequestBody Account account) {
         account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        acccountService.updateAccountByEidAndRoleid(eid, roleid, account);
+        acccountService.updateAccountById(id, account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("account/{eid}/{roleid}")
-    public ResponseEntity<?> insertAccount(@PathVariable Long eid,
-                                           @PathVariable Long roleid,
-                                           @RequestBody Account account) {
+    @PostMapping("account")
+    public ResponseEntity<?> insertAccount(@RequestBody Account account) {
         account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        acccountService.insertAccountByEidAndRoleid(eid, roleid, account);
+        acccountService.insertAccount(account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -2,7 +2,6 @@ package com.example.thesis.repositories;
 
 import com.example.thesis.entities.Account;
 import com.example.thesis.entities.AccountStatus;
-import com.example.thesis.keys.AccountPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,11 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface AccountRepository extends JpaRepository<Account, AccountPK> {
+public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Account findByUsername(String username);
-
-    Account findByEidAndRoleid(Long eid, Long roleid);
 
     @Transactional
     @Modifying
@@ -25,21 +22,13 @@ public interface AccountRepository extends JpaRepository<Account, AccountPK> {
 
     @Transactional
     @Modifying
-    @Query("update Account a set a.eid = ?3, a.roleid = ?4, a.password = ?5, a.status = ?6, a.username = ?7 where a.eid = ?1 and a.roleid = ?2")
-    int setAccountByEidAndRoleid(Long eid,
-                                   Long roleid,
+    @Query(value = "update Account a set a.eid = ?2, a.roleid = ?3, a.password = ?4, a.status = ?5, a.username = ?6 where a.id = ?1", nativeQuery = true)
+    int setAccountById(Long id,
                                    Long newEid,
-                                   Long roleId,
+                                   Long newRoleId,
                                    String newPassword,
                                    AccountStatus newStatus,
                                    String newUsername);
 
-    @Transactional
-    @Modifying
-    @Query(value = "insert into Account (eid, roleid, password, status, username) values (?1, ?2, ?3, ?4, ?5)", nativeQuery = true)
-    void insertAccountByEidAndRoleid(Long newEid,
-                                 Long roleId,
-                                 String newPassword,
-                                 AccountStatus newStatus,
-                                 String newUsername);
+    Account getByid(Long id);
 }

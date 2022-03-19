@@ -115,13 +115,9 @@ public class DepartmentService {
 
     }
 
-    public void insertDepartmentById(Long id, DepartmentRequest departmentRequest) {
-        if (repository.existsById(id)) {
-            throw new IllegalStateException("Department already exists " + id);
-        }
+    public void insertDepartmentById(DepartmentRequest departmentRequest) {
 
-        repository.insertDepartmentById(id,
-                departmentRequest.getLocation(),
+        repository.insertDepartmentById(departmentRequest.getLocation(),
                 departmentRequest.getType(),
                 departmentRequest.getName(),
                 departmentRequest.getPeopleNumber(),
@@ -130,7 +126,7 @@ public class DepartmentService {
 
         if (departmentRequest.getSubUnits() != null) {
             for (DepartmentRequest subDepartment : departmentRequest.getSubUnits()) {
-                insertDepartmentById(subDepartment.getId(), subDepartment);
+                insertDepartmentById(subDepartment);
                 repository.setHeadOfUnit(subDepartment.getId(), departmentRequest.getId());
             }
         }

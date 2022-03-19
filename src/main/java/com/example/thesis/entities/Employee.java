@@ -59,6 +59,22 @@ public class Employee {
         this.date_of_birth = date_of_birth;
     }
 
+    public Employee(String first_name, String last_name, String email, String permanent_address, String temporary_address, String phone, BigDecimal gross_salary, LocalDate employed_date, String sex, LocalDate date_of_birth, String pit, String avatar, Position position) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.email = email;
+        this.permanent_address = permanent_address;
+        this.temporary_address = temporary_address;
+        this.phone = phone;
+        this.gross_salary = gross_salary;
+        this.employed_date = employed_date;
+        this.sex = sex;
+        this.date_of_birth = date_of_birth;
+        this.pit = pit;
+        this.avatar = avatar;
+        this.position = position;
+    }
+
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL

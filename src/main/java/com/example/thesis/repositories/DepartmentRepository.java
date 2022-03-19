@@ -26,6 +26,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "insert into Department (id, location, type, name, people_number, description, head_of_unit_id) values (?1, ?2, ?3, ?4, ?5, ?6, ?7)", nativeQuery = true)
-    int insertDepartmentById(Long id,String location,String type,String name,Integer peopleNumber,String description,Long headOfUnitId);
+    @Query(value = "insert into Department (location, type, name, people_number, description, head_of_unit_id) values (?1, ?2, ?3, ?4, ?5, ?6)", nativeQuery = true)
+    int insertDepartmentById(String location,String type,String name,Integer peopleNumber,String description,Long headOfUnitId);
 }

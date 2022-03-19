@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class Attendance implements Serializable {
     @Id
     private Long eid;
 
+    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)

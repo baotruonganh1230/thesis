@@ -49,9 +49,8 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("employee/{id}")
-    public ResponseEntity<?> insertEmployee(@PathVariable Long id,
-                                            @RequestParam("avatar") MultipartFile file,
+    @PostMapping("employee")
+    public ResponseEntity<?> insertEmployee(@RequestParam("avatar") MultipartFile file,
                                             @RequestParam("data") String employeeRequestString) {
         ObjectMapper mapper = new ObjectMapper();
         EmployeeRequest employeeRequest = null;
@@ -60,21 +59,16 @@ public class EmployeeController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        employeeService.insertEmployeeById(id, file, employeeRequest);
+        employeeService.insertEmployeeById(file, employeeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("upload")
     public String uploadFile() throws IOException {
-//        googleDriveService.uploadFile();
         File originalFile = new File("C:\\Users\\baoatruong\\Downloads\\2925.png");
         com.google.api.services.drive.model.File uploadedFile = googleDriveService.upLoadFile(originalFile.getName(), originalFile.getAbsolutePath(), "image/png");
         return uploadedFile.toPrettyString();
-//        return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
+
     }
-//
-//    @GetMapping("employee/{id}")
-//    public ResponseEntity<?> getEmployee(@PathVariable Long id) {
-//        return new ResponseEntity<>(employeeService.getEmployee(id), HttpStatus.OK);
-//    }
+
 }

@@ -4,7 +4,7 @@ jwt:
   auth:
     app: Hrms-App
     secret_key: thesecretreveal#Abc1230g
-    expires_in: 300
+    expires_in: 86400
 google:
   service_account_email: hrms-drive@hrms-drive.iam.gserviceaccount.com
   application_name: hrms drive

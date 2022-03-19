@@ -51,7 +51,7 @@ public class PositionService {
                 position.getNote());
     }
 
-    public void insertPositionById(Long id, Position position) {
+    public void insertPositionById(Position position) {
         repository.save(position);
     }
 }

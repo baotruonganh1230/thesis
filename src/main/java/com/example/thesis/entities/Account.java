@@ -1,6 +1,7 @@
 package com.example.thesis.entities;
 
-import com.example.thesis.keys.AccountPK;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,21 +15,19 @@ import java.util.Collections;
 @Getter
 @Setter
 @Entity
-@IdClass(AccountPK.class)
 @NoArgsConstructor
+@AllArgsConstructor
 public class Account implements UserDetails {
     @Id
-    private Long eid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    private Long roleid;
-
-    @MapsId
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
-    @MapsId
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Role.class)
     @JoinColumn(name="roleid", referencedColumnName="id")
     private Role role;
@@ -40,9 +39,7 @@ public class Account implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private AccountStatus status;
 
-    public Account(Long eid, Long roleid, Employee employee, Role role, String username, String password, AccountStatus status) {
-        this.eid = eid;
-        this.roleid = roleid;
+    public Account(Employee employee, Role role, String username, String password, AccountStatus status) {
         this.employee = employee;
         this.role = role;
         this.username = username;

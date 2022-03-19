@@ -31,10 +31,9 @@ public class PositionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("position/{id}")
-    public ResponseEntity<?> insertJob(@PathVariable Long id,
-                                       @RequestBody Position position) {
-        positionService.insertPositionById(id, position);
+    @PostMapping("position")
+    public ResponseEntity<?> insertJob(@RequestBody Position position) {
+        positionService.insertPositionById(position);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -57,8 +57,6 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
             Role savedRole = roleService.save(new Role("USER", "User role"));
 
             accountService.save(new Account(
-                    savedEmployee.getId(),
-                    savedRole.getId(),
                     savedEmployee,
                     savedRole,
                     "anhbao1230",

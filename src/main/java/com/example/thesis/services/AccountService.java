@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,9 +66,8 @@ public class AccountService implements UserDetailsService {
 
         Lists.newArrayList(accountRepository.findAll()).forEach((Account account) -> {
             AccountResponse accountResponse = new AccountResponse(
-                    account.getEid(),
+                    account.getId(),
                     account.getUsername(),
-                    account.getRoleid(),
                     account.getPassword(),
                     account.getStatus().toString());
 
@@ -79,38 +77,32 @@ public class AccountService implements UserDetailsService {
         return accountResponses;
     }
 
-    public AccountResponse getAccountByEidAndRoleid(Long eid, Long roleid) {
-        Account account = accountRepository.findByEidAndRoleid(eid, roleid);
+    public AccountResponse getAccountById(Long id) {
+        Account account = accountRepository.getByid(id);
         AccountResponse accountResponse = new AccountResponse(
-                account.getEid(),
+                account.getId(),
                 account.getUsername(),
-                account.getRoleid(),
                 account.getPassword(),
                 account.getStatus().toString());
         return accountResponse;
     }
 
-    public int updateAccountByEidAndRoleid(Long eid, Long roleid, Account account) {
-        Account oldAccount = accountRepository.findByEidAndRoleid(eid, roleid);
+    public int updateAccountById(Long id, Account account) {
+        Account oldAccount = accountRepository.getByid(id);
         if (oldAccount == null) {
             throw new DataReadException("There is no account with that eid and roleid");
         }
-        return accountRepository.setAccountByEidAndRoleid(
-                eid,
-                roleid,
-                account.getEid(),
-                account.getRoleid(),
+        return accountRepository.setAccountById(
+                id,
+                account.getEmployee().getId(),
+                account.getRole().getId(),
                 account.getPassword(),
                 account.getStatus(),
                 account.getUsername());
 
     }
 
-    public void insertAccountByEidAndRoleid(Long eid, Long roleid, Account account) {
-        Account oldAccount = accountRepository.findByEidAndRoleid(eid, roleid);
-        if (oldAccount != null) {
-            throw new EntityExistsException("Key already exists!");
-        }
+    public void insertAccount(Account account) {
         accountRepository.save(account);
     }
 

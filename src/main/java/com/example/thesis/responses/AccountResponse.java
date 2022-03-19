@@ -8,9 +8,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class AccountResponse {
-    private Long eid;
+    private Long id;
     private String username;
-    private Long roleid;
     private String password;
     private String accountStatus;
 }

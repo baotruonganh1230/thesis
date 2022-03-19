@@ -135,12 +135,9 @@ public class EmployeeService {
 
         } else if (employeeRequest.getAccountDetail() != null) {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
-                accountService.insertAccountByEidAndRoleid(employeeRequest.getAccountDetail().getEmployeeId(),
-                        employeeRequest.getAccountDetail().getRoleId(),
-                        employeeRequest.getAccountDetail().getNewAccount());
+                accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
             } else {
-                accountService.updateAccountByEidAndRoleid(id,
-                        employeeRequest.getAccountDetail().getRoleId(),
+                accountService.updateAccountById(employeeRequest.getAccountDetail().getNewAccount().getId(),
                         employeeRequest.getAccountDetail().getNewAccount());
             }
         } else if (employeeRequest.getJobDetail() != null) {
@@ -180,10 +177,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public void insertEmployeeById(Long id, MultipartFile file, EmployeeRequest employeeRequest) {
-        if (!employeeRepository.existsById(id)) {
-            throw new IllegalStateException("There is no employee with that id");
-        }
+    public void insertEmployeeById(MultipartFile file, EmployeeRequest employeeRequest) {
         File filetoUpload = convertMultiPartFiletoFile(file);
         Tika tika = new Tika();
         String mimeType = null;
@@ -200,30 +194,31 @@ public class EmployeeService {
             throw new IllegalStateException("Cannot delete file!");
         }
 
-        employeeRepository.insertEmployeeById(id,
-                employeeRequest.getPersonalDetail().getDateOfBirth(),
-                employeeRequest.getPersonalDetail().getEmail(),
-                employeeRequest.getJobDetail().getJoinDate(),
-                employeeRequest.getPersonalDetail().getFirstName(),
-                employeeRequest.getJobDetail().getSalary(),
-                upLoadedFile.getWebContentLink(),
-                employeeRequest.getPersonalDetail().getLastName(),
-                employeeRequest.getPersonalDetail().getPermanentAddress().toString(),
-                employeeRequest.getPersonalDetail().getPhone(),
-                employeeRequest.getPersonalDetail().getSex(),
-                employeeRequest.getPersonalDetail().getTemporaryAddress().toString(),
-                employeeRequest.getJobDetail().getPit(),
-                employeeRequest.getJobDetail().getJobId()
+        Employee savedEmployee = employeeRepository.save(
+                new Employee(employeeRequest.getPersonalDetail().getFirstName(),
+                        employeeRequest.getPersonalDetail().getLastName(),
+                        employeeRequest.getPersonalDetail().getEmail(),
+                        employeeRequest.getPersonalDetail().getPermanentAddress().toString(),
+                        employeeRequest.getPersonalDetail().getTemporaryAddress().toString(),
+                        employeeRequest.getPersonalDetail().getPhone(),
+                        employeeRequest.getJobDetail().getSalary(),
+                        employeeRequest.getJobDetail().getJoinDate(),
+                        employeeRequest.getPersonalDetail().getSex(),
+                        employeeRequest.getPersonalDetail().getDateOfBirth(),
+                        employeeRequest.getJobDetail().getPit(),
+                        upLoadedFile.getWebContentLink(),
+                        positionRepository.getById(employeeRequest.getJobDetail().getJobId())
+                )
         );
 
         positionRepository.setSalaryGroupById(employeeRequest.getJobDetail().getJobId(),
                 employeeRequest.getJobDetail().getSalaryGroup());
-        works_inRepository.save(new Works_In(id, employeeRepository.getById(id),
+        works_inRepository.save(new Works_In(savedEmployee.getId(), savedEmployee,
                 departmentRepository.getById(employeeRequest.getJobDetail().getDepartmentId())));
         for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {
             Bonus_List bonus_list = new Bonus_List(bonus.getId(), bonus.getBonusName(),
                     bonus.getBonusAmount(),
-                    employeeRepository.getById(id));
+                    employeeRepository.getById(savedEmployee.getId()));
             bonus_listRepository.save(bonus_list);
         }
 
@@ -233,9 +228,9 @@ public class EmployeeService {
         insuranceRepository.save(
                 new Insurance(
                         employeeRequest.getInsuranceDetail().getId(),
-                        id,
+                        savedEmployee.getId(),
                         insurance_type.getId(),
-                        employeeRepository.getById(id),
+                        savedEmployee,
                         insurance_type,
                         employeeRequest.getInsuranceDetail().getInsuranceCommon().getFrom_date(),
                         employeeRequest.getInsuranceDetail().getInsuranceCommon().getTo_date(),
@@ -245,14 +240,11 @@ public class EmployeeService {
                         employeeRequest.getInsuranceDetail().getKcbId()));
 
         if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
-            accountService.insertAccountByEidAndRoleid(employeeRequest.getAccountDetail().getEmployeeId(),
-                    employeeRequest.getAccountDetail().getRoleId(),
-                    employeeRequest.getAccountDetail().getNewAccount());
+            accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
         } else {
             accountService.save(
-                    new Account(id,
-                            employeeRequest.getAccountDetail().getRoleId(),
-                            employeeRepository.getById(id),
+                    new Account(employeeRequest.getAccountDetail().getNewAccount().getId(),
+                            employeeRepository.getById(savedEmployee.getId()),
                             roleRepository.getById(employeeRequest.getAccountDetail().getRoleId()),
                             employeeRequest.getAccountDetail().getNewAccount().getUsername(),
                             employeeRequest.getAccountDetail().getNewAccount().getPassword(),

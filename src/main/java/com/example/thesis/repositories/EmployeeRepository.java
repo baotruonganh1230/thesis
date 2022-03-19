@@ -28,25 +28,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     int setEmployeeJobById(Long id, LocalDate employed_date,
                         BigDecimal gross_salary, String pit, Long position_id);
 
-    @Transactional
-    @Modifying
-    @Query(value = "insert into Employee e (id,\n" +
-            "date_of_birth,\n" +
-            "email,\n" +
-            "employed_date,\n" +
-            "first_name,\n" +
-            "gross_salary,\n" +
-            "avatar,\n" +
-            "last_name,\n" +
-            "permanent_address,\n" +
-            "phone,\n" +
-            "sex,\n" +
-            "temporary_address,\n" +
-            "pit,\n" +
-            "position_id) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)", nativeQuery = true)
-    int insertEmployeeById(Long id, LocalDate date_of_birth, String email, LocalDate employed_date, String first_name,
-                           BigDecimal gross_salary, String avatar, String last_name, String permanent_address,
-                           String phone, String sex, String temporary_address, String pit, Long position_id);
-
 
 }

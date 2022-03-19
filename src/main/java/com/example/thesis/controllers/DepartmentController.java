@@ -33,10 +33,9 @@ public class DepartmentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("department/{id}")
-    public ResponseEntity<?> insertDepartment(@PathVariable Long id,
-                                           @RequestBody DepartmentRequest departmentRequest) {
-        departmentService.insertDepartmentById(id, departmentRequest);
+    @PostMapping("department")
+    public ResponseEntity<?> insertDepartment(@RequestBody DepartmentRequest departmentRequest) {
+        departmentService.insertDepartmentById(departmentRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

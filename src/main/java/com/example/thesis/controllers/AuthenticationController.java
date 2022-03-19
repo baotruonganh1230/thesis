@@ -46,11 +46,10 @@ public class AuthenticationController {
         LoginResponse loginResponse=new LoginResponse();
         loginResponse.setToken(jwtToken);
         Account account = accountService.findByUsername(authenticationRequest.getUsername());
-        loginResponse.setEid(account.getEid());
-        loginResponse.setRoleid(account.getRoleid());
+        loginResponse.setId(account.getId());
 
         Cookie cookie = new Cookie("jwt_token", jwtToken);
-        cookie.setMaxAge(5 * 60); // expires in 5 minutes
+        cookie.setMaxAge(1440 * 60);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         cookie.setPath("/"); // global cookie accessible every where
