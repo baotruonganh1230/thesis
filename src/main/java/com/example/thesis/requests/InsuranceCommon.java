@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InsuranceCommon {
+    private Long id;
+
     private LocalDate from_date;
 
     private LocalDate to_date;
@@ -20,8 +22,6 @@ public class InsuranceCommon {
     private LocalDate issue_date;
 
     private String number;
-
-    private String type;
 
     public void setFrom_date(String from_dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");

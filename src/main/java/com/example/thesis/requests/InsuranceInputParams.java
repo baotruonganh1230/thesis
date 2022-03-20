@@ -10,8 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InsuranceInputParams {
-    private Long id;
-    private InsuranceCommon insuranceCommon;
+    private InsuranceCommon social;
+    private InsuranceCommon unemployment;
+    private InsuranceCommon health;
     private Long cityId;
     private Long kcbId;
 }

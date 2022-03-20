@@ -1,5 +1,6 @@
-package com.example.thesis.responses;
+package com.example.thesis.requests;
 
+import com.example.thesis.entities.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountResponse {
-    private Long id;
+public class AccountRequest {
     private Long eid;
     private Long roleid;
     private String username;
     private String password;
-    private String status;
+    private AccountStatus status;
 }

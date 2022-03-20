@@ -38,4 +38,10 @@ public class DepartmentController {
         departmentService.insertDepartmentById(departmentRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("department/{id}")
+    public ResponseEntity<?> deleteDepartment(@PathVariable Long id) {
+        departmentService.deleteDepartmentById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

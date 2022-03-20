@@ -1,12 +1,10 @@
 package com.example.thesis.responses;
 
+import com.example.thesis.requests.InsuranceInputParams;
+import com.example.thesis.requests.JobDetailInputParams;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,32 +12,9 @@ import java.util.List;
 public class EmployeeResponse {
     private Long id;
 
-    private String avatar;
+    private PersonalDetailOutputParams personalDetail;
 
-    private String firstName;
+    private JobDetailInputParams jobDetail;
 
-    private String lastName;
-
-    private String email;
-
-    private String permanentAddress;
-
-    private String temporaryAddress;
-
-    private String phone;
-
-    private String departmentName;
-
-    private String jobTitle;
-
-    private LocalDate dateOfBirth;
-
-    private String pit;
-
-    private Integer salaryGroup;
-
-    private BigDecimal gross_salary;
-
-    private List<Bonus> bonus_lists;
-
+    private InsuranceInputParams insuranceDetail;
 }

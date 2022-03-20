@@ -2,9 +2,12 @@ package com.example.thesis.services;
 
 import com.example.thesis.entities.*;
 import com.example.thesis.repositories.*;
-import com.example.thesis.requests.EmployeeRequest;
+import com.example.thesis.requests.*;
 import com.example.thesis.responses.Bonus;
 import com.example.thesis.responses.EmployeeResponse;
+import com.example.thesis.responses.PersonalDetailOutputParams;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import org.apache.tika.Tika;
@@ -34,29 +37,87 @@ public class EmployeeService {
     private final Insurance_TypeRepository insurance_typeRepository;
     private final RoleRepository roleRepository;
 
+    private InsuranceInputParams getInsuranceInputParams(Employee employee) {
+        InsuranceInputParams insuranceInputParams = new InsuranceInputParams();
+        for (Insurance insurance : employee.getInsurances()) {
+            if (insurance.getType().getName().equalsIgnoreCase("health")) {
+                insuranceInputParams.setHealth(
+                        new InsuranceCommon(
+                                insurance.getId(),
+                                insurance.getFrom_date(),
+                                insurance.getTo_date(),
+                                insurance.getIssue_date(),
+                                insurance.getNumber()
+                        )
+                );
+                insuranceInputParams.setCityId(insurance.getCityId());
+                insuranceInputParams.setKcbId(insurance.getKcbId());
+            } else if (insurance.getType().getName().equalsIgnoreCase("social")) {
+                insuranceInputParams.setSocial(
+                        new InsuranceCommon(
+                                insurance.getId(),
+                                insurance.getFrom_date(),
+                                insurance.getTo_date(),
+                                insurance.getIssue_date(),
+                                insurance.getNumber()
+                        )
+                );
+            } else {
+                insuranceInputParams.setUnemployment(
+                        new InsuranceCommon(
+                                insurance.getId(),
+                                insurance.getFrom_date(),
+                                insurance.getTo_date(),
+                                insurance.getIssue_date(),
+                                insurance.getNumber()
+                        )
+                );
+            }
+        }
+        return insuranceInputParams;
+    }
+
+
     public List<EmployeeResponse> getEmployees() {
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
 
         Lists.newArrayList(employeeRepository.findAll()).forEach((Employee employee) -> {
-            EmployeeResponse employeeResponse = new EmployeeResponse(
-                    employee.getId(),
-                    employee.getAvatar(),
-                    employee.getFirst_name(),
-                    employee.getLast_name(),
-                    employee.getEmail(),
-                    employee.getPermanent_address(),
-                    employee.getTemporary_address(),
-                    employee.getPhone(),
-                    employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getName(),
-                    employee.getPosition() == null ? null : employee.getPosition().getName(),
-                    employee.getDate_of_birth(),
-                    employee.getPit(),
-                    employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
-                    employee.getGross_salary(),
-                    employee.getBonus_lists().stream().map((Bonus_List bonus_list) -> {
-                        return new Bonus(bonus_list.getId(), bonus_list.getName(), bonus_list.getAmount());
-                    }).collect(Collectors.toList())
-            );
+            EmployeeResponse employeeResponse = null;
+            try {
+                employeeResponse = new EmployeeResponse(
+                        employee.getId(),
+                        new PersonalDetailOutputParams(
+                                employee.getAvatar(),
+                                employee.getFirst_name(),
+                                employee.getLast_name(),
+                                employee.getEmail(),
+                                employee.getPhone(),
+                                employee.getSex(),
+                                employee.getDate_of_birth(),
+                                mapper.readValue(employee.getPermanent_address(), Address.class),
+                                mapper.readValue(employee.getTemporary_address(), Address.class)
+                        ),
+                        new JobDetailInputParams(
+                                employee.getEmployed_date(),
+                                employee.getPosition() == null ? null : employee.getPosition().getId(),
+                                employee.getPit(),
+                                employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getId(),
+                                employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
+                                employee.getGross_salary(),
+                                employee.getBonus_lists() == null ? null : employee.getBonus_lists()
+                                        .stream()
+                                        .map(bonus_list -> new Bonus(
+                                                bonus_list.getId(),
+                                                bonus_list.getName(),
+                                                bonus_list.getAmount()
+                                        )).collect(Collectors.toList())
+                        ),
+                        getInsuranceInputParams(employee)
+                );
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
 
             employeeResponses.add(employeeResponse);
         });
@@ -78,26 +139,44 @@ public class EmployeeService {
         if (!employeeRepository.existsById(id)) {
             throw new EntityNotFoundException("Cannot find employee with id " + id);
         }
+        ObjectMapper mapper = new ObjectMapper();
         Employee employee = employeeRepository.getById(id);
-        return new EmployeeResponse(
-                employee.getId(),
-                employee.getAvatar(),
-                employee.getFirst_name(),
-                employee.getLast_name(),
-                employee.getEmail(),
-                employee.getPermanent_address(),
-                employee.getTemporary_address(),
-                employee.getPhone(),
-                employee.getWorks_in().getDepartment().getName(),
-                employee.getPosition().getName(),
-                employee.getDate_of_birth(),
-                employee.getPit(),
-                employee.getPosition().getSalaryGroup(),
-                employee.getGross_salary(),
-                employee.getBonus_lists().stream().map((Bonus_List bonus_list) -> {
-                    return new Bonus(bonus_list.getId(), bonus_list.getName(), bonus_list.getAmount());
-                }).collect(Collectors.toList())
-        );
+
+        try {
+            return new EmployeeResponse(
+                    employee.getId(),
+                    new PersonalDetailOutputParams(
+                            employee.getAvatar(),
+                            employee.getFirst_name(),
+                            employee.getLast_name(),
+                            employee.getEmail(),
+                            employee.getPhone(),
+                            employee.getSex(),
+                            employee.getDate_of_birth(),
+                            mapper.readValue(employee.getPermanent_address(), Address.class),
+                            mapper.readValue(employee.getTemporary_address(), Address.class)
+                    ),
+                    new JobDetailInputParams(
+                            employee.getEmployed_date(),
+                            employee.getPosition() == null ? null : employee.getPosition().getId(),
+                            employee.getPit(),
+                            employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getId(),
+                            employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
+                            employee.getGross_salary(),
+                            employee.getBonus_lists() == null ? null : employee.getBonus_lists()
+                                    .stream()
+                                    .map(bonus_list -> new Bonus(
+                                            bonus_list.getId(),
+                                            bonus_list.getName(),
+                                            bonus_list.getAmount()
+                                    )).collect(Collectors.toList())
+                    ),
+                    getInsuranceInputParams(employee)
+            );
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void updateEmployeeById(Long id, MultipartFile file, EmployeeRequest employeeRequest) {
@@ -137,7 +216,7 @@ public class EmployeeService {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
                 accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
             } else {
-                accountService.updateAccountById(employeeRequest.getAccountDetail().getNewAccount().getId(),
+                accountService.updateAccountById(employeeRequest.getAccountDetail().getId(),
                         employeeRequest.getAccountDetail().getNewAccount());
             }
         } else if (employeeRequest.getJobDetail() != null) {
@@ -156,20 +235,48 @@ public class EmployeeService {
                 bonus_listRepository.save(bonus_list);
             }
         } else {
-            Insurance_Type insurance_type =
-                    insurance_typeRepository
-                            .findByName(employeeRequest.getInsuranceDetail().getInsuranceCommon().getType());
+            Insurance_Type insurance_typeSocial = insurance_typeRepository.findByName("social");
             insuranceRepository.save(
                     new Insurance(
-                            employeeRequest.getInsuranceDetail().getId(),
+                            employeeRequest.getInsuranceDetail().getSocial().getId() == null ? null : employeeRequest.getInsuranceDetail().getSocial().getId(),
                             id,
-                            insurance_type.getId(),
+                            insurance_typeSocial.getId(),
                             employeeRepository.getById(id),
-                            insurance_type,
-                            employeeRequest.getInsuranceDetail().getInsuranceCommon().getFrom_date(),
-                            employeeRequest.getInsuranceDetail().getInsuranceCommon().getTo_date(),
-                            employeeRequest.getInsuranceDetail().getInsuranceCommon().getIssue_date(),
-                            employeeRequest.getInsuranceDetail().getInsuranceCommon().getNumber(),
+                            insurance_typeSocial,
+                            employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
+                            employeeRequest.getInsuranceDetail().getSocial().getTo_date(),
+                            employeeRequest.getInsuranceDetail().getSocial().getIssue_date(),
+                            employeeRequest.getInsuranceDetail().getSocial().getNumber(),
+                            null,
+                            null));
+
+            Insurance_Type insurance_typeUnemployment = insurance_typeRepository.findByName("unemployment");
+            insuranceRepository.save(
+                    new Insurance(
+                            employeeRequest.getInsuranceDetail().getUnemployment().getId() == null ? null : employeeRequest.getInsuranceDetail().getUnemployment().getId(),
+                            id,
+                            insurance_typeUnemployment.getId(),
+                            employeeRepository.getById(id),
+                            insurance_typeUnemployment,
+                            employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
+                            employeeRequest.getInsuranceDetail().getUnemployment().getTo_date(),
+                            employeeRequest.getInsuranceDetail().getUnemployment().getIssue_date(),
+                            employeeRequest.getInsuranceDetail().getUnemployment().getNumber(),
+                            null,
+                            null));
+
+            Insurance_Type insurance_typeHealth = insurance_typeRepository.findByName("health");
+            insuranceRepository.save(
+                    new Insurance(
+                            employeeRequest.getInsuranceDetail().getHealth().getId() == null ? null : employeeRequest.getInsuranceDetail().getHealth().getId(),
+                            id,
+                            insurance_typeHealth.getId(),
+                            employeeRepository.getById(id),
+                            insurance_typeHealth,
+                            employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
+                            employeeRequest.getInsuranceDetail().getHealth().getTo_date(),
+                            employeeRequest.getInsuranceDetail().getHealth().getIssue_date(),
+                            employeeRequest.getInsuranceDetail().getHealth().getNumber(),
                             employeeRequest.getInsuranceDetail().getCityId(),
                             employeeRequest.getInsuranceDetail().getKcbId()));
         }
@@ -222,33 +329,63 @@ public class EmployeeService {
             bonus_listRepository.save(bonus_list);
         }
 
-        Insurance_Type insurance_type =
-                insurance_typeRepository
-                        .findByName(employeeRequest.getInsuranceDetail().getInsuranceCommon().getType());
+        Insurance_Type insurance_typeSocial = insurance_typeRepository.findByName("social");
         insuranceRepository.save(
                 new Insurance(
-                        employeeRequest.getInsuranceDetail().getId(),
+                        employeeRequest.getInsuranceDetail().getSocial().getId() == null ? null : employeeRequest.getInsuranceDetail().getSocial().getId(),
                         savedEmployee.getId(),
-                        insurance_type.getId(),
+                        insurance_typeSocial.getId(),
                         savedEmployee,
-                        insurance_type,
-                        employeeRequest.getInsuranceDetail().getInsuranceCommon().getFrom_date(),
-                        employeeRequest.getInsuranceDetail().getInsuranceCommon().getTo_date(),
-                        employeeRequest.getInsuranceDetail().getInsuranceCommon().getIssue_date(),
-                        employeeRequest.getInsuranceDetail().getInsuranceCommon().getNumber(),
+                        insurance_typeSocial,
+                        employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
+                        employeeRequest.getInsuranceDetail().getSocial().getTo_date(),
+                        employeeRequest.getInsuranceDetail().getSocial().getIssue_date(),
+                        employeeRequest.getInsuranceDetail().getSocial().getNumber(),
+                        null,
+                        null));
+
+        Insurance_Type insurance_typeUnemployment = insurance_typeRepository.findByName("unemployment");
+        insuranceRepository.save(
+                new Insurance(
+                        employeeRequest.getInsuranceDetail().getUnemployment().getId() == null ? null : employeeRequest.getInsuranceDetail().getUnemployment().getId(),
+                        savedEmployee.getId(),
+                        insurance_typeUnemployment.getId(),
+                        savedEmployee,
+                        insurance_typeUnemployment,
+                        employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
+                        employeeRequest.getInsuranceDetail().getUnemployment().getTo_date(),
+                        employeeRequest.getInsuranceDetail().getUnemployment().getIssue_date(),
+                        employeeRequest.getInsuranceDetail().getUnemployment().getNumber(),
+                        null,
+                        null));
+
+        Insurance_Type insurance_typeHealth = insurance_typeRepository.findByName("health");
+        insuranceRepository.save(
+                new Insurance(
+                        employeeRequest.getInsuranceDetail().getHealth().getId() == null ? null : employeeRequest.getInsuranceDetail().getHealth().getId(),
+                        savedEmployee.getId(),
+                        insurance_typeHealth.getId(),
+                        savedEmployee,
+                        insurance_typeHealth,
+                        employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
+                        employeeRequest.getInsuranceDetail().getHealth().getTo_date(),
+                        employeeRequest.getInsuranceDetail().getHealth().getIssue_date(),
+                        employeeRequest.getInsuranceDetail().getHealth().getNumber(),
                         employeeRequest.getInsuranceDetail().getCityId(),
                         employeeRequest.getInsuranceDetail().getKcbId()));
 
-        if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
-            accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
-        } else {
-            accountService.save(
-                    new Account(employeeRequest.getAccountDetail().getNewAccount().getId(),
-                            employeeRepository.getById(savedEmployee.getId()),
-                            roleRepository.getById(employeeRequest.getAccountDetail().getRoleId()),
-                            employeeRequest.getAccountDetail().getNewAccount().getUsername(),
-                            employeeRequest.getAccountDetail().getNewAccount().getPassword(),
-                            employeeRequest.getAccountDetail().getNewAccount().getStatus()));
+        if (employeeRequest.getAccountDetail() != null) {
+            if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
+                accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
+            } else {
+                accountService.save(
+                        new Account(employeeRequest.getAccountDetail().getId(),
+                                employeeRepository.getById(savedEmployee.getId()),
+                                roleRepository.getById(employeeRequest.getAccountDetail().getNewAccount().getRoleid()),
+                                employeeRequest.getAccountDetail().getNewAccount().getUsername(),
+                                employeeRequest.getAccountDetail().getNewAccount().getPassword(),
+                                employeeRequest.getAccountDetail().getNewAccount().getStatus()));
+            }
         }
     }
 

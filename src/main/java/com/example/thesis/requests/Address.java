@@ -17,11 +17,11 @@ public class Address {
 
     @Override
     public String toString() {
-        return "Address{" +
-                "cityId=" + cityId +
-                ", districtId=" + districtId +
-                ", wardId=" + wardId +
-                ", address='" + address + '\'' +
+        return "{" +
+                "\"cityId\":" + cityId.toString() +
+                ", \"districtId\":" + districtId.toString() +
+                ", \"wardId\":" + wardId.toString() +
+                ", \"address\":" + "\"" + address + "\""  +
                 '}';
     }
 }

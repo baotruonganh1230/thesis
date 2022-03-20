@@ -47,6 +47,7 @@ public class AuthenticationController {
         loginResponse.setToken(jwtToken);
         Account account = accountService.findByUsername(authenticationRequest.getUsername());
         loginResponse.setId(account.getId());
+        loginResponse.setEid((account.getEmployee() == null) ? null : account.getEmployee().getId());
 
         Cookie cookie = new Cookie("jwt_token", jwtToken);
         cookie.setMaxAge(1440 * 60);

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -36,6 +38,7 @@ public class Insurance {
     private Employee employee;
 
     @JsonIgnore
+    @Fetch(FetchMode.JOIN)
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Insurance_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")
@@ -52,5 +55,4 @@ public class Insurance {
     private Long cityId;
 
     private Long kcbId;
-
 }

@@ -2,6 +2,9 @@ package com.example.thesis.services;
 
 import com.example.thesis.entities.Account;
 import com.example.thesis.repositories.AccountRepository;
+import com.example.thesis.repositories.EmployeeRepository;
+import com.example.thesis.repositories.RoleRepository;
+import com.example.thesis.requests.AccountRequest;
 import com.example.thesis.responses.AccountResponse;
 import com.google.common.collect.Lists;
 import com.mysql.cj.exceptions.DataReadException;
@@ -25,6 +28,10 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final EmployeeRepository employeeRepository;
+
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -67,9 +74,11 @@ public class AccountService implements UserDetailsService {
         Lists.newArrayList(accountRepository.findAll()).forEach((Account account) -> {
             AccountResponse accountResponse = new AccountResponse(
                     account.getId(),
+                    account.getEmployee() == null ? null : account.getEmployee().getId(),
+                    account.getRole() == null ? null : account.getRole().getId(),
                     account.getUsername(),
                     account.getPassword(),
-                    account.getStatus().toString());
+                    account.getStatus() == null ? null : account.getStatus().toString());
 
             accountResponses.add(accountResponse);
         });
@@ -79,31 +88,39 @@ public class AccountService implements UserDetailsService {
 
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.getByid(id);
-        AccountResponse accountResponse = new AccountResponse(
+        return new AccountResponse(
                 account.getId(),
+                account.getEmployee() == null ? null : account.getEmployee().getId(),
+                account.getRole() == null ? null : account.getRole().getId(),
                 account.getUsername(),
                 account.getPassword(),
-                account.getStatus().toString());
-        return accountResponse;
+                account.getStatus() == null ? null : account.getStatus().toString());
     }
 
-    public int updateAccountById(Long id, Account account) {
+    public int updateAccountById(Long id, AccountRequest accountRequest) {
         Account oldAccount = accountRepository.getByid(id);
         if (oldAccount == null) {
-            throw new DataReadException("There is no account with that eid and roleid");
+            throw new DataReadException("There is no account with that id");
         }
         return accountRepository.setAccountById(
                 id,
-                account.getEmployee().getId(),
-                account.getRole().getId(),
-                account.getPassword(),
-                account.getStatus(),
-                account.getUsername());
-
+                accountRequest.getEid(),
+                accountRequest.getRoleid(),
+                accountRequest.getPassword(),
+                accountRequest.getStatus(),
+                accountRequest.getUsername());
     }
 
-    public void insertAccount(Account account) {
-        accountRepository.save(account);
+    public void insertAccount(AccountRequest accountRequest) {
+        accountRepository.save(
+                new Account(
+                        null,
+                        accountRequest.getEid() == null ? null : employeeRepository.getById(accountRequest.getEid()),
+                        roleRepository.getById(accountRequest.getRoleid()),
+                        accountRequest.getUsername(),
+                        accountRequest.getPassword(),
+                        accountRequest.getStatus())
+        );
     }
 
     public Long count() {

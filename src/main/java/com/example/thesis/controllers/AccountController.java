@@ -1,6 +1,6 @@
 package com.example.thesis.controllers;
 
-import com.example.thesis.entities.Account;
+import com.example.thesis.requests.AccountRequest;
 import com.example.thesis.services.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +31,16 @@ public class AccountController {
 
     @PutMapping("account/{id}")
     public ResponseEntity<?> updateAccount(@PathVariable Long id,
-                                           @RequestBody Account account) {
-        account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        acccountService.updateAccountById(id, account);
+                                           @RequestBody AccountRequest accountRequest) {
+        accountRequest.setPassword(bCryptPasswordEncoder.encode(accountRequest.getPassword()));
+        acccountService.updateAccountById(id, accountRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("account")
-    public ResponseEntity<?> insertAccount(@RequestBody Account account) {
-        account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        acccountService.insertAccount(account);
+    public ResponseEntity<?> insertAccount(@RequestBody AccountRequest accountRequest) {
+        accountRequest.setPassword(bCryptPasswordEncoder.encode(accountRequest.getPassword()));
+        acccountService.insertAccount(accountRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -116,12 +116,13 @@ public class Employee {
     )
     private Managed_By managed_by;
 
+    @Fetch(FetchMode.JOIN)
     @JsonIgnore
     @OneToMany(
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
-    private List<Insurance> insurances = new ArrayList<>();
+    private Set<Insurance> insurances = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany
