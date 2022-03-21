@@ -3,6 +3,7 @@ package com.example.thesis.entities;
 import com.example.thesis.keys.LeavesPK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @IdClass(LeavesPK.class)
 public class Leaves {
     @Id
@@ -44,4 +46,20 @@ public class Leaves {
     private Integer total;
 
     private Integer status;
+
+    @Column(columnDefinition = "TEXT")
+    private String reason;
+
+    public Leaves(Long eid, Long typeid, Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate application_date, Integer total, Integer status, String reason) {
+        this.eid = eid;
+        this.typeid = typeid;
+        this.employee = employee;
+        this.type = type;
+        this.from_date = from_date;
+        this.to_date = to_date;
+        this.application_date = application_date;
+        this.total = total;
+        this.status = status;
+        this.reason = reason;
+    }
 }

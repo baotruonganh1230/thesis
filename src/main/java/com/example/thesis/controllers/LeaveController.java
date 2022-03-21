@@ -1,5 +1,6 @@
 package com.example.thesis.controllers;
 
+import com.example.thesis.requests.LeaveRequest;
 import com.example.thesis.requests.UpdateLeaveRequest;
 import com.example.thesis.responses.LeaveEmployeeList;
 import com.example.thesis.services.LeaveService;
@@ -25,5 +26,16 @@ public class LeaveController {
     public ResponseEntity<?> updateLeaveStatus(@RequestBody UpdateLeaveRequest updateLeaveRequest) {
         leaveService.updateLeavesStatusByIds(updateLeaveRequest);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("sendRequestLeave")
+    public ResponseEntity<?> sendRequestLeave(@RequestBody LeaveRequest leaveRequest) {
+        leaveService.insertRequestLeave(leaveRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("getLeave")
+    public ResponseEntity<?> getLeave(@RequestParam Long userId) {
+        return new ResponseEntity<>(leaveService.getLeave(userId), HttpStatus.OK);
     }
 }
