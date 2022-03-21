@@ -14,7 +14,7 @@ public class DepartmentRequest {
 
     private String description;
 
-    private Long mangerOfUnitId;
+    private Long managerOfUnitId;
 
     private Long headOfUnitId;
 }

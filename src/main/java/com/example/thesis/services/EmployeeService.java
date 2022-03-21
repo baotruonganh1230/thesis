@@ -307,7 +307,7 @@ public class EmployeeService {
                         employeeRequest.getPersonalDetail().getSex(),
                         employeeRequest.getPersonalDetail().getDateOfBirth(),
                         employeeRequest.getJobDetail().getPit(),
-                        upLoadedFile.getWebContentLink(),
+                        "https://drive.google.com/thumbnail?authuser=0&sz=w320&id=" + upLoadedFile.getWebContentLink().replace("https://drive.google.com/uc?id=", "").replace("&export=download", ""),
                         positionRepository.getById(employeeRequest.getJobDetail().getJobId())
                 )
         );
