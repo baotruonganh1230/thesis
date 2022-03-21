@@ -3,10 +3,10 @@ package com.example.thesis.services;
 import com.example.thesis.entities.Attendance;
 import com.example.thesis.repositories.AttendanceRepository;
 import com.example.thesis.responses.AttendanceResponse;
+import com.example.thesis.responses.CheckinResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +48,14 @@ public class AttendanceService {
                         attendance.getEmployee().getLast_name(),
                         attendance.getEmployee().getWorks_in() == null ? null : attendance.getEmployee().getWorks_in().getDepartment().getName(),
                         attendance.getEmployee().getPosition() == null ? null : attendance.getEmployee().getPosition().getName(),
-                        new ArrayList<>(attendance.getCheckins()))).collect(Collectors.toList());
+                        attendance.getCheckins().stream().map(checkin ->
+                                new CheckinResponse(
+                                        checkin.getAttendanceId(),
+                                        checkin.getStatus(),
+                                        checkin.getDate(),
+                                        checkin.getTime_in(),
+                                        checkin.getTime_out()
+                                )
+                        ).collect(Collectors.toList()))).collect(Collectors.toList());
     }
 }

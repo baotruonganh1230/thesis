@@ -10,6 +10,7 @@ import com.mysql.cj.exceptions.DataReadException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +50,8 @@ public class Job_RecruitmentService {
                 id,
                 vacanciesInfo.getPostContent(),
                 null,
-                vacanciesInfo.getPublishedDate(),
-                vacanciesInfo.getExpiredDate(),
+                LocalDate.parse(vacanciesInfo.getPublishedDate()),
+                LocalDate.parse(vacanciesInfo.getExpiredDate()),
                 vacanciesInfo.getStatus(),
                 vacanciesInfo.getQuantity(),
                 employeeRepository.getById(vacanciesInfo.getHiringManagerId()),

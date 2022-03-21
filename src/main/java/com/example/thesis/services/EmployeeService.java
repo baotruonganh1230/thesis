@@ -2,10 +2,9 @@ package com.example.thesis.services;
 
 import com.example.thesis.entities.*;
 import com.example.thesis.repositories.*;
-import com.example.thesis.requests.*;
-import com.example.thesis.responses.Bonus;
-import com.example.thesis.responses.EmployeeResponse;
-import com.example.thesis.responses.PersonalDetailOutputParams;
+import com.example.thesis.requests.Address;
+import com.example.thesis.requests.EmployeeRequest;
+import com.example.thesis.responses.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -37,12 +36,12 @@ public class EmployeeService {
     private final Insurance_TypeRepository insurance_typeRepository;
     private final RoleRepository roleRepository;
 
-    private InsuranceInputParams getInsuranceInputParams(Employee employee) {
-        InsuranceInputParams insuranceInputParams = new InsuranceInputParams();
+    private InsuranceOutputParams getInsuranceOutputParams(Employee employee) {
+        InsuranceOutputParams insuranceOutputParams = new InsuranceOutputParams();
         for (Insurance insurance : employee.getInsurances()) {
             if (insurance.getType().getName().equalsIgnoreCase("health")) {
-                insuranceInputParams.setHealth(
-                        new InsuranceCommon(
+                insuranceOutputParams.setHealth(
+                        new InsuranceCommonResponse(
                                 insurance.getId(),
                                 insurance.getFrom_date(),
                                 insurance.getTo_date(),
@@ -50,11 +49,11 @@ public class EmployeeService {
                                 insurance.getNumber()
                         )
                 );
-                insuranceInputParams.setCityId(insurance.getCityId());
-                insuranceInputParams.setKcbId(insurance.getKcbId());
+                insuranceOutputParams.setCityId(insurance.getCityId());
+                insuranceOutputParams.setKcbId(insurance.getKcbId());
             } else if (insurance.getType().getName().equalsIgnoreCase("social")) {
-                insuranceInputParams.setSocial(
-                        new InsuranceCommon(
+                insuranceOutputParams.setSocial(
+                        new InsuranceCommonResponse(
                                 insurance.getId(),
                                 insurance.getFrom_date(),
                                 insurance.getTo_date(),
@@ -63,8 +62,8 @@ public class EmployeeService {
                         )
                 );
             } else {
-                insuranceInputParams.setUnemployment(
-                        new InsuranceCommon(
+                insuranceOutputParams.setUnemployment(
+                        new InsuranceCommonResponse(
                                 insurance.getId(),
                                 insurance.getFrom_date(),
                                 insurance.getTo_date(),
@@ -74,7 +73,7 @@ public class EmployeeService {
                 );
             }
         }
-        return insuranceInputParams;
+        return insuranceOutputParams;
     }
 
 
@@ -98,7 +97,7 @@ public class EmployeeService {
                                 mapper.readValue(employee.getPermanent_address(), Address.class),
                                 mapper.readValue(employee.getTemporary_address(), Address.class)
                         ),
-                        new JobDetailInputParams(
+                        new JobDetailOutputParams(
                                 employee.getEmployed_date(),
                                 employee.getPosition() == null ? null : employee.getPosition().getId(),
                                 employee.getPit(),
@@ -113,7 +112,7 @@ public class EmployeeService {
                                                 bonus_list.getAmount()
                                         )).collect(Collectors.toList())
                         ),
-                        getInsuranceInputParams(employee)
+                        getInsuranceOutputParams(employee)
                 );
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -156,7 +155,7 @@ public class EmployeeService {
                             mapper.readValue(employee.getPermanent_address(), Address.class),
                             mapper.readValue(employee.getTemporary_address(), Address.class)
                     ),
-                    new JobDetailInputParams(
+                    new JobDetailOutputParams(
                             employee.getEmployed_date(),
                             employee.getPosition() == null ? null : employee.getPosition().getId(),
                             employee.getPit(),
@@ -171,7 +170,7 @@ public class EmployeeService {
                                             bonus_list.getAmount()
                                     )).collect(Collectors.toList())
                     ),
-                    getInsuranceInputParams(employee)
+                    getInsuranceOutputParams(employee)
             );
         } catch (JsonProcessingException e) {
             e.printStackTrace();

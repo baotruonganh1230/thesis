@@ -1,7 +1,5 @@
 package com.example.thesis.responses;
 
-import com.example.thesis.requests.InsuranceInputParams;
-import com.example.thesis.requests.JobDetailInputParams;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +12,7 @@ public class EmployeeResponse {
 
     private PersonalDetailOutputParams personalDetail;
 
-    private JobDetailInputParams jobDetail;
+    private JobDetailOutputParams jobDetail;
 
-    private InsuranceInputParams insuranceDetail;
+    private InsuranceOutputParams insuranceDetail;
 }

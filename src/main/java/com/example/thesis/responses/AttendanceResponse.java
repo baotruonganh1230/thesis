@@ -1,6 +1,5 @@
 package com.example.thesis.responses;
 
-import com.example.thesis.entities.Checkin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +15,5 @@ public class AttendanceResponse {
     private String name;
     private String departmentName;
     private String jobTitle;
-    private List<Checkin> checkins;
+    private List<CheckinResponse> checkins;
 }

@@ -15,23 +15,33 @@ import java.time.format.DateTimeFormatter;
 public class LeaveResponse {
     private Long leaveType;
     private Integer amount;
-    private LocalDate fromDate;
-    private LocalDate toDate;
+    private String fromDate;
+    private String toDate;
     private Long userId;
     private String reason;
     private Integer status;
+
+    public LeaveResponse(Long leaveType, Integer amount, LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status) {
+        this.leaveType = leaveType;
+        this.amount = amount;
+        this.fromDate = fromDate.toString() + "'T'00:00:00.000Z";
+        this.toDate = toDate.toString() + "'T'00:00:00.000Z";
+        this.userId = userId;
+        this.reason = reason;
+        this.status = status;
+    }
 
     public void setFromDate(String fromDateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         //convert String to LocalDate
-        this.fromDate = LocalDate.parse(fromDateString, formatter);
+        this.fromDate = LocalDate.parse(fromDateString, formatter).toString();
     }
 
     public void setToDate(String toDateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         //convert String to LocalDate
-        this.toDate = LocalDate.parse(toDateString, formatter);
+        this.toDate = LocalDate.parse(toDateString, formatter).toString();
     }
 }

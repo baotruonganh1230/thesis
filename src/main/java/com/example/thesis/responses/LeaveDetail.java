@@ -18,13 +18,24 @@ public class LeaveDetail {
 
     private String departmentName;
 
-    private LocalDate applicationDate;
+    private String applicationDate;
 
-    private LocalDate fromDate;
+    private String fromDate;
 
-    private LocalDate toDate;
+    private String toDate;
 
     private Integer total;
 
     private Integer status;
+
+    public LeaveDetail(Long id, String employeeName, String departmentName, LocalDate applicationDate, LocalDate fromDate, LocalDate toDate, Integer total, Integer status) {
+        this.id = id;
+        this.employeeName = employeeName;
+        this.departmentName = departmentName;
+        this.applicationDate = applicationDate.toString() + "'T'00:00:00.000Z";
+        this.fromDate = fromDate.toString() + "'T'00:00:00.000Z";
+        this.toDate = toDate.toString() + "'T'00:00:00.000Z";
+        this.total = total;
+        this.status = status;
+    }
 }

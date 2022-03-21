@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 
 @Getter
@@ -21,14 +20,19 @@ public class PersonalDetailOutputParams {
     private String email;
     private String phone;
     private String sex;
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
     private Address permanentAddress;
     private Address temporaryAddress;
 
-    public void setDateOfBirth(String dateOfBirthString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
-        //convert String to LocalDate
-        this.dateOfBirth = LocalDate.parse(dateOfBirthString, formatter);
+    public PersonalDetailOutputParams(String avatar, String firstName, String lastName, String email, String phone, String sex, LocalDate dateOfBirth, Address permanentAddress, Address temporaryAddress) {
+        this.avatar = avatar;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.sex = sex;
+        this.dateOfBirth = dateOfBirth.toString() + "'T'00:00:00.000Z";
+        this.permanentAddress = permanentAddress;
+        this.temporaryAddress = temporaryAddress;
     }
 }
