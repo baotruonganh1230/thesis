@@ -122,7 +122,7 @@ public class DepartmentService {
         manageRepository.save(new Manage(
                 id,
                 departmentRepository.getById(id),
-                employeeRepository.getById(departmentRequest.getMangerOfUnitId())
+                employeeRepository.getById(departmentRequest.getManagerOfUnitId())
         ));
 
     }
