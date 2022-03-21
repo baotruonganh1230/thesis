@@ -204,7 +204,7 @@ public class EmployeeService {
                     employeeRequest.getPersonalDetail().getDateOfBirth(),
                     employeeRequest.getPersonalDetail().getEmail(),
                     employeeRequest.getPersonalDetail().getFirstName(),
-                    upLoadedFile.getWebContentLink(),
+                    "https://drive.google.com/thumbnail?authuser=0&sz=w320&id=" + upLoadedFile.getWebContentLink().replace("https://drive.google.com/uc?id=", "").replace("&export=download", ""),
                     employeeRequest.getPersonalDetail().getLastName(),
                     employeeRequest.getPersonalDetail().getPermanentAddress().toString(),
                     employeeRequest.getPersonalDetail().getPhone(),

@@ -13,7 +13,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update Employee e set e.date_of_birth = ?2, e.email = ?3, e.first_name = ?4, " +
+    @Query(value = "update employee e set e.date_of_birth = ?2, e.email = ?3, e.first_name = ?4, " +
             "e.avatar = ?5, e.last_name = ?6, e.permanent_address = ?7, e.phone = ?8, e.sex = ?9, " +
             "e.temporary_address = ?10 where e.id = ?1", nativeQuery = true)
     int setEmployeePersonalById(Long id, LocalDate date_of_birth, String email, String first_name,
