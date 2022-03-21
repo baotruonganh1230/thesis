@@ -19,12 +19,12 @@ public class Works_In implements Serializable {
     private Long eid;
 
     @MapsId
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
     @Fetch(FetchMode.JOIN)
-    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Department.class)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Department.class)
     @JoinColumn(name="did", referencedColumnName="id")
     private Department department;
 }

@@ -239,8 +239,6 @@ public class EmployeeService {
             insuranceRepository.save(
                     new Insurance(
                             employeeRequest.getInsuranceDetail().getSocial().getId() == null ? null : employeeRequest.getInsuranceDetail().getSocial().getId(),
-                            id,
-                            insurance_typeSocial.getId(),
                             employeeRepository.getById(id),
                             insurance_typeSocial,
                             employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
@@ -254,8 +252,6 @@ public class EmployeeService {
             insuranceRepository.save(
                     new Insurance(
                             employeeRequest.getInsuranceDetail().getUnemployment().getId() == null ? null : employeeRequest.getInsuranceDetail().getUnemployment().getId(),
-                            id,
-                            insurance_typeUnemployment.getId(),
                             employeeRepository.getById(id),
                             insurance_typeUnemployment,
                             employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
@@ -269,8 +265,6 @@ public class EmployeeService {
             insuranceRepository.save(
                     new Insurance(
                             employeeRequest.getInsuranceDetail().getHealth().getId() == null ? null : employeeRequest.getInsuranceDetail().getHealth().getId(),
-                            id,
-                            insurance_typeHealth.getId(),
                             employeeRepository.getById(id),
                             insurance_typeHealth,
                             employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
@@ -333,8 +327,6 @@ public class EmployeeService {
         insuranceRepository.save(
                 new Insurance(
                         employeeRequest.getInsuranceDetail().getSocial().getId() == null ? null : employeeRequest.getInsuranceDetail().getSocial().getId(),
-                        savedEmployee.getId(),
-                        insurance_typeSocial.getId(),
                         savedEmployee,
                         insurance_typeSocial,
                         employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
@@ -348,8 +340,6 @@ public class EmployeeService {
         insuranceRepository.save(
                 new Insurance(
                         employeeRequest.getInsuranceDetail().getUnemployment().getId() == null ? null : employeeRequest.getInsuranceDetail().getUnemployment().getId(),
-                        savedEmployee.getId(),
-                        insurance_typeUnemployment.getId(),
                         savedEmployee,
                         insurance_typeUnemployment,
                         employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
@@ -363,8 +353,6 @@ public class EmployeeService {
         insuranceRepository.save(
                 new Insurance(
                         employeeRequest.getInsuranceDetail().getHealth().getId() == null ? null : employeeRequest.getInsuranceDetail().getHealth().getId(),
-                        savedEmployee.getId(),
-                        insurance_typeHealth.getId(),
                         savedEmployee,
                         insurance_typeHealth,
                         employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
