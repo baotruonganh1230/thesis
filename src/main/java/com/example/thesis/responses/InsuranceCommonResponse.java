@@ -25,9 +25,9 @@ public class InsuranceCommonResponse {
 
     public InsuranceCommonResponse(Long id, LocalDate from_date, LocalDate to_date, LocalDate issue_date, String number) {
         this.id = id;
-        this.from_date = from_date.toString() + "'T'00:00:00.000Z";
-        this.to_date = to_date.toString() + "'T'00:00:00.000Z";
-        this.issue_date = issue_date.toString() + "'T'00:00:00.000Z";
+        this.from_date = from_date.toString() + "T00:00:00.000Z";
+        this.to_date = to_date.toString() + "T00:00:00.000Z";
+        this.issue_date = issue_date.toString() + "T00:00:00.000Z";
         this.number = number;
     }
 

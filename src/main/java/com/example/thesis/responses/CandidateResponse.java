@@ -27,7 +27,7 @@ public class CandidateResponse {
         this.name = name;
         this.jobTitle = jobTitle;
         this.departmentName = departmentName;
-        this.appliedDate = appliedDate.toString() + "'T'00:00:00.000Z";
+        this.appliedDate = appliedDate.toString() + "T00:00:00.000Z";
         this.email = email;
         this.contact = contact;
     }

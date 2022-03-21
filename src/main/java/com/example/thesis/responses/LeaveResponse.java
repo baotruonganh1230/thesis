@@ -24,8 +24,8 @@ public class LeaveResponse {
     public LeaveResponse(Long leaveType, Integer amount, LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status) {
         this.leaveType = leaveType;
         this.amount = amount;
-        this.fromDate = fromDate.toString() + "'T'00:00:00.000Z";
-        this.toDate = toDate.toString() + "'T'00:00:00.000Z";
+        this.fromDate = fromDate.toString() + "T00:00:00.000Z";
+        this.toDate = toDate.toString() + "T00:00:00.000Z";
         this.userId = userId;
         this.reason = reason;
         this.status = status;

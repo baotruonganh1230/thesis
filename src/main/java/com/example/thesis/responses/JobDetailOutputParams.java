@@ -26,7 +26,7 @@ public class JobDetailOutputParams {
     private List<Bonus> bonus;
 
     public JobDetailOutputParams(LocalDate joinDate, Long jobId, String pit, Long departmentId, Integer salaryGroup, BigDecimal salary, List<Bonus> bonus) {
-        this.joinDate = joinDate.toString() + "'T'00:00:00.000Z";
+        this.joinDate = joinDate.toString() + "T00:00:00.000Z";
         this.jobId = jobId;
         this.pit = pit;
         this.departmentId = departmentId;

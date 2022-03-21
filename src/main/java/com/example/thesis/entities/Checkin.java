@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,7 +19,6 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class Checkin {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendanceId;
 
     private Integer status;
@@ -27,9 +28,12 @@ public class Checkin {
     private LocalTime time_in;
     private LocalTime time_out;
 
+    private Long deviceId;
+
+    @Fetch(FetchMode.JOIN)
     @JsonIgnore
     @MapsId
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Attendance.class)
-    @JoinColumn(name="attendanceId", referencedColumnName="eid")
+    @JoinColumn(name="attendanceId", referencedColumnName="id")
     private Attendance attendance;
 }

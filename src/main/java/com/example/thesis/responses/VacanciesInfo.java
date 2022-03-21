@@ -28,8 +28,8 @@ public class VacanciesInfo {
         this.hiringManagerId = hiringManagerId;
         this.positionId = positionId;
         this.departmentId = departmentId;
-        this.publishedDate = publishedDate.toString() + "'T'00:00:00.000Z";
-        this.expiredDate = expiredDate.toString() + "'T'00:00:00.000Z";
+        this.publishedDate = publishedDate.toString() + "T00:00:00.000Z";
+        this.expiredDate = expiredDate.toString() + "T00:00:00.000Z";
         this.quantity = quantity;
         this.status = status;
         this.postContent = postContent;

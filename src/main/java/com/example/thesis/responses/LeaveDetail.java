@@ -32,9 +32,9 @@ public class LeaveDetail {
         this.id = id;
         this.employeeName = employeeName;
         this.departmentName = departmentName;
-        this.applicationDate = applicationDate.toString() + "'T'00:00:00.000Z";
-        this.fromDate = fromDate.toString() + "'T'00:00:00.000Z";
-        this.toDate = toDate.toString() + "'T'00:00:00.000Z";
+        this.applicationDate = applicationDate.toString() + "T00:00:00.000Z";
+        this.fromDate = fromDate.toString() + "T00:00:00.000Z";
+        this.toDate = toDate.toString() + "T00:00:00.000Z";
         this.total = total;
         this.status = status;
     }

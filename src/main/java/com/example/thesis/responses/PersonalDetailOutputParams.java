@@ -31,7 +31,7 @@ public class PersonalDetailOutputParams {
         this.email = email;
         this.phone = phone;
         this.sex = sex;
-        this.dateOfBirth = dateOfBirth.toString() + "'T'00:00:00.000Z";
+        this.dateOfBirth = dateOfBirth.toString() + "T00:00:00.000Z";
         this.permanentAddress = permanentAddress;
         this.temporaryAddress = temporaryAddress;
     }

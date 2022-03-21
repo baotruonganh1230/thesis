@@ -25,7 +25,7 @@ public class CheckinResponse {
     public CheckinResponse(Long attendanceId, Integer status, LocalDate date, LocalTime time_in, LocalTime time_out) {
         this.attendanceId = attendanceId;
         this.status = status;
-        this.date = date.toString() + "'T'00:00:00.000Z";
+        this.date = date.toString() + "T00:00:00.000Z";
         this.time_in = time_in;
         this.time_out = time_out;
     }
