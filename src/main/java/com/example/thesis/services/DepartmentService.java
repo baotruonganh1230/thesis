@@ -115,6 +115,7 @@ public class DepartmentService {
         return convertFromDepartmentToDepartmentResponse(idSet, department);
     }
 
+    @Transactional
     public void updateDepartmentById(Long id, DepartmentRequest departmentRequest) {
         if (!departmentRepository.existsById(id)) {
             throw new IllegalStateException("There is no department with that id");
@@ -124,17 +125,25 @@ public class DepartmentService {
                 departmentRequest.getName(),
                 departmentRequest.getDescription());
 
-        manageRepository.save(new Manage(
-                id,
-                departmentRepository.findById(id).get(),
-                employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
-        ));
+        if (manageRepository.existsById(id)) {
+            manageRepository.setEmployeeId(id, departmentRequest.getManagerOfUnitId());
+        } else {
+            manageRepository.save(new Manage(
+                    id,
+                    departmentRepository.findById(id).get(),
+                    employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
+            ));
+        }
 
-        works_inRepository.save(new Works_In(
-                departmentRequest.getManagerOfUnitId(),
-                employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get(),
-                departmentRepository.findById(id).get()
-        ));
+        if (works_inRepository.existsById(departmentRequest.getManagerOfUnitId())) {
+            works_inRepository.setDepartmentId(departmentRequest.getManagerOfUnitId(), id);
+        } else {
+            works_inRepository.save(new Works_In(
+                    departmentRequest.getManagerOfUnitId(),
+                    employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get(),
+                    departmentRepository.findById(id).get()
+            ));
+        }
 
     }
 
@@ -156,11 +165,15 @@ public class DepartmentService {
                     null
             ));
 
-            manageRepository.save(new Manage(
-                    savedDepartment.getId(),
-                    savedDepartment,
-                    employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
-            ));
+            if (manageRepository.existsById(savedDepartment.getId())) {
+                manageRepository.setEmployeeId(savedDepartment.getId(), departmentRequest.getManagerOfUnitId());
+            } else {
+                manageRepository.save(new Manage(
+                        savedDepartment.getId(),
+                        savedDepartment,
+                        employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
+                ));
+            }
 
             if (works_inRepository.existsById(departmentRequest.getManagerOfUnitId())) {
                 works_inRepository.setDepartmentId(departmentRequest.getManagerOfUnitId(), savedDepartment.getId());
