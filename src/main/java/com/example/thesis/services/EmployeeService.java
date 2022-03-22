@@ -128,9 +128,7 @@ public class EmployeeService {
         File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/" + multipartFile.getOriginalFilename());
         System.out.println("The file part is: " + file.getAbsolutePath());
         try {
-            if (!file.createNewFile()) {
-                return null;
-            }
+            file.createNewFile();
             multipartFile.transferTo(file);
         } catch (IOException e) {
             e.printStackTrace();
