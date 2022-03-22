@@ -190,9 +190,6 @@
           "content": {
             "application/json": {
               "schema": {
-                "required": [
-                  "avatar"
-                ],
                 "type": "object",
                 "properties": {
                   "avatar": {
