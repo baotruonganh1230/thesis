@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import org.apache.tika.Tika;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,7 +125,8 @@ public class EmployeeService {
     }
 
     public File convertMultiPartFiletoFile(MultipartFile multipartFile) {
-        File file = new File(new FileSystemResource("").getFile().getAbsolutePath() + "/src/main/resources/avatars/" + multipartFile.getOriginalFilename());
+        File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/" + multipartFile.getOriginalFilename());
+        System.out.println("The file part is: " + file.getAbsolutePath());
         try {
             multipartFile.transferTo(file);
         } catch (IOException e) {
