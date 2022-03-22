@@ -16,17 +16,17 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update Department d set d.head_of_unit_id = ?2 where d.id = ?1", nativeQuery = true)
+    @Query(value = "update department set head_of_unit_id = ?2 where id = ?1", nativeQuery = true)
     int setHeadOfUnit(Long id, Long headOfUnitId);
 
     @Transactional
     @Modifying
-    @Query(value = "update Department d set d.name = ?2, d.description = ?3 where d.id = ?1", nativeQuery = true)
+    @Query(value = "update department set name = ?2, description = ?3 where id = ?1", nativeQuery = true)
     int setDepartmentById(Long id,String name,String description);
 
     @Transactional
     @Modifying
-    @Query(value = "insert into Department (name, description, head_of_unit_id) values (?1, ?2, ?3)", nativeQuery = true)
+    @Query(value = "insert into department (name, description, head_of_unit_id) values (?1, ?2, ?3)", nativeQuery = true)
     int insertDepartmentById(String name,String description,Long headOfUnitId);
 
     Department findByName(String name);

@@ -1,6 +1,9 @@
 package com.example.thesis.bootstrap;
 
-import com.example.thesis.entities.*;
+import com.example.thesis.entities.Account;
+import com.example.thesis.entities.AccountStatus;
+import com.example.thesis.entities.Employee;
+import com.example.thesis.entities.Role;
 import com.example.thesis.services.AccountService;
 import com.example.thesis.services.DepartmentService;
 import com.example.thesis.services.EmployeeService;
@@ -14,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Locale;
 
 /**
@@ -64,18 +65,6 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
                     AccountStatus.ENABLE));
         }
 
-
-
-        if (departmentService.count() == 0L) {
-            Department department1 = new Department("Dev", 2, "sub", "SD", null, null);
-            Department department2 = new Department("Tech", 5, "sub-head", "Technology", new HashSet<>(Arrays.asList(department1)), null);
-            Department department3 = new Department("Director", 10, "head", "Chairpeople", new HashSet<>(Arrays.asList(department2)), null);
-            department1.setHeadOfUnit(department2);
-            department2.setHeadOfUnit(department3);
-            departmentService.save(department1);
-            departmentService.save(department2);
-            departmentService.save(department3);
-        }
 
     }
 

@@ -2,14 +2,17 @@ package com.example.thesis.services;
 
 import com.example.thesis.entities.Department;
 import com.example.thesis.entities.Manage;
+import com.example.thesis.entities.Works_In;
 import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.repositories.EmployeeRepository;
 import com.example.thesis.repositories.ManageRepository;
+import com.example.thesis.repositories.Works_InRepository;
 import com.example.thesis.requests.DepartmentRequest;
 import com.example.thesis.responses.DepartmentResponse;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +24,7 @@ public class DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final ManageRepository manageRepository;
     private final EmployeeRepository employeeRepository;
+    private final Works_InRepository works_inRepository;
 
     private DepartmentResponse convertFromDepartmentToDepartmentResponse(Set<Long> idSet, Department department) {
         if (department != null) {
@@ -82,6 +86,7 @@ public class DepartmentService {
         return false;
     }
 
+    @Transactional
     public Set<DepartmentResponse> getDepartments(Boolean nested) {
         Set<DepartmentResponse> departmentResponses = new HashSet<>();
 
@@ -121,19 +126,52 @@ public class DepartmentService {
 
         manageRepository.save(new Manage(
                 id,
-                departmentRepository.getById(id),
-                employeeRepository.getById(departmentRequest.getManagerOfUnitId())
+                departmentRepository.findById(id).get(),
+                employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
+        ));
+
+        works_inRepository.save(new Works_In(
+                departmentRequest.getManagerOfUnitId(),
+                employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get(),
+                departmentRepository.findById(id).get()
         ));
 
     }
 
+    @Transactional
     public void insertDepartmentById(DepartmentRequest departmentRequest) {
         if (departmentRepository.findByName(departmentRequest.getName()) == null) {
-            departmentRepository.insertDepartmentById(
+
+            Department savedDepartment = departmentRepository.save(new Department(
+                    null,
+                    null,
                     departmentRequest.getName(),
+                    null,
+                    null,
                     departmentRequest.getDescription(),
-                    departmentRequest.getHeadOfUnitId()
-            );
+                    null,
+                    departmentRepository.findById(departmentRequest.getHeadOfUnitId()).get(),
+                    null,
+                    null,
+                    null
+            ));
+
+            manageRepository.save(new Manage(
+                    savedDepartment.getId(),
+                    savedDepartment,
+                    employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
+            ));
+
+            if (works_inRepository.existsById(departmentRequest.getManagerOfUnitId())) {
+                works_inRepository.setDepartmentId(departmentRequest.getManagerOfUnitId(), savedDepartment.getId());
+            } else {
+                works_inRepository.save(new Works_In(
+                        departmentRequest.getManagerOfUnitId(),
+                        employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get(),
+                        savedDepartment
+                ));
+            }
+
         }
 
     }

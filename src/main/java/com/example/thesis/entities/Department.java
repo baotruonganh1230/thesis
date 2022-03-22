@@ -1,6 +1,7 @@
 package com.example.thesis.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,16 +61,4 @@ public class Department {
     public Department() {
     }
 
-    public Department(Long id) {
-        this.id = id;
-    }
-
-    public Department(String name, Integer peopleNumber, String type, String description, Set<Department> subUnits, Department headOfUnit) {
-        this.name = name;
-        this.peopleNumber = peopleNumber;
-        this.type = type;
-        this.description = description;
-        this.subUnits = subUnits;
-        this.headOfUnit = headOfUnit;
-    }
 }

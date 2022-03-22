@@ -16,11 +16,11 @@ public class Manage implements Serializable {
     private Long did;
 
     @MapsId
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Department.class)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Department.class)
     @JoinColumn(name="did", referencedColumnName="id")
     private Department department;
 
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 }
