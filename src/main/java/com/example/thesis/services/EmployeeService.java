@@ -178,6 +178,7 @@ public class EmployeeService {
         }
     }
 
+    @Transactional
     public void updateEmployeeById(Long id, MultipartFile file, EmployeeRequest employeeRequest) {
         if (!employeeRepository.existsById(id)) {
             throw new IllegalStateException("There is no employee with that id");
@@ -225,8 +226,16 @@ public class EmployeeService {
                     employeeRequest.getJobDetail().getJobId());
             positionRepository.setSalaryGroupById(employeeRequest.getJobDetail().getJobId(),
                     employeeRequest.getJobDetail().getSalaryGroup());
-            works_inRepository.save(new Works_In(id, employeeRepository.getById(id),
-                    departmentRepository.getById(employeeRequest.getJobDetail().getDepartmentId())));
+
+            if (works_inRepository.existsById(id)) {
+                works_inRepository.setDepartmentId(id, employeeRequest.getJobDetail().getDepartmentId());
+            } else {
+                works_inRepository.save(new Works_In(
+                        id,
+                        employeeRepository.findById(id).get(),
+                        departmentRepository.findById(employeeRequest.getJobDetail().getDepartmentId()).get()
+                ));
+            }
             for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {
                 Bonus_List bonus_list = new Bonus_List(bonus.getId(), bonus.getBonusName(),
                         bonus.getBonusAmount(),

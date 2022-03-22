@@ -22,7 +22,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update Account a set a.eid = ?2, a.roleid = ?3, a.password = ?4, a.status = ?5, a.username = ?6 where a.id = ?1", nativeQuery = true)
+    @Query(value = "update account set eid = ?2, roleid = ?3, password = ?4, status = ?5, username = ?6 where id = ?1", nativeQuery = true)
     int setAccountById(Long id,
                                    Long newEid,
                                    Long newRoleId,

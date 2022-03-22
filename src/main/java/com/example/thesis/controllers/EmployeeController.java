@@ -34,7 +34,7 @@ public class EmployeeController {
 
     @PutMapping("employee/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id,
-                                              @RequestParam("avatar") MultipartFile file,
+                                              @RequestParam(value = "avatar", required = false) MultipartFile file,
                                             @RequestParam("data") String employeeRequestString) {
         ObjectMapper mapper = new ObjectMapper();
         EmployeeRequest employeeRequest = null;
