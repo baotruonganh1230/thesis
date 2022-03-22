@@ -1,5 +1,6 @@
 package com.example.thesis.controllers;
 
+import com.example.thesis.repositories.InsuranceRepository;
 import com.example.thesis.requests.EmployeeRequest;
 import com.example.thesis.services.EmployeeService;
 import com.example.thesis.services.GoogleDriveService;
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class EmployeeController {
     private final EmployeeService employeeService;
     private final GoogleDriveService googleDriveService;
+    private final InsuranceRepository insuranceRepository;
 
     @GetMapping("employees")
     public ResponseEntity<?> getEmployees() {

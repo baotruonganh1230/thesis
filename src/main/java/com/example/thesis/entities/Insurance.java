@@ -1,5 +1,6 @@
 package com.example.thesis.entities;
 
+import com.example.thesis.keys.InsurancePK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,19 +17,24 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(InsurancePK.class)
 public class Insurance {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long eid;
 
+    @Id
+    private Long typeid;
+
+    @MapsId
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
+    @MapsId
     @JsonIgnore
     @Fetch(FetchMode.JOIN)
-    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Insurance_Type.class)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Insurance_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Insurance_Type type;
 
