@@ -125,9 +125,12 @@ public class EmployeeService {
     }
 
     public File convertMultiPartFiletoFile(MultipartFile multipartFile) {
-        File file = new File(System.getProperty("user.dir") + multipartFile.getOriginalFilename());
+        File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/" + multipartFile.getOriginalFilename());
         System.out.println("The file part is: " + file.getAbsolutePath());
         try {
+            if (!file.createNewFile()) {
+                return null;
+            }
             multipartFile.transferTo(file);
         } catch (IOException e) {
             e.printStackTrace();
