@@ -17,11 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -128,9 +125,10 @@ public class EmployeeService {
     }
 
     public File convertMultiPartFiletoFile(MultipartFile multipartFile) {
-        File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/avatar");
+        File file = new File(System.getProperty("java.io.tmpdir") + multipartFile.getOriginalFilename());
         System.out.println("The file part is: " + file.getAbsolutePath());
         try {
+            file.createNewFile();
             multipartFile.transferTo(file);
         } catch (IOException e) {
             e.printStackTrace();
@@ -197,22 +195,13 @@ public class EmployeeService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("The file name is: " + filetoUpload.getName());
-            System.out.println("The file path is: " + filetoUpload.getAbsolutePath());
-            System.out.println("The file mime type is: " + mimeType);
-
-
-            try {
-                System.out.println("The file content is: " + Arrays.toString(Files.readAllBytes(filetoUpload.toPath())));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
             com.google.api.services.drive.model.File upLoadedFile =
                     googleDriveService.upLoadFile(filetoUpload.getName(),
                             filetoUpload.getAbsolutePath(), mimeType);
 
+            if (!filetoUpload.delete()) {
+                throw new IllegalStateException("Cannot delete file!");
+            }
             employeeRepository.setEmployeePersonalById(id,
                     employeeRequest.getPersonalDetail().getDateOfBirth(),
                     employeeRequest.getPersonalDetail().getEmail(),
@@ -224,12 +213,6 @@ public class EmployeeService {
                     employeeRequest.getPersonalDetail().getSex(),
                     employeeRequest.getPersonalDetail().getTemporaryAddress().toString()
             );
-
-            try {
-                new FileOutputStream(filetoUpload.getAbsolutePath()).close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
         } else if (employeeRequest.getAccountDetail() != null) {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
