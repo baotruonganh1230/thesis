@@ -19,7 +19,9 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -195,15 +197,21 @@ public class EmployeeService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            com.google.api.services.drive.model.File upLoadedFile =
-                    googleDriveService.upLoadFile(filetoUpload.getName(),
-                            filetoUpload.getAbsolutePath(), mimeType);
+
+            System.out.println("The file name is: " + filetoUpload.getName());
+            System.out.println("The file path is: " + filetoUpload.getAbsolutePath());
+            System.out.println("The file mime type is: " + mimeType);
+
 
             try {
-                new FileOutputStream(filetoUpload.getAbsolutePath()).close();
+                System.out.println("The file content is: " + Arrays.toString(Files.readAllBytes(filetoUpload.toPath())));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            com.google.api.services.drive.model.File upLoadedFile =
+                    googleDriveService.upLoadFile(filetoUpload.getName(),
+                            filetoUpload.getAbsolutePath(), mimeType);
 
             employeeRepository.setEmployeePersonalById(id,
                     employeeRequest.getPersonalDetail().getDateOfBirth(),
@@ -216,6 +224,12 @@ public class EmployeeService {
                     employeeRequest.getPersonalDetail().getSex(),
                     employeeRequest.getPersonalDetail().getTemporaryAddress().toString()
             );
+
+            try {
+                new FileOutputStream(filetoUpload.getAbsolutePath()).close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         } else if (employeeRequest.getAccountDetail() != null) {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
