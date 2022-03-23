@@ -125,7 +125,7 @@ public class EmployeeService {
     }
 
     public File convertMultiPartFiletoFile(MultipartFile multipartFile) {
-        File file = new File(System.getProperty("java.io.tmpdir") + multipartFile.getOriginalFilename());
+        File file = new File(System.getProperty("java.io.tmpdir") + "/" + multipartFile.getOriginalFilename());
         System.out.println("The file part is: " + file.getAbsolutePath());
         try {
             file.createNewFile();
