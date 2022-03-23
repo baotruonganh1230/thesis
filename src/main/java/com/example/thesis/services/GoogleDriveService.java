@@ -61,13 +61,17 @@ public class GoogleDriveService {
         File file = new File();
         try {
             java.io.File fileUpload = new java.io.File(filePath);
+            System.out.println("The path of file upload is: " + fileUpload.getAbsolutePath());
             com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
             fileMetadata.setMimeType(mimeType);
             fileMetadata.setName(fileName);
             fileMetadata.setParents(Collections.singletonList(folderID));
+            System.out.println("The parent id of file metadata is: " + fileMetadata.getParents());
             com.google.api.client.http.FileContent fileContent = new FileContent(mimeType, fileUpload);
+            System.out.println("The length of file content is: " + fileContent.getLength());
             file = getDriveService().files().create(fileMetadata, fileContent)
                     .setFields("webContentLink").execute();
+            System.out.println("The file is null? " + (file == null));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }

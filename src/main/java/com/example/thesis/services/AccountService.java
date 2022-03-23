@@ -102,12 +102,13 @@ public class AccountService implements UserDetailsService {
         if (oldAccount == null) {
             throw new DataReadException("There is no account with that id");
         }
+        System.out.println();
         return accountRepository.setAccountById(
                 id,
                 accountRequest.getEid(),
                 accountRequest.getRoleid(),
                 accountRequest.getPassword(),
-                accountRequest.getStatus(),
+                accountRequest.getStatus().toString(),
                 accountRequest.getUsername());
     }
 

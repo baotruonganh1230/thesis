@@ -195,6 +195,9 @@ public class EmployeeService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.out.println("The file name is: " + filetoUpload.getName());
+            System.out.println("The file mime type is: " + mimeType);
+
             com.google.api.services.drive.model.File upLoadedFile =
                     googleDriveService.upLoadFile(filetoUpload.getName(),
                             filetoUpload.getAbsolutePath(), mimeType);

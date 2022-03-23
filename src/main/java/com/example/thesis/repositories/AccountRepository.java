@@ -1,7 +1,6 @@
 package com.example.thesis.repositories;
 
 import com.example.thesis.entities.Account;
-import com.example.thesis.entities.AccountStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +26,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
                                    Long newEid,
                                    Long newRoleId,
                                    String newPassword,
-                                   AccountStatus newStatus,
+                                   String newStatus,
                                    String newUsername);
 
     Account getByid(Long id);
