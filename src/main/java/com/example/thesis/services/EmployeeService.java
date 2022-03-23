@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,10 +126,9 @@ public class EmployeeService {
     }
 
     public File convertMultiPartFiletoFile(MultipartFile multipartFile) {
-        File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/" + multipartFile.getOriginalFilename());
+        File file = new File(System.getProperty("user.dir") + "/src/main/resources/avatars/avatar");
         System.out.println("The file part is: " + file.getAbsolutePath());
         try {
-            file.createNewFile();
             multipartFile.transferTo(file);
         } catch (IOException e) {
             e.printStackTrace();
@@ -199,9 +199,12 @@ public class EmployeeService {
                     googleDriveService.upLoadFile(filetoUpload.getName(),
                             filetoUpload.getAbsolutePath(), mimeType);
 
-            if (!filetoUpload.delete()) {
-                throw new IllegalStateException("Cannot delete file!");
+            try {
+                new FileOutputStream(filetoUpload.getAbsolutePath()).close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
             employeeRepository.setEmployeePersonalById(id,
                     employeeRequest.getPersonalDetail().getDateOfBirth(),
                     employeeRequest.getPersonalDetail().getEmail(),

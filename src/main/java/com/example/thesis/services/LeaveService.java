@@ -67,8 +67,6 @@ public class LeaveService {
         Employee employee = accountRepository.getById(leaveRequest.getUserId()).getEmployee();
         leavesRepository.save(
                 new Leaves(
-                        employee.getId(),
-                        leaveRequest.getLeaveType(),
                         employee,
                         leave_typeRepository.getById(leaveRequest.getLeaveType()),
                         leaveRequest.getFromDate(),
@@ -83,11 +81,11 @@ public class LeaveService {
 
     public List<LeaveResponse> getLeave(Long userId) {
         Account account = accountRepository.getById(userId);
-        return leavesRepository.getAllByEid(account.getEmployee().getId())
+        return leavesRepository.getAllByEmployee(account.getEmployee())
                 .stream()
                 .map(leaves ->
                         new LeaveResponse(
-                                leaves.getTypeid(),
+                                leaves.getType().getId(),
                                 leaves.getTotal(),
                                 leaves.getFrom_date(),
                                 leaves.getTo_date(),

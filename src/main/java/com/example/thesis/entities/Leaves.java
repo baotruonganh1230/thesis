@@ -1,10 +1,11 @@
 package com.example.thesis.entities;
 
-import com.example.thesis.keys.LeavesPK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,26 +14,19 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @NoArgsConstructor
-@IdClass(LeavesPK.class)
 public class Leaves {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Id
-    private Long eid;
-
-    @Id
-    private Long typeid;
-
     @JsonIgnore
-    @MapsId
+    @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 
     @JsonIgnore
-    @MapsId
+    @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Leave_Type.class)
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Leave_Type type;
@@ -50,9 +44,7 @@ public class Leaves {
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    public Leaves(Long eid, Long typeid, Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate application_date, Integer total, Integer status, String reason) {
-        this.eid = eid;
-        this.typeid = typeid;
+    public Leaves(Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate application_date, Integer total, Integer status, String reason) {
         this.employee = employee;
         this.type = type;
         this.from_date = from_date;
