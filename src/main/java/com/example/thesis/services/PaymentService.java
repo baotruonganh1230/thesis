@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +21,18 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     public PaymentResponse getPayment(String month, Long employeeId) {
-        Payment payment = paymentRepository.findPaymentByMonthAndEid(month, employeeId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        LocalDate dayPassed = LocalDate.parse(month, formatter);
+        LocalDate firstDate = dayPassed.withDayOfMonth(1);
+        LocalDate lastDate = dayPassed.withDayOfMonth(
+                dayPassed.getMonth().length(dayPassed.isLeapYear()));
+
+        Payment payment = paymentRepository.findPaymentByMonthAndEid(firstDate, lastDate, employeeId);
+        if (payment == null) {
+            return null;
+        }
         List<Bonus> bonuses = convertListBonus_listToListBonus(payment.getEmployee().getBonus_lists());
         return new PaymentResponse(payment.getBasicSalary(),
                 new MonthlyInfo(payment.getActualDay(),

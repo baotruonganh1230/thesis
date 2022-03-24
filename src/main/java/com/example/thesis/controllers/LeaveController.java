@@ -17,8 +17,8 @@ public class LeaveController {
     private LeaveService leaveService;
 
     @GetMapping("leaves")
-    public ResponseEntity<?> getLeaves(@RequestParam(required=false) Long departmentId) {
-        return new ResponseEntity<>(new LeaveEmployeeList(leaveService.getAllLeaves(departmentId)),
+    public ResponseEntity<?> getLeaves(@RequestParam(required=false) Long departmentId, @RequestParam(required=false) String date) {
+        return new ResponseEntity<>(new LeaveEmployeeList(leaveService.getAllLeaves(departmentId, date)),
                 HttpStatus.OK);
     }
 

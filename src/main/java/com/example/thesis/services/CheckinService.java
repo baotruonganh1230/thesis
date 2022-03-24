@@ -33,7 +33,7 @@ public class CheckinService {
         checkinRepository.save(
                 new Checkin(
                         savedAttendance.getId(),
-                        0,
+                        2,
                         checkinRequest.getDate(),
                         checkinRequest.getTimeIn(),
                         null,

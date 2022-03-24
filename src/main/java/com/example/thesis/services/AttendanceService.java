@@ -7,6 +7,9 @@ import com.example.thesis.responses.CheckinResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,11 +22,15 @@ public class AttendanceService {
         List<Attendance> attendanceList = null;
 
         if (week != null) {
-            String[] dates = week.split("-");
-            String fromDate = dates[0];
-            String toDate = dates[1];
 
-            attendanceList = attendanceRepository.findAllAttendancesFromdateTodate(fromDate, toDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            //convert String to LocalDate
+            LocalDate dayPassed = LocalDate.parse(week, formatter);
+            LocalDate fromDate = dayPassed.with(DayOfWeek.MONDAY);
+            LocalDate toDate = fromDate.plusDays(4);
+
+            attendanceList = attendanceRepository.findAllAttendancesFromdateTodate(fromDate.toString(), toDate.toString());
         } else {
             attendanceList = attendanceRepository.findAll();
         }

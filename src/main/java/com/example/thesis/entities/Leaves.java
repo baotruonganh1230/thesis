@@ -35,7 +35,7 @@ public class Leaves {
 
     private LocalDate to_date;
 
-    private LocalDate application_date;
+    private LocalDate applicationDate;
 
     private Integer total;
 
@@ -44,12 +44,12 @@ public class Leaves {
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    public Leaves(Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate application_date, Integer total, Integer status, String reason) {
+    public Leaves(Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate applicationDate, Integer total, Integer status, String reason) {
         this.employee = employee;
         this.type = type;
         this.from_date = from_date;
         this.to_date = to_date;
-        this.application_date = application_date;
+        this.applicationDate = applicationDate;
         this.total = total;
         this.status = status;
         this.reason = reason;

@@ -16,6 +16,6 @@ public class DepartmentResponse {
     private Integer peopleNumber;
     private String description;
     private Long headOfUnitId;
-    private Long mangerOfUnitId;
+    private Long managerOfUnitId;
     private Set<DepartmentResponse> subUnits;
 }

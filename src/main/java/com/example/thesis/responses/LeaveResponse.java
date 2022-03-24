@@ -15,15 +15,17 @@ import java.time.format.DateTimeFormatter;
 public class LeaveResponse {
     private Long leaveType;
     private Integer amount;
+    private String applicationDate;
     private String fromDate;
     private String toDate;
     private Long userId;
     private String reason;
     private Integer status;
 
-    public LeaveResponse(Long leaveType, Integer amount, LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status) {
+    public LeaveResponse(Long leaveType, Integer amount, LocalDate applicationDate,LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status) {
         this.leaveType = leaveType;
         this.amount = amount;
+        this.applicationDate = applicationDate.toString() + "T00:00:00.000Z";
         this.fromDate = fromDate.toString() + "T00:00:00.000Z";
         this.toDate = toDate.toString() + "T00:00:00.000Z";
         this.userId = userId;
