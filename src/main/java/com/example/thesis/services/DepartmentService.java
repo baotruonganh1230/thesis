@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class DepartmentService {
                     department.getPeopleNumber(),
                     department.getDescription(),
                     (department.getHeadOfUnit() == null) ? null : department.getHeadOfUnit().getId(),
-                    (department.getManage() == null) ? null : department.getManage().getDepartment().getId(),
+                    (department.getManage() == null) ? null : department.getManage().getEmployee().getId(),
                     departmentResponses);
         }
         return null;
@@ -60,7 +61,7 @@ public class DepartmentService {
                         department.getPeopleNumber(),
                         department.getDescription(),
                         (department.getHeadOfUnit() == null) ? null : department.getHeadOfUnit().getId(),
-                        (department.getManage() == null) ? null : department.getManage().getDepartment().getId(),
+                        (department.getManage() == null) ? null : department.getManage().getEmployee().getId(),
                         null));
             }
 
@@ -189,15 +190,11 @@ public class DepartmentService {
 
     }
 
-    public Department save(Department department) {
-        return departmentRepository.save(department);
-    }
-
-    public Long count() {
-        return departmentRepository.count();
-    }
-
     public void deleteDepartmentById(Long id) {
+        if (!departmentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Department does not exist");
+        }
         departmentRepository.deleteById(id);
+
     }
 }
