@@ -7,6 +7,7 @@ import com.example.thesis.repositories.AccountRepository;
 import com.example.thesis.repositories.AttendanceRepository;
 import com.example.thesis.repositories.CheckinRepository;
 import com.example.thesis.requests.CheckinRequest;
+import com.example.thesis.responses.HaveCheckedInResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,23 +51,23 @@ public class CheckinService {
         checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut());
     }
 
-    public boolean haveCheckedin(Long userId, String date) {
+    public HaveCheckedInResponse haveCheckedin(Long userId, String date) {
         if (!accountRepository.existsById(userId)) {
-            return false;
+            return new HaveCheckedInResponse(false, null);
         }
         Employee employee = accountRepository.getById(userId).getEmployee();
-        if (employee == null) return false;
+        if (employee == null) return new HaveCheckedInResponse(false, null);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         //convert String to LocalDate
         LocalDate checkinDate = LocalDate.parse(date, formatter);
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinDate);
-        if (attendance == null) return false;
+        if (attendance == null) return new HaveCheckedInResponse(false, null);
 
         Checkin checkin = checkinRepository.findByAttendanceIdAndDate(attendance.getId(), checkinDate);
 
-        if (checkin != null) return true;
-        return false;
+        if (checkin != null) return new HaveCheckedInResponse(true, checkin.getTime_in());
+        return new HaveCheckedInResponse(false, null);
     }
 }

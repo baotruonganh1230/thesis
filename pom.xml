@@ -90,11 +90,6 @@
             <version>31.0.1-jre</version>
         </dependency>
         <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.33.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
             <version>1.33.1</version>
@@ -102,7 +97,7 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v3-rev197-1.25.0</version>
+            <version>v3-rev173-1.25.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

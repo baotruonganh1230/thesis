@@ -28,7 +28,7 @@ public class Checkin {
     private LocalTime time_in;
     private LocalTime time_out;
 
-    private Long deviceId;
+    private String deviceId;
 
     @Fetch(FetchMode.JOIN)
     @JsonIgnore

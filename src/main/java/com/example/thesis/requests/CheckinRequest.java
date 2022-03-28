@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 public class CheckinRequest {
     private Long userId;
-    private Long deviceId;
+    private String deviceId;
     private LocalDate date;
     private LocalTime timeIn;
     private LocalTime timeOut;
