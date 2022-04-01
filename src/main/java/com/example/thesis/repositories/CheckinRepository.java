@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Repository
 public interface CheckinRepository extends JpaRepository<Checkin, Long> {
@@ -17,5 +16,10 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     @Transactional
     @Modifying
     @Query(value = "update checkin set time_out = ?2 where attendance_id = ?1", nativeQuery = true)
-    int setTimeout(Long attendance_id, LocalTime time_out);
+    int setTimeout(Long attendance_id, String time_out);
+
+    @Transactional
+    @Modifying
+    @Query(value = "insert into checkin (date, device_id, status, time_in, time_out, attendance_id) values (?3, ?6, ?2, ?4, ?5, ?1)", nativeQuery = true)
+    int insertCheckin(Long attendance_id, Integer status, String date, String timeIn, String timeOut, String deviceId);
 }

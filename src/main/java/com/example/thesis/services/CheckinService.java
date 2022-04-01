@@ -25,49 +25,53 @@ public class CheckinService {
     @Transactional
     public void checkin_in(CheckinRequest checkinRequest) {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
-        Attendance savedAttendance = attendanceRepository.save(new Attendance(
-                null,
-                employee,
-                checkinRequest.getDate(),
-                null
-        ));
-        checkinRepository.save(
-                new Checkin(
-                        savedAttendance.getId(),
-                        2,
-                        checkinRequest.getDate(),
-                        checkinRequest.getTimeIn(),
-                        null,
-                        checkinRequest.getDeviceId(),
-                        savedAttendance
-                )
-        );
+
+        if (!attendanceRepository.existsByEmployeeAndDate(employee, checkinRequest.getDate())) {
+            Attendance savedAttendance = attendanceRepository.save(new Attendance(
+                    null,
+                    employee,
+                    checkinRequest.getDate(),
+                    null
+            ));
+
+            checkinRepository.insertCheckin(
+                    savedAttendance.getId(),
+                    2,
+                    checkinRequest.getDate().toString(),
+                    checkinRequest.getTimeIn().toString(),
+                    null,
+                    checkinRequest.getDeviceId()
+            );
+        }
+
     }
 
     @Transactional
     public void checkin_out(CheckinRequest checkinRequest) {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinRequest.getDate());
-        checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut());
+        checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut().toString());
     }
 
     public HaveCheckedInResponse haveCheckedin(Long userId, String date) {
         if (!accountRepository.existsById(userId)) {
-            return new HaveCheckedInResponse(false, null);
+            return new HaveCheckedInResponse(false, null, null);
         }
         Employee employee = accountRepository.getById(userId).getEmployee();
-        if (employee == null) return new HaveCheckedInResponse(false, null);
+        if (employee == null) return new HaveCheckedInResponse(false, null, null);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         //convert String to LocalDate
         LocalDate checkinDate = LocalDate.parse(date, formatter);
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinDate);
-        if (attendance == null) return new HaveCheckedInResponse(false, null);
+        if (attendance == null) return new HaveCheckedInResponse(false, null, null);
 
         Checkin checkin = checkinRepository.findByAttendanceIdAndDate(attendance.getId(), checkinDate);
 
-        if (checkin != null) return new HaveCheckedInResponse(true, checkin.getTime_in());
-        return new HaveCheckedInResponse(false, null);
+        if (checkin != null) return new HaveCheckedInResponse(true,
+                checkin.getDate().toString() + "T" + checkin.getTime_in().toString() + "Z",
+                checkin.getTime_out() == null ? null : checkin.getDate().toString() + "T" + checkin.getTime_out().toString() + "Z");
+        return new HaveCheckedInResponse(false, null, null);
     }
 }

@@ -26,4 +26,19 @@ public class CheckinRequest {
         //convert String to LocalDate
         this.date = LocalDate.parse(dateString, formatter);
     }
+
+    public void setTimeIn(String timeInString) {
+        this.timeIn = LocalTime.of(Integer.parseInt(timeInString.substring(11,13)),
+                Integer.parseInt(timeInString.substring(14,16)),
+                Integer.parseInt(timeInString.substring(17,19)),
+                Integer.parseInt(timeInString.substring(20,23)) * (int) Math.pow(10, 6));
+    }
+
+    public void setTimeOut(String timeOutString) {
+        this.timeOut = LocalTime.of(Integer.parseInt(timeOutString.substring(11,13)),
+                Integer.parseInt(timeOutString.substring(14,16)),
+                Integer.parseInt(timeOutString.substring(17,19)),
+                Integer.parseInt(timeOutString.substring(20,23)) * (int) Math.pow(10, 6));
+
+    }
 }

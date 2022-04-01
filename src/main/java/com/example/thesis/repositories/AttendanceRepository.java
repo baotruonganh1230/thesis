@@ -15,4 +15,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     @Query(value = "select * from attendance where date > ?1 AND date < ?2", nativeQuery = true)
     List<Attendance> findAllAttendancesFromdateTodate(String fromDate, String toDate);
+
+    boolean existsByEmployeeAndDate(Employee employee, LocalDate date);
 }
