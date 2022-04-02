@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Collections;
 
 @Service
@@ -37,10 +36,6 @@ public class GoogleDriveService {
     public Drive getDriveService() {
         Drive service = null;
         try {
-//            Resource resource = new ClassPathResource(this.serviceAccountKey);
-//            URL resource = GoogleDriveService.class.getResource("/" + this.serviceAccountKey);
-//            System.out.println("Result is null: " + (resource == null));
-//            System.out.println("This class path is: " + GoogleDriveService.class.getProtectionDomain().getCodeSource().getLocation().getPath());
             java.io.File key = new java.io.File("/var/app/current/BOOT-INF/classes/" + this.serviceAccountKey);
             System.out.println("Path of key is: " + key.getAbsolutePath());
             System.out.println("Key is null: " + (key == null));
@@ -69,10 +64,6 @@ public class GoogleDriveService {
 
     public File upLoadFile(String fileName, String filePath, String mimeType) {
         File file = new File();
-        if (firstExec) {
-            execCommand();
-            firstExec = false;
-        }
         try {
             java.io.File fileUpload = new java.io.File(filePath);
             System.out.println("The path of file upload is: " + fileUpload.getAbsolutePath());
@@ -92,22 +83,11 @@ public class GoogleDriveService {
             file = create1.execute();
 //            file = getDriveService().files().create(fileMetadata, fileContent)
 //                    .setFields("webContentLink").execute();
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA The file is null? " + (file == null));
+            System.out.println("The file is null? " + (file == null));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
         return file;
-    }
-
-    private void execCommand() {
-        try {
-            Runtime.getRuntime().exec("cd /var/app/current");
-            Process process2 = Runtime.getRuntime().exec("jar xf application.jar BOOT-INF/classes/hrms-drive-c2daac40864c.p12");
-            process2.waitFor();
-            Runtime.getRuntime().exec("cd ~");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 }

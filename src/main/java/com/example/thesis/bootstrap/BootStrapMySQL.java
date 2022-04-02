@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -65,7 +66,19 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
                     AccountStatus.ENABLE));
         }
 
+        execCommand();
 
+    }
+
+    private void execCommand() {
+        try {
+            Runtime.getRuntime().exec("cd /var/app/current");
+            Process process2 = Runtime.getRuntime().exec("jar xf application.jar BOOT-INF/classes/hrms-drive-c2daac40864c.p12");
+            process2.waitFor();
+            Runtime.getRuntime().exec("cd ~");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
