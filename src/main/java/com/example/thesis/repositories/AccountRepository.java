@@ -15,6 +15,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "UPDATE account " +
+            "SET eid = ?2 WHERE id = ?1", nativeQuery = true)
+    int updateEidById(Long id, Long eid);
+
+    @Transactional
+    @Modifying
     @Query("UPDATE Account a " +
             "SET a.status = 'ENABLE' WHERE a.username = ?1")
     int enableAccount(String username);

@@ -28,7 +28,6 @@ public class CandidateService {
                                     candidate.getContact()))
                     .collect(Collectors.toList());
         } else {
-            List<Candidate> candidates = candidateRepository.findAll();
             return candidateRepository.findAll().stream().map(candidate ->
                             new CandidateResponse(candidate.getId(),
                                     candidate.getJob_recruitment().getId(),

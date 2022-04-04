@@ -221,8 +221,9 @@ public class EmployeeService {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
                 accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
             } else {
-                accountService.updateAccountById(employeeRequest.getAccountDetail().getId(),
-                        employeeRequest.getAccountDetail().getNewAccount());
+//                accountService.updateAccountById(employeeRequest.getAccountDetail().getId(),
+//                        employeeRequest.getAccountDetail().getNewAccount());
+                accountService.updateEidById(employeeRequest.getAccountDetail().getId(), id);
             }
         } else if (employeeRequest.getJobDetail() != null) {
             employeeRepository.setEmployeeJobById(id, employeeRequest.getJobDetail().getJoinDate(),
@@ -401,13 +402,7 @@ public class EmployeeService {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {
                 accountService.insertAccount(employeeRequest.getAccountDetail().getNewAccount());
             } else {
-                accountService.save(
-                        new Account(employeeRequest.getAccountDetail().getId(),
-                                employeeRepository.getById(savedEmployee.getId()),
-                                roleRepository.getById(employeeRequest.getAccountDetail().getNewAccount().getRoleid()),
-                                employeeRequest.getAccountDetail().getNewAccount().getUsername(),
-                                employeeRequest.getAccountDetail().getNewAccount().getPassword(),
-                                employeeRequest.getAccountDetail().getNewAccount().getStatus()));
+                accountService.updateEidById(employeeRequest.getAccountDetail().getId(), savedEmployee.getId());
             }
         }
     }

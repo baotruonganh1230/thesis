@@ -131,4 +131,12 @@ public class AccountService implements UserDetailsService {
     public Account findByUsername(String username){
         return accountRepository.findByUsername(username);
     }
+
+    public Account getById(Long id) {
+        return accountRepository.getById(id);
+    }
+
+    public int updateEidById(Long id, Long eid){
+        return accountRepository.updateEidById(id, eid);
+    }
 }
