@@ -1,5 +1,6 @@
 package com.example.thesis.controllers;
 
+import com.example.thesis.services.UtilService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +11,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/")
 @AllArgsConstructor
 public class UtilController {
+    private final UtilService utilService;
 
     @GetMapping("chart/attendHour")
-    public ResponseEntity<?> getAverageWorkingHours(@PathVariable String week) {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> getAverageWorkingHours(@RequestParam(required=false) String week) {
+        return new ResponseEntity<>(utilService.getAverageWorkingHoursByWeek(week), HttpStatus.OK);
     }
 
     @GetMapping("chart/attendNumber")
-    public ResponseEntity<?> getEmployeeStatus(@PathVariable String week) {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> getEmployeeAttendStatus(@RequestParam(required=false) String week) {
+        return new ResponseEntity<>(utilService.getEmployeeAttendStatus(week), HttpStatus.OK);
     }
 }

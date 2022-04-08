@@ -38,7 +38,7 @@ public class Job_Recruitment {
 
     @JsonIgnore
     @Fetch(FetchMode.JOIN)
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name="hiring_manager_id", referencedColumnName="id")
     private Employee employee;
 
@@ -57,7 +57,7 @@ public class Job_Recruitment {
 
     @JsonIgnore
     @OneToMany(
-            mappedBy = "job_recruitment",
+            mappedBy = "jobRecruitment",
             cascade = CascadeType.ALL
     )
     private List<Candidate> candidates = new ArrayList<>();

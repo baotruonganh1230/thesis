@@ -21,9 +21,15 @@ public class Job_RecruitmentController {
     }
 
     @PutMapping("job_recruitment/{id}")
-    public ResponseEntity<?> updateJob(@PathVariable Long id,
+    public ResponseEntity<?> updateJob_Recruitment(@PathVariable Long id,
                                        @RequestBody VacanciesInfo vacanciesInfo) {
         jobRecruitmentService.updateJob_RecruitmentById(id, vacanciesInfo);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("job_recruitment")
+    public ResponseEntity<?> insertJob_Recruitment(@RequestBody VacanciesInfo vacanciesInfo) {
+        jobRecruitmentService.insertJob_Recruitment(vacanciesInfo);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

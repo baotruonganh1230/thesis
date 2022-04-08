@@ -153,9 +153,10 @@ public class Employee {
     @Fetch(FetchMode.JOIN)
     @OneToMany(
             mappedBy = "employee",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    private List<Bonus_List> bonus_lists =  new ArrayList<>();
+    private Set<Bonus_List> bonus_lists =  new HashSet<>();
 
     public Employee() {
 

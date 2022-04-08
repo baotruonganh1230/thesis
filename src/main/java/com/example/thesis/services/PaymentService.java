@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +49,7 @@ public class PaymentService {
                 payment.getNetIncome());
     }
 
-    private List<Bonus> convertListBonus_listToListBonus(List<Bonus_List> bonus_lists) {
+    private List<Bonus> convertListBonus_listToListBonus(Set<Bonus_List> bonus_lists) {
         return bonus_lists.stream().map(bonus_list ->
                 new Bonus(bonus_list.getId(),
                         bonus_list.getName(),

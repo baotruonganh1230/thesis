@@ -3,7 +3,9 @@ package com.example.thesis.services;
 import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.repositories.EmployeeRepository;
+import com.example.thesis.repositories.HasRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
+import com.example.thesis.responses.UnauthorizedJob_RecruitmentResponse;
 import com.example.thesis.responses.VacanciesInfo;
 import com.google.common.collect.Lists;
 import com.mysql.cj.exceptions.DataReadException;
@@ -20,6 +22,25 @@ public class Job_RecruitmentService {
     private final Job_RecruitmentRepository repository;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final HasRepository hasRepository;
+
+    public List<UnauthorizedJob_RecruitmentResponse> getJob_RecruitmentsUnauthorized() {
+        List<UnauthorizedJob_RecruitmentResponse> unauthorizedJob_recruitmentResponses
+                = new ArrayList<>();
+
+        Lists.newArrayList(repository.findAll()).forEach((Job_Recruitment job) -> {
+            UnauthorizedJob_RecruitmentResponse unauthorizedJob_recruitmentResponse =
+                    new UnauthorizedJob_RecruitmentResponse(
+                    job.getId(),
+                    job.getHas().getPosition().getName(),
+                    job.getDepartment().getName(),
+                    job.getPostContent());
+
+            unauthorizedJob_recruitmentResponses.add(unauthorizedJob_recruitmentResponse);
+        });
+
+        return unauthorizedJob_recruitmentResponses;
+    }
 
     public List<VacanciesInfo> getJob_Recruitments() {
         List<VacanciesInfo> vacanciesInfos = new ArrayList<>();
@@ -46,8 +67,28 @@ public class Job_RecruitmentService {
         if (!repository.existsById(id)) {
             throw new DataReadException("There is no job_recruitment with that id");
         }
-        repository.save(new Job_Recruitment(
+        repository.updateJob_Recruitment(
                 id,
+                LocalDate.parse(vacanciesInfo.getExpiredDate()),
+                null,
+                vacanciesInfo.getPostContent(),
+                LocalDate.parse(vacanciesInfo.getPublishedDate()),
+                vacanciesInfo.getQuantity(),
+                vacanciesInfo.getStatus(),
+                vacanciesInfo.getDepartmentId(),
+                vacanciesInfo.getHiringManagerId()
+        );
+
+        if (hasRepository.existsByPosid(vacanciesInfo.getPositionId())) {
+            hasRepository.updateJob_RecuitmentIdByPosId(vacanciesInfo.getPositionId(), id);
+        } else {
+            hasRepository.insertHas(vacanciesInfo.getPositionId(), id);
+        }
+    }
+
+    public void insertJob_Recruitment(VacanciesInfo vacanciesInfo) {
+        Job_Recruitment savedJob_recruitment = repository.save(new Job_Recruitment(
+                null,
                 vacanciesInfo.getPostContent(),
                 null,
                 LocalDate.parse(vacanciesInfo.getPublishedDate()),
@@ -58,5 +99,11 @@ public class Job_RecruitmentService {
                 departmentRepository.getById(vacanciesInfo.getDepartmentId()),
                 null,
                 null));
+
+        if (hasRepository.existsByPosid(vacanciesInfo.getPositionId())) {
+            hasRepository.updateJob_RecuitmentIdByPosId(vacanciesInfo.getPositionId(), savedJob_recruitment.getId());
+        } else {
+            hasRepository.insertHas(vacanciesInfo.getPositionId(), savedJob_recruitment.getId());
+        }
     }
 }

@@ -13,6 +13,9 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class Has implements Serializable {
     @Id
+    private Long posid;
+
+    @MapsId
     @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Position.class)
     @JoinColumn(name="posid", referencedColumnName="id")
     private Position position;

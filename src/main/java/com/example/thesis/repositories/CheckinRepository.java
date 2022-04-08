@@ -13,6 +13,8 @@ import java.time.LocalDate;
 public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     Checkin findByAttendanceIdAndDate(Long attendanceId, LocalDate date);
 
+    Checkin findByAttendanceId(Long attendanceId);
+
     @Transactional
     @Modifying
     @Query(value = "update checkin set time_out = ?2 where attendance_id = ?1", nativeQuery = true)

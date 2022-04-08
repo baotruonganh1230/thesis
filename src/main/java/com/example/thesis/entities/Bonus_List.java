@@ -23,7 +23,7 @@ public class Bonus_List {
     private BigDecimal amount;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
 }

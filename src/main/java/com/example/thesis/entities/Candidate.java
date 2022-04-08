@@ -18,11 +18,12 @@ public class Candidate {
 
     private String name;
 
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Candidate_CV.class)
-    @JoinColumn(name = "cv_file_id", referencedColumnName="id")
-    private Candidate_CV candidate_cv;
+    @Column(columnDefinition = "TEXT")
+    private String cv_file;
 
     private LocalDate appliedDate;
+
+    private LocalDate dateOfBirth;
 
     private String email;
 
@@ -31,9 +32,18 @@ public class Candidate {
     @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade=CascadeType.ALL, targetEntity = Job_Recruitment.class)
     @JoinColumn(name="job_recruitment_id", referencedColumnName="id")
-    private Job_Recruitment job_recruitment;
+    private Job_Recruitment jobRecruitment;
 
     public Candidate() {
     }
 
+    public Candidate(String name, String cv_file, LocalDate appliedDate, LocalDate dateOfBirth, String email, String contact, Job_Recruitment jobRecruitment) {
+        this.name = name;
+        this.cv_file = cv_file;
+        this.appliedDate = appliedDate;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.contact = contact;
+        this.jobRecruitment = jobRecruitment;
+    }
 }

@@ -19,6 +19,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -242,11 +243,30 @@ public class EmployeeService {
                         departmentRepository.findById(employeeRequest.getJobDetail().getDepartmentId()).get()
                 ));
             }
+
             for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {
                 Bonus_List bonus_list = new Bonus_List(bonus.getId(), bonus.getBonusName(),
                         bonus.getBonusAmount(),
                         employeeRepository.getById(id));
                 bonus_listRepository.save(bonus_list);
+            }
+
+            Employee employee = employeeRepository.getById(id);
+            List<Long> bonus_listIds = bonus_listRepository.findAllByEmployee(employee)
+                    .stream()
+                    .map(Bonus_List::getId)
+                    .collect(Collectors.toList());
+            Collections.sort(bonus_listIds, Collections.reverseOrder());
+
+            List<Long> idList = employeeRequest.getJobDetail().getBonus()
+                    .stream()
+                    .map(Bonus::getId)
+                    .collect(Collectors.toList());
+
+            for (Long bonus_listId : bonus_listIds) {
+                if (!idList.contains(bonus_listId)) {
+                    bonus_listRepository.deleteBonusById(bonus_listId);
+                }
             }
         } else {
             Insurance_Type insurance_typeSocial = insurance_typeRepository.findByName("social");
@@ -365,38 +385,41 @@ public class EmployeeService {
             bonus_listRepository.save(bonus_list);
         }
 
-        Insurance_Type insurance_typeSocial = insurance_typeRepository.findByName("social");
-        insuranceRepository.insertInsurance(
-                savedEmployee.getId(),
-                insurance_typeSocial.getId(),
-                null,
-                employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
-                employeeRequest.getInsuranceDetail().getSocial().getIssue_date(),
-                null,
-                employeeRequest.getInsuranceDetail().getSocial().getNumber(),
-                employeeRequest.getInsuranceDetail().getSocial().getTo_date());
+        if (employeeRequest.getInsuranceDetail() != null) {
+            Insurance_Type insurance_typeSocial = insurance_typeRepository.findByName("social");
+            insuranceRepository.insertInsurance(
+                    savedEmployee.getId(),
+                    insurance_typeSocial.getId(),
+                    null,
+                    employeeRequest.getInsuranceDetail().getSocial().getFrom_date(),
+                    employeeRequest.getInsuranceDetail().getSocial().getIssue_date(),
+                    null,
+                    employeeRequest.getInsuranceDetail().getSocial().getNumber(),
+                    employeeRequest.getInsuranceDetail().getSocial().getTo_date());
 
-        Insurance_Type insurance_typeUnemployment = insurance_typeRepository.findByName("unemployment");
-        insuranceRepository.insertInsurance(
-                savedEmployee.getId(),
-                insurance_typeUnemployment.getId(),
-                null,
-                employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
-                employeeRequest.getInsuranceDetail().getUnemployment().getIssue_date(),
-                null,
-                employeeRequest.getInsuranceDetail().getUnemployment().getNumber(),
-                employeeRequest.getInsuranceDetail().getUnemployment().getTo_date());
+            Insurance_Type insurance_typeUnemployment = insurance_typeRepository.findByName("unemployment");
+            insuranceRepository.insertInsurance(
+                    savedEmployee.getId(),
+                    insurance_typeUnemployment.getId(),
+                    null,
+                    employeeRequest.getInsuranceDetail().getUnemployment().getFrom_date(),
+                    employeeRequest.getInsuranceDetail().getUnemployment().getIssue_date(),
+                    null,
+                    employeeRequest.getInsuranceDetail().getUnemployment().getNumber(),
+                    employeeRequest.getInsuranceDetail().getUnemployment().getTo_date());
 
-        Insurance_Type insurance_typeHealth = insurance_typeRepository.findByName("health");
-        insuranceRepository.insertInsurance(
-                savedEmployee.getId(),
-                insurance_typeHealth.getId(),
-                employeeRequest.getInsuranceDetail().getCityId(),
-                employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
-                employeeRequest.getInsuranceDetail().getHealth().getIssue_date(),
-                employeeRequest.getInsuranceDetail().getKcbId(),
-                employeeRequest.getInsuranceDetail().getHealth().getNumber(),
-                employeeRequest.getInsuranceDetail().getHealth().getTo_date());
+            Insurance_Type insurance_typeHealth = insurance_typeRepository.findByName("health");
+            insuranceRepository.insertInsurance(
+                    savedEmployee.getId(),
+                    insurance_typeHealth.getId(),
+                    employeeRequest.getInsuranceDetail().getCityId(),
+                    employeeRequest.getInsuranceDetail().getHealth().getFrom_date(),
+                    employeeRequest.getInsuranceDetail().getHealth().getIssue_date(),
+                    employeeRequest.getInsuranceDetail().getKcbId(),
+                    employeeRequest.getInsuranceDetail().getHealth().getNumber(),
+                    employeeRequest.getInsuranceDetail().getHealth().getTo_date());
+        }
+
 
         if (employeeRequest.getAccountDetail() != null) {
             if (employeeRequest.getAccountDetail().getType().equalsIgnoreCase("new")) {

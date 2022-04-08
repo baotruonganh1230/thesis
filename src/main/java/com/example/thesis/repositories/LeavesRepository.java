@@ -3,6 +3,7 @@ package com.example.thesis.repositories;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.entities.Leaves;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -13,4 +14,7 @@ public interface LeavesRepository extends JpaRepository<Leaves, Long> {
     Leaves getById(Long id);
     List<Leaves> getAllByEmployee(Employee employee);
     List<Leaves> findAllByApplicationDate(LocalDate applicationDate);
+
+    @Query(value = "select * from leaves where (from_date >= ?1 AND from_date <= ?1) OR (to_date >= ?2 AND to_date <= ?2)", nativeQuery = true)
+    List<Leaves> findAllLeavesInWeek(String monday, String saturday);
 }

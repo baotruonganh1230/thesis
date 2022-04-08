@@ -1,7 +1,9 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Attendance;
+import com.example.thesis.entities.Department;
 import com.example.thesis.repositories.AttendanceRepository;
+import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.responses.AttendanceResponse;
 import com.example.thesis.responses.CheckinResponse;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
+    private final DepartmentRepository departmentRepository;
 
     public List<AttendanceResponse> getAllAttendances(String week, Long departmentId) {
         List<Attendance> attendanceList = null;
@@ -28,7 +31,7 @@ public class AttendanceService {
             //convert String to LocalDate
             LocalDate dayPassed = LocalDate.parse(week, formatter);
             LocalDate fromDate = dayPassed.with(DayOfWeek.MONDAY);
-            LocalDate toDate = fromDate.plusDays(4);
+            LocalDate toDate = fromDate.plusDays(5);
 
             attendanceList = attendanceRepository.findAllAttendancesFromdateTodate(fromDate.toString(), toDate.toString());
         } else {
@@ -36,12 +39,24 @@ public class AttendanceService {
         }
 
         if (departmentId != null) {
+
+            Department department = departmentRepository.getById(departmentId);
+            List<Long> subDepartmentIds =
+                    departmentRepository.findAllByHeadOfUnit(department)
+                            .stream()
+                            .map(
+                                    department1 ->
+                                            department1.getId()
+                            ).collect(Collectors.toList());
+
+            subDepartmentIds.add(department.getId());
+
             List<Attendance> attendances = attendanceList.stream()
-                    .filter(attendance -> (attendance
+                    .filter(attendance -> (subDepartmentIds.contains(attendance
                             .getEmployee()
                             .getWorks_in()
                             .getDepartment()
-                            .getId() == departmentId))
+                            .getId())))
                     .collect(Collectors.toList());
             return convertListAttendanceToAttendanceResponse(attendances);
         } else {
