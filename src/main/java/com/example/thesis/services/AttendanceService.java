@@ -67,51 +67,11 @@ public class AttendanceService {
                             .getId())))
                     .collect(Collectors.toList());
             List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendances);
-            List<AttendanceResponse> attendanceResponsesReturned = new ArrayList<>();
-            Map<String, List<AttendanceResponse>> groupByEmployeeName =
-                    attendanceResponses
-                            .stream()
-                            .collect(Collectors.groupingBy(AttendanceResponse::getName));
 
-            for (Map.Entry<String, List<AttendanceResponse>> entry : groupByEmployeeName.entrySet()) {
-                AttendanceResponse prototype = entry.getValue().get(0);
-                List<String> avaiableDays = entry.getValue()
-                    .stream()
-                    .map(attendanceResponse -> attendanceResponse.getCheckins().get(0).getDate().toString())
-                    .collect(Collectors.toList());
-                if (avaiableDays.size() < 6 && workingDays != null) {
-                    for (String day : workingDays) {
-                        if (!avaiableDays.contains(day)){
-                            List<CheckinResponse> checkins = new ArrayList<>();
-                            checkins.add(
-                                    new CheckinResponse(
-                                            null,
-                                            prototype.getCheckins().get(0).getStatus(),
-                                            day,
-                                            null,
-                                            null
-                                    )
-                            );
-                            attendanceResponsesReturned.add(
-                                    new AttendanceResponse(
-                                            prototype.getName(),
-                                            prototype.getDepartmentName(),
-                                            prototype.getJobTitle(),
-                                            checkins
-                                    )
-                            );
-                        } else {
-                            attendanceResponsesReturned.add(
-                                    attendanceResponses.get(
-                                            getIndexByDate(attendanceResponses, day))
-                            );
-                        }
-                    }
-                }
-            }
-            return attendanceResponsesReturned;
+            return addNullAttendanceInWeek(attendanceResponses, workingDays);
         } else {
-            return convertListAttendanceToAttendanceResponse(attendanceList);
+            List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendanceList);
+            return addNullAttendanceInWeek(attendanceResponses, workingDays);
         }
     }
 
@@ -139,5 +99,54 @@ public class AttendanceService {
             }
         }
         return -1;
+    }
+
+    private List<AttendanceResponse> addNullAttendanceInWeek(
+            List<AttendanceResponse> attendanceResponses,
+            List<String> workingDays
+            ) {
+        List<AttendanceResponse> attendanceResponsesReturned = new ArrayList<>();
+        Map<String, List<AttendanceResponse>> groupByEmployeeName =
+                attendanceResponses
+                        .stream()
+                        .collect(Collectors.groupingBy(AttendanceResponse::getName));
+
+        for (Map.Entry<String, List<AttendanceResponse>> entry : groupByEmployeeName.entrySet()) {
+            AttendanceResponse prototype = entry.getValue().get(0);
+            List<String> avaiableDays = entry.getValue()
+                    .stream()
+                    .map(attendanceResponse -> attendanceResponse.getCheckins().get(0).getDate().toString())
+                    .collect(Collectors.toList());
+            if (avaiableDays.size() < 6 && workingDays != null) {
+                for (String day : workingDays) {
+                    if (!avaiableDays.contains(day)){
+                        List<CheckinResponse> checkins = new ArrayList<>();
+                        checkins.add(
+                                new CheckinResponse(
+                                        null,
+                                        prototype.getCheckins().get(0).getStatus(),
+                                        day,
+                                        null,
+                                        null
+                                )
+                        );
+                        attendanceResponsesReturned.add(
+                                new AttendanceResponse(
+                                        prototype.getName(),
+                                        prototype.getDepartmentName(),
+                                        prototype.getJobTitle(),
+                                        checkins
+                                )
+                        );
+                    } else {
+                        attendanceResponsesReturned.add(
+                                attendanceResponses.get(
+                                        getIndexByDate(attendanceResponses, day))
+                        );
+                    }
+                }
+            }
+        }
+        return attendanceResponsesReturned;
     }
 }
