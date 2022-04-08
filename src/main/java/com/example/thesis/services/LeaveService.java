@@ -98,7 +98,7 @@ public class LeaveService {
                         leaveRequest.getToDate(),
                         LocalDate.now(),
                         leaveRequest.getAmount(),
-                        null,
+                        2,
                         leaveRequest.getReason()
                 )
         );
