@@ -13,8 +13,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckinResponse {
-    private Long attendanceId;
-
     private Integer status;
 
     private String date;
@@ -22,8 +20,7 @@ public class CheckinResponse {
     private LocalTime time_in;
     private LocalTime time_out;
 
-    public CheckinResponse(Long attendanceId, Integer status, LocalDate date, LocalTime time_in, LocalTime time_out) {
-        this.attendanceId = attendanceId;
+    public CheckinResponse(Integer status, LocalDate date, LocalTime time_in, LocalTime time_out) {
         this.status = status;
         this.date = date.toString() + "T00:00:00.000Z";
         this.time_in = time_in;

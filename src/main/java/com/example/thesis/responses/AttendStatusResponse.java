@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttendStatusResponse {
-    private Long onTime;
-    private Long late;
-    private Long onLeave;
+    private List<Long> onTime;
+    private List<Long> lateEarly;
+    private List<Long> off;
 }

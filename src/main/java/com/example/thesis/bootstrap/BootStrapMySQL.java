@@ -5,7 +5,6 @@ import com.example.thesis.entities.AccountStatus;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.entities.Role;
 import com.example.thesis.services.AccountService;
-import com.example.thesis.services.DepartmentService;
 import com.example.thesis.services.EmployeeService;
 import com.example.thesis.services.RoleService;
 import lombok.AllArgsConstructor;
@@ -34,8 +33,6 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
     private final RoleService roleService;
 
     private final EmployeeService employeeService;
-
-    private final DepartmentService departmentService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {

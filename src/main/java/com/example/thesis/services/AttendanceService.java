@@ -14,6 +14,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,10 +69,10 @@ public class AttendanceService {
                     .collect(Collectors.toList());
             List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendances);
 
-            return addNullAttendanceInWeek(attendanceResponses, workingDays);
+            return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
         } else {
             List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendanceList);
-            return addNullAttendanceInWeek(attendanceResponses, workingDays);
+            return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
         }
     }
 
@@ -83,7 +84,6 @@ public class AttendanceService {
                         attendance.getEmployee().getPosition() == null ? null : attendance.getEmployee().getPosition().getName(),
                         attendance.getCheckins().stream().map(checkin ->
                                 new CheckinResponse(
-                                        checkin.getAttendanceId(),
                                         checkin.getStatus(),
                                         checkin.getDate(),
                                         checkin.getTime_in(),
@@ -92,61 +92,44 @@ public class AttendanceService {
                         ).collect(Collectors.toList()))).collect(Collectors.toList());
     }
 
-    private int getIndexByDate(List<AttendanceResponse> attendanceResponses, String date) {
-        for (int i = 0; i < attendanceResponses.size(); i++) {
-            if (attendanceResponses.get(i).getCheckins().get(0).getDate().equalsIgnoreCase(date)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private List<AttendanceResponse> addNullAttendanceInWeek(
+    private List<AttendanceResponse> addNullAndGroupAttendanceInWeek(
             List<AttendanceResponse> attendanceResponses,
             List<String> workingDays
             ) {
-        List<AttendanceResponse> attendanceResponsesReturned = new ArrayList<>();
+
         Map<String, List<AttendanceResponse>> groupByEmployeeName =
                 attendanceResponses
                         .stream()
                         .collect(Collectors.groupingBy(AttendanceResponse::getName));
+        List<AttendanceResponse> attendanceResponsesReturned = new ArrayList<>();
 
         for (Map.Entry<String, List<AttendanceResponse>> entry : groupByEmployeeName.entrySet()) {
-            AttendanceResponse prototype = entry.getValue().get(0);
-            List<String> avaiableDays = entry.getValue()
+            List<AttendanceResponse> empAttendance = entry.getValue();
+            AttendanceResponse prototype = empAttendance.get(0);
+            List<String> avaiableDays = empAttendance
                     .stream()
                     .map(attendanceResponse -> attendanceResponse.getCheckins().get(0).getDate().toString())
                     .collect(Collectors.toList());
+            for (int i = 1; i < empAttendance.size(); i++) {
+                prototype.getCheckins().add(empAttendance.get(i).getCheckins().get(0));
+            }
             if (avaiableDays.size() < 6 && workingDays != null) {
                 for (String day : workingDays) {
                     if (!avaiableDays.contains(day)){
-                        List<CheckinResponse> checkins = new ArrayList<>();
-                        checkins.add(
-                                new CheckinResponse(
-                                        null,
-                                        prototype.getCheckins().get(0).getStatus(),
-                                        day,
-                                        null,
-                                        null
-                                )
-                        );
-                        attendanceResponsesReturned.add(
-                                new AttendanceResponse(
-                                        prototype.getName(),
-                                        prototype.getDepartmentName(),
-                                        prototype.getJobTitle(),
-                                        checkins
-                                )
-                        );
-                    } else {
-                        attendanceResponsesReturned.add(
-                                attendanceResponses.get(
-                                        getIndexByDate(attendanceResponses, day))
-                        );
+                        prototype.getCheckins().add(new CheckinResponse(
+                                prototype.getCheckins().get(0).getStatus(),
+                                day,
+                                null,
+                                null
+                        ));
+
                     }
                 }
             }
+            prototype.getCheckins().sort(Comparator.comparing(CheckinResponse::getDate));
+            attendanceResponsesReturned.add(prototype);
         }
+
         return attendanceResponsesReturned;
     }
 }

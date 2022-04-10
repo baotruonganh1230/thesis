@@ -96,7 +96,7 @@
         "tags": [
           "job-_-recruitment-controller"
         ],
-        "operationId": "updateJob_1",
+        "operationId": "updateJob_Recruitment",
         "parameters": [
           {
             "name": "id",
@@ -474,6 +474,36 @@
         }
       }
     },
+    "/api/v1/job_recruitment": {
+      "post": {
+        "tags": [
+          "job-_-recruitment-controller"
+        ],
+        "operationId": "insertJob_Recruitment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VacanciesInfo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/employee": {
       "post": {
         "tags": [
@@ -657,6 +687,54 @@
             }
           },
           "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/unauthorized/candidate": {
+      "post": {
+        "tags": [
+          "unauthorized-controller"
+        ],
+        "operationId": "insertCandidateUnauthorized",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "avatar"
+                ],
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -864,6 +942,14 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1020,6 +1106,66 @@
         }
       }
     },
+    "/api/v1/chart/attendNumber": {
+      "get": {
+        "tags": [
+          "util-controller"
+        ],
+        "operationId": "getEmployeeAttendStatus",
+        "parameters": [
+          {
+            "name": "week",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chart/attendHour": {
+      "get": {
+        "tags": [
+          "util-controller"
+        ],
+        "operationId": "getAverageWorkingHours",
+        "parameters": [
+          {
+            "name": "week",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/candidates": {
       "get": {
         "tags": [
@@ -1096,6 +1242,26 @@
           "account-controller"
         ],
         "operationId": "getAccounts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/unauthorized/job_recruitments": {
+      "get": {
+        "tags": [
+          "unauthorized-controller"
+        ],
+        "operationId": "getJob_RecruitmentsUnauthorized",
         "responses": {
           "200": {
             "description": "OK",
@@ -1218,8 +1384,8 @@
           "status": {
             "type": "string",
             "enum": [
-              "enable",
-              "disable"
+              "ENABLE",
+              "DISABLE"
             ]
           }
         }
@@ -1276,8 +1442,7 @@
             "format": "int64"
           },
           "deviceId": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "date": {
             "type": "string",
