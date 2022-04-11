@@ -15,15 +15,31 @@ import java.util.List;
 public class PaymentResponse {
     private BigDecimal basicSalary;
 
-    private MonthlyInfo monthlyInfo;
-
-    private BigDecimal derivedSalary;
-
     private List<Bonus> bonus;
 
     private BigDecimal totalBonus;
 
+    private MonthlyInfo monthlyInfo;
+
+    private BigDecimal totalDerivedIncome;
+
+    private BigDecimal derivedSalary;
+
+    private BigDecimal anotherIncome;
+
+    private BigDecimal lunch;
+
+    private BigDecimal parking;
+
+    private BigDecimal totalDeduction;
+
     private BigDecimal mandatoryInsurance;
+
+    private BigDecimal allowanceNotSubjectedToTax;
+
+    private BigDecimal personalRelief;
+
+    private BigDecimal dependentRelief;
 
     private BigDecimal taxableIncome;
 
