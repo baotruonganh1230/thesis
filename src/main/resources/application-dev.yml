@@ -59,4 +59,6 @@ log4j:
       hibernate:
         SQL: debug
         type: trace
+pdf:
+  directory: '/tmp/'
 

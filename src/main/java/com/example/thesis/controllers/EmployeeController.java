@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("api/v1/")
@@ -59,14 +56,6 @@ public class EmployeeController {
         }
         employeeService.insertEmployeeById(file, employeeRequest);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("upload")
-    public String uploadFile() throws IOException {
-        File originalFile = new File("C:\\Users\\baoatruong\\Downloads\\2925.png");
-        com.google.api.services.drive.model.File uploadedFile = googleDriveService.upLoadFile(originalFile.getName(), originalFile.getAbsolutePath(), "image/png");
-        return uploadedFile.toPrettyString();
-
     }
 
 }

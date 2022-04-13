@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <style>
+    h1{
+      color: brown;
+    }
+    .payroll {
+      width: 100%;
+    }
+    .payroll, .payroll th, .payroll td {
+      border: 1px solid brown;
+      border-collapse: collapse;
+    }
+    .payroll th {
+      background-color: brown;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<h1>Payroll</h1>
+<br />
+<table class="payroll">
+  <tr>
+    <th>Id</th>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Month</th>
+    <th>Income</th>
+  </tr>
+  <tr th:each="item, iterStat: ${entities}">
+    <td th:text="${item.id}"></td>
+    <td th:text="${item.firstName}"></td>
+    <td th:text="${item.lastName}"></td>
+    <td th:text="${item.month}"></td>
+    <td th:text="${item.netIncome}"></td>
+  </tr>
+</table>
+</body>
+</html>

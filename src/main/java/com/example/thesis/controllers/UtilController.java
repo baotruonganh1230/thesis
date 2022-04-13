@@ -22,4 +22,9 @@ public class UtilController {
     public ResponseEntity<?> getEmployeeAttendStatus(@RequestParam(required=false) String week) {
         return new ResponseEntity<>(utilService.getEmployeeAttendStatus(week), HttpStatus.OK);
     }
+
+    @GetMapping("link")
+    public ResponseEntity<?> getPayrollPdf(@RequestParam(required=false) String month) {
+        return new ResponseEntity<>(utilService.getPayrollPdf(month), HttpStatus.OK);
+    }
 }

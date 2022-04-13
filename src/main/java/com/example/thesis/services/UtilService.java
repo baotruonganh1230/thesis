@@ -1,17 +1,19 @@
 package com.example.thesis.services;
 
-import com.example.thesis.entities.Attendance;
-import com.example.thesis.entities.Checkin;
-import com.example.thesis.entities.Employee;
-import com.example.thesis.entities.Leaves;
-import com.example.thesis.repositories.AttendanceRepository;
-import com.example.thesis.repositories.CheckinRepository;
-import com.example.thesis.repositories.EmployeeRepository;
-import com.example.thesis.repositories.LeavesRepository;
+import com.example.thesis.entities.*;
+import com.example.thesis.repositories.*;
 import com.example.thesis.responses.AttendStatusResponse;
-import lombok.AllArgsConstructor;
+import com.example.thesis.responses.PaymentResponse;
+import com.example.thesis.responses.PayrollEntity;
+import com.example.thesis.responses.PayrollResponsePdf;
+import org.apache.tika.Tika;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,12 +27,33 @@ import java.util.stream.Collectors;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 @Service
-@AllArgsConstructor
 public class UtilService {
-    private final EmployeeRepository employeeRepository;
-    private final AttendanceRepository attendanceRepository;
-    private final CheckinRepository checkinRepository;
-    private final LeavesRepository leavesRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private CheckinRepository checkinRepository;
+
+    @Autowired
+    private LeavesRepository leavesRepository;
+
+    @Autowired
+    private PayrollRepository payrollRepository;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private GoogleDriveService googleDriveService;
+
+    @Autowired
+    private PdfGenerateService pdfGenerateService;
+
+    @Value("${pdf.directory}")
+    private String pdfDirectory;
 
     public List<Double> getAverageWorkingHoursByWeek(String week) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -121,5 +144,64 @@ public class UtilService {
                 late,
                 onLeave
         );
+    }
+
+    @Transactional
+    public PayrollResponsePdf getPayrollPdf(String month) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        LocalDate dayPassed = LocalDate.parse(month, formatter);
+        LocalDate firstDate = dayPassed.withDayOfMonth(1);
+        LocalDate lastDate = dayPassed.withDayOfMonth(
+                dayPassed.getMonth().length(dayPassed.isLeapYear()));
+
+        Payroll payroll = payrollRepository.findPayrollByMonth(firstDate, lastDate);
+        List<PayrollEntity> payrollEntities =
+                payroll.getPayments()
+                        .stream()
+                        .map(payment ->
+                        {
+                            PaymentResponse paymentResponse =
+                                    paymentService.getPayment(month, payment.getEid());
+
+                            return new PayrollEntity(
+                                    payment.getEid(),
+                                    payment.getEmployee().getFirst_name(),
+                                    payment.getEmployee().getLast_name(),
+                                    payment.getPayment_date().format(DateTimeFormatter.ofPattern("MM/yyyy")),
+                                    paymentResponse.getNetIncome()
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("entities", payrollEntities);
+
+        pdfGenerateService.generatePdfFile("payroll", data, "payroll.pdf");
+        File filetoUpload = new File(pdfDirectory + "payroll.pdf");
+
+        Tika tika = new Tika();
+        String mimeType = null;
+        try {
+            mimeType = tika.detect(filetoUpload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("The file name is: " + filetoUpload.getName());
+        System.out.println("The file mime type is: " + mimeType);
+
+        com.google.api.services.drive.model.File upLoadedFile =
+                googleDriveService.upLoadFile(filetoUpload.getName(),
+                        filetoUpload.getAbsolutePath(), mimeType);
+
+        if (!filetoUpload.delete()) {
+            throw new IllegalStateException("Cannot delete file!");
+        }
+
+        return new PayrollResponsePdf(
+                upLoadedFile.getWebContentLink()
+        );
+
     }
 }

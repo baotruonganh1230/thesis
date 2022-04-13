@@ -75,11 +75,8 @@ public class GoogleDriveService {
             com.google.api.client.http.FileContent fileContent = new FileContent(mimeType, fileUpload);
             System.out.println("The length of file content is: " + fileContent.getLength());
             Drive.Files files = getDriveService().files();
-            System.out.println("AAAAAAAA");
             Drive.Files.Create create = files.create(fileMetadata, fileContent);
-            System.out.println("BBBBBBBB");
             Drive.Files.Create create1 = create.setFields("webContentLink");
-            System.out.println("CCCCCCCC");
             file = create1.execute();
 //            file = getDriveService().files().create(fileMetadata, fileContent)
 //                    .setFields("webContentLink").execute();

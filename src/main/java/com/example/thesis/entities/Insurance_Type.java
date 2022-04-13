@@ -28,10 +28,4 @@ public class Insurance_Type {
             cascade = CascadeType.ALL
     )
     private List<Insurance> insurances = new ArrayList<>();
-
-    public Insurance_Type(Long id, String name, BigDecimal rate_of_payment) {
-        this.id = id;
-        this.name = name;
-        this.rate_of_payment = rate_of_payment;
-    }
 }
