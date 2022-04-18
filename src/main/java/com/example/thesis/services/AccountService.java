@@ -68,22 +68,33 @@ public class AccountService implements UserDetailsService {
         return accountRepository.save(account);
     }
 
-    public List<AccountResponse> getAccountResponses() {
+    public List<AccountResponse> getAccountResponses(Boolean avaiable) {
         List<AccountResponse> accountResponses = new ArrayList<>();
 
-        Lists.newArrayList(accountRepository.findAll()).forEach((Account account) -> {
-            AccountResponse accountResponse = new AccountResponse(
-                    account.getId(),
-                    account.getEmployee() == null ? null : account.getEmployee().getId(),
-                    account.getRole() == null ? null : account.getRole().getId(),
-                    account.getUsername(),
-                    account.getPassword(),
-                    account.getStatus() == null ? null : account.getStatus().toString());
-
-            accountResponses.add(accountResponse);
-        });
+        if (avaiable != null && avaiable) {
+            Lists.newArrayList(accountRepository.findAll())
+                    .stream()
+                    .filter(account -> (account.getEmployee() == null))
+                    .forEach(account -> {
+                        accountResponses.add(convertAccountToAccountResponse(account));
+                    });
+        } else {
+            Lists.newArrayList(accountRepository.findAll()).forEach(account -> {
+                accountResponses.add(convertAccountToAccountResponse(account));
+            });
+        }
 
         return accountResponses;
+    }
+
+    private AccountResponse convertAccountToAccountResponse(Account account) {
+        return new AccountResponse(
+                account.getId(),
+                account.getEmployee() == null ? null : account.getEmployee().getId(),
+                account.getRole() == null ? null : account.getRole().getId(),
+                account.getUsername(),
+                account.getPassword(),
+                account.getStatus() == null ? null : account.getStatus().toString());
     }
 
     public AccountResponse getAccountById(Long id) {
@@ -102,7 +113,11 @@ public class AccountService implements UserDetailsService {
         if (oldAccount == null) {
             throw new DataReadException("There is no account with that id");
         }
-        System.out.println();
+        boolean usernameExists = (accountRepository.findByUsername(accountRequest.getUsername()) != null);
+
+        if (usernameExists) {
+            throw new IllegalStateException("username already taken");
+        }
         return accountRepository.setAccountById(
                 id,
                 accountRequest.getEid(),
@@ -113,6 +128,11 @@ public class AccountService implements UserDetailsService {
     }
 
     public void insertAccount(AccountRequest accountRequest) {
+        boolean usernameExists = (accountRepository.findByUsername(accountRequest.getUsername()) != null);
+
+        if (usernameExists) {
+            throw new IllegalStateException("username already taken");
+        }
         accountRepository.save(
                 new Account(
                         null,

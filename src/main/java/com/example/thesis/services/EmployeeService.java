@@ -35,7 +35,6 @@ public class EmployeeService {
     private final PositionRepository positionRepository;
     private final InsuranceRepository insuranceRepository;
     private final Insurance_TypeRepository insurance_typeRepository;
-    private final RoleRepository roleRepository;
 
     private InsuranceOutputParams getInsuranceOutputParams(Employee employee) {
         InsuranceOutputParams insuranceOutputParams = new InsuranceOutputParams();
@@ -78,19 +77,27 @@ public class EmployeeService {
     }
 
 
-    public List<EmployeeResponse> getEmployees() {
+    public List<EmployeeResponse> getEmployees(Boolean isHavingDepartment) {
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
+        List<Employee> employeeList = employeeRepository.findAll();
 
-        Lists.newArrayList(employeeRepository.findAll()).forEach((Employee employee) -> {
+        if (isHavingDepartment != null && isHavingDepartment) {
+            employeeList = employeeList.stream().filter(
+                    employee -> (employee.getWorksIn() != null
+                            && employee.getWorksIn().getDepartment() != null)
+            ).collect(Collectors.toList());
+        }
+
+        Lists.newArrayList(employeeList).forEach((Employee employee) -> {
             EmployeeResponse employeeResponse = null;
             try {
                 employeeResponse = new EmployeeResponse(
                         employee.getId(),
                         new PersonalDetailOutputParams(
                                 employee.getAvatar(),
-                                employee.getFirst_name(),
-                                employee.getLast_name(),
+                                employee.getFirstName(),
+                                employee.getLastName(),
                                 employee.getEmail(),
                                 employee.getPhone(),
                                 employee.getSex(),
@@ -102,7 +109,7 @@ public class EmployeeService {
                                 employee.getEmployed_date(),
                                 employee.getPosition() == null ? null : employee.getPosition().getId(),
                                 employee.getPit(),
-                                employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getId(),
+                                employee.getWorksIn() == null ? null : employee.getWorksIn().getDepartment().getId(),
                                 employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
                                 employee.getGross_salary(),
                                 employee.getBonus_lists() == null ? null : employee.getBonus_lists()
@@ -149,8 +156,8 @@ public class EmployeeService {
                     employee.getId(),
                     new PersonalDetailOutputParams(
                             employee.getAvatar(),
-                            employee.getFirst_name(),
-                            employee.getLast_name(),
+                            employee.getFirstName(),
+                            employee.getLastName(),
                             employee.getEmail(),
                             employee.getPhone(),
                             employee.getSex(),
@@ -162,7 +169,7 @@ public class EmployeeService {
                             employee.getEmployed_date(),
                             employee.getPosition() == null ? null : employee.getPosition().getId(),
                             employee.getPit(),
-                            employee.getWorks_in() == null ? null : employee.getWorks_in().getDepartment().getId(),
+                            employee.getWorksIn() == null ? null : employee.getWorksIn().getDepartment().getId(),
                             employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
                             employee.getGross_salary(),
                             employee.getBonus_lists() == null ? null : employee.getBonus_lists()
@@ -196,8 +203,6 @@ public class EmployeeService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("The file name is: " + filetoUpload.getName());
-            System.out.println("The file mime type is: " + mimeType);
 
             com.google.api.services.drive.model.File upLoadedFile =
                     googleDriveService.upLoadFile(filetoUpload.getName(),
@@ -235,8 +240,14 @@ public class EmployeeService {
                     employeeRequest.getJobDetail().getSalaryGroup());
 
             if (works_inRepository.existsById(id)) {
-                works_inRepository.setDepartmentId(id, employeeRequest.getJobDetail().getDepartmentId());
+                Works_In works_in = works_inRepository.getById(id);
+                if (!works_in.getDepartment().getId().equals(employeeRequest.getJobDetail().getDepartmentId())) {
+                    departmentRepository.decreasePeopleCount(works_in.getDepartment().getId());
+                    works_inRepository.setDepartmentId(id, employeeRequest.getJobDetail().getDepartmentId());
+                    departmentRepository.increasePeopleCount(employeeRequest.getJobDetail().getDepartmentId());
+                }
             } else {
+                departmentRepository.increasePeopleCount(employeeRequest.getJobDetail().getDepartmentId());
                 works_inRepository.save(new Works_In(
                         id,
                         employeeRepository.findById(id).get(),
@@ -245,10 +256,17 @@ public class EmployeeService {
             }
 
             for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {
-                Bonus_List bonus_list = new Bonus_List(bonus.getId(), bonus.getBonusName(),
-                        bonus.getBonusAmount(),
-                        employeeRepository.getById(id));
-                bonus_listRepository.save(bonus_list);
+                if (bonus.getId() != null && bonus_listRepository.existsById(bonus.getId())) {
+                    bonus_listRepository.updateBonus(
+                            bonus.getId(),
+                            bonus.getBonusName(),
+                            bonus.getBonusAmount(),
+                            id
+                    );
+                } else {
+                    bonus_listRepository.insertNewBonus(bonus.getBonusAmount(), bonus.getBonusName(), id);
+                }
+
             }
 
             Employee employee = employeeRepository.getById(id);
@@ -376,6 +394,7 @@ public class EmployeeService {
 
         positionRepository.setSalaryGroupById(employeeRequest.getJobDetail().getJobId(),
                 employeeRequest.getJobDetail().getSalaryGroup());
+        departmentRepository.increasePeopleCount(employeeRequest.getJobDetail().getDepartmentId());
         works_inRepository.save(new Works_In(savedEmployee.getId(), savedEmployee,
                 departmentRepository.getById(employeeRequest.getJobDetail().getDepartmentId())));
         for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {

@@ -1,6 +1,5 @@
 package com.example.thesis.controllers;
 
-import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.requests.DepartmentRequest;
 import com.example.thesis.services.DepartmentService;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class DepartmentController {
     private final DepartmentService departmentService;
-    private final DepartmentRepository repository;
 
     @GetMapping("departments")
     public ResponseEntity<?> getDepartments(@RequestParam Boolean nested) {

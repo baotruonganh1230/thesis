@@ -1,7 +1,13 @@
 package com.example.thesis.services;
 
-import com.example.thesis.entities.*;
-import com.example.thesis.repositories.*;
+import com.example.thesis.entities.Attendance;
+import com.example.thesis.entities.Checkin;
+import com.example.thesis.entities.Employee;
+import com.example.thesis.entities.Payroll;
+import com.example.thesis.repositories.AttendanceRepository;
+import com.example.thesis.repositories.CheckinRepository;
+import com.example.thesis.repositories.EmployeeRepository;
+import com.example.thesis.repositories.PayrollRepository;
 import com.example.thesis.responses.AttendStatusResponse;
 import com.example.thesis.responses.PaymentResponse;
 import com.example.thesis.responses.PayrollEntity;
@@ -36,9 +42,6 @@ public class UtilService {
 
     @Autowired
     private CheckinRepository checkinRepository;
-
-    @Autowired
-    private LeavesRepository leavesRepository;
 
     @Autowired
     private PayrollRepository payrollRepository;
@@ -94,32 +97,25 @@ public class UtilService {
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-        //convert String to LocalDate
         LocalDate dayPassed = LocalDate.parse(week, formatter);
         LocalDate monday = dayPassed.with(DayOfWeek.MONDAY);
-        LocalDate saturday = monday.plusDays(5);
         for (int i = 0; i < 6; i++) {
             workingDays.add(monday.plusDays(i) + "T00:00:00.000Z");
         }
 
         List<Long> onTime = new ArrayList<>();
         List<Long> late = new ArrayList<>();
-        List<Long> onLeave = new ArrayList<>();
+        List<Long> off = new ArrayList<>();
 
-        List<Attendance> attendances = attendanceRepository.findAllAttendancesFromdateTodate(monday.toString(), saturday.toString());
-
-        Map<Employee, List<Attendance>> groupByEmployee =
-                attendances
-                        .stream()
-                        .collect(Collectors.groupingBy(Attendance::getEmployee));
+        List<Employee> employees = employeeRepository.findAll();
 
         for (String date : workingDays) {
             long onTimeThatDay = 0;
             long lateThatDay = 0;
-            long onLeaveThatDay = 0;
+            long offThatDay = 0;
 
-            for (Map.Entry<Employee, List<Attendance>> entry : groupByEmployee.entrySet()) {
-                Attendance attendance = attendanceRepository.findByEmployeeAndDate(entry.getKey(), LocalDate.parse(date.substring(0,10)));
+            for (Employee employee : employees) {
+                Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, LocalDate.parse(date.substring(0,10)));
                 if (attendance != null) {
                     Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
                     if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) > 0) {
@@ -128,21 +124,18 @@ public class UtilService {
                         onTimeThatDay += 1;
                     }
                 } else {
-                    List<Leaves> empLeaveThatDay = leavesRepository.findAllByEmployeeAndDate(entry.getKey().getId(), LocalDate.parse(date.substring(0,10)));
-                    if (empLeaveThatDay.size() == 0) {
-                        onLeaveThatDay += 1;
-                    }
+                    offThatDay += 1;
                 }
             }
             onTime.add(onTimeThatDay);
             late.add(lateThatDay);
-            onLeave.add(onLeaveThatDay);
+            off.add(offThatDay);
         }
 
         return new AttendStatusResponse(
                 onTime,
                 late,
-                onLeave
+                off
         );
     }
 
@@ -167,8 +160,8 @@ public class UtilService {
 
                             return new PayrollEntity(
                                     payment.getEid(),
-                                    payment.getEmployee().getFirst_name(),
-                                    payment.getEmployee().getLast_name(),
+                                    payment.getEmployee().getFirstName(),
+                                    payment.getEmployee().getLastName(),
                                     payment.getPayment_date().format(DateTimeFormatter.ofPattern("MM/yyyy")),
                                     paymentResponse.getNetIncome()
                             );

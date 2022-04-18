@@ -1,12 +1,10 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Department;
+import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.entities.Manage;
 import com.example.thesis.entities.Works_In;
-import com.example.thesis.repositories.DepartmentRepository;
-import com.example.thesis.repositories.EmployeeRepository;
-import com.example.thesis.repositories.ManageRepository;
-import com.example.thesis.repositories.Works_InRepository;
+import com.example.thesis.repositories.*;
 import com.example.thesis.requests.DepartmentRequest;
 import com.example.thesis.responses.DepartmentResponse;
 import com.google.common.collect.Lists;
@@ -26,6 +24,7 @@ public class DepartmentService {
     private final ManageRepository manageRepository;
     private final EmployeeRepository employeeRepository;
     private final Works_InRepository works_inRepository;
+    private final Job_RecruitmentRepository job_recruitmentRepository;
 
     private DepartmentResponse convertFromDepartmentToDepartmentResponse(Set<Long> idSet, Department department) {
         if (department != null) {
@@ -137,7 +136,12 @@ public class DepartmentService {
         }
 
         if (works_inRepository.existsById(departmentRequest.getManagerOfUnitId())) {
-            works_inRepository.setDepartmentId(departmentRequest.getManagerOfUnitId(), id);
+            Works_In works_in = works_inRepository.getById(departmentRequest.getManagerOfUnitId());
+            if (!works_in.getDepartment().getId().equals(id)) {
+                departmentRepository.decreasePeopleCount(works_in.getDepartment().getId());
+                works_inRepository.setDepartmentId(departmentRequest.getManagerOfUnitId(), id);
+                departmentRepository.increasePeopleCount(id);
+            }
         } else {
             works_inRepository.save(new Works_In(
                     departmentRequest.getManagerOfUnitId(),
@@ -156,7 +160,7 @@ public class DepartmentService {
                     null,
                     null,
                     departmentRequest.getName(),
-                    null,
+                    departmentRequest.getManagerOfUnitId() != null ? 1 : 0,
                     null,
                     departmentRequest.getDescription(),
                     null,
@@ -194,6 +198,23 @@ public class DepartmentService {
         if (!departmentRepository.existsById(id)) {
             throw new EntityNotFoundException("Department does not exist");
         }
+        Department department = departmentRepository.getById(id);
+        Department headOfUnit = department.getHeadOfUnit();
+
+        for (Job_Recruitment job_recruitment : department.getJob_recruitments()) {
+            job_recruitmentRepository.deleteByDid(job_recruitment.getId());
+        }
+
+        manageRepository.deleteByDid(id);
+
+        for (Works_In works_in : department.getWorks_ins()) {
+            works_inRepository.setDepartmentId(works_in.getEid(), headOfUnit.getId());
+        }
+
+        for (Department subDepartment : department.getSubUnits()) {
+            departmentRepository.setHeadOfUnit(subDepartment.getId(), headOfUnit.getId());
+        }
+
         departmentRepository.deleteById(id);
 
     }

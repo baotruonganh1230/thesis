@@ -15,4 +15,9 @@ public interface Job_RecruitmentRepository extends JpaRepository<Job_Recruitment
     @Modifying
     @Query(value = "update job_recruitment set expired_date = ?2, note = ?3, post_content = ?4, published_date = ?5, quantity = ?6, status = ?7, department_id = ?8, hiring_manager_id = ?9 where id = ?1", nativeQuery = true)
     int updateJob_Recruitment(Long id, LocalDate expired_date, String note, String post_content, LocalDate published_date, Integer quantity, Integer status, Long department_id, Long hiring_manager_id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from job_recruitment where department_id = ?1", nativeQuery = true)
+    void deleteByDid(Long did);
 }

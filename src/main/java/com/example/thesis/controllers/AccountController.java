@@ -20,8 +20,8 @@ public class AccountController {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("accounts")
-    public ResponseEntity<?> getAccounts() {
-        return new ResponseEntity<>(acccountService.getAccountResponses(), HttpStatus.OK);
+    public ResponseEntity<?> getAccounts(@RequestParam(required=false) Boolean avaiable) {
+        return new ResponseEntity<>(acccountService.getAccountResponses(avaiable), HttpStatus.OK);
     }
 
     @GetMapping("account/{id}")

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -51,6 +52,16 @@ public class CheckinService {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinRequest.getDate());
         checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut().toString());
+        Integer status;
+        Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
+        if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) <= 0 && checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) >= 0) {
+            status = 0;
+        } else if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) > 0 || checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) < 0) {
+            status = 1;
+        } else {
+            status = 2;
+        }
+        checkinRepository.setStatus(attendance.getId(), status);
     }
 
     public HaveCheckedInResponse haveCheckedin(Long userId, String date) {

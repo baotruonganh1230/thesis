@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,19 +33,23 @@ public class Department {
     private String description;
 
     @OneToMany(mappedBy = "headOfUnit")
+    @Fetch(FetchMode.JOIN)
     private Set<Department> subUnits = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    @Fetch(FetchMode.JOIN)
     private Department headOfUnit;
 
     @JsonIgnore
+    @Fetch(FetchMode.JOIN)
     @OneToMany(
             mappedBy = "department",
             cascade = CascadeType.ALL
     )
-    private List<Job_Recruitment> job_recruitments = new ArrayList<>();
+    private Set<Job_Recruitment> job_recruitments = new HashSet<>();
 
     @JsonIgnore
+    @Fetch(FetchMode.JOIN)
     @OneToOne(
             mappedBy = "department",
             cascade = CascadeType.ALL
@@ -52,6 +57,7 @@ public class Department {
     private Manage manage;
 
     @JsonIgnore
+    @Fetch(FetchMode.JOIN)
     @OneToMany(
             mappedBy = "department",
             cascade = CascadeType.ALL

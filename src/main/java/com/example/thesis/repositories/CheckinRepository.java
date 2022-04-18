@@ -22,6 +22,11 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "update checkin set status where attendance_id = ?1", nativeQuery = true)
+    int setStatus(Long attendance_id, Integer status);
+
+    @Transactional
+    @Modifying
     @Query(value = "insert into checkin (date, device_id, status, time_in, time_out, attendance_id) values (?3, ?6, ?2, ?4, ?5, ?1)", nativeQuery = true)
     int insertCheckin(Long attendance_id, Integer status, String date, String timeIn, String timeOut, String deviceId);
 }

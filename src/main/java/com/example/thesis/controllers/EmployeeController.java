@@ -20,8 +20,8 @@ public class EmployeeController {
     private final GoogleDriveService googleDriveService;
 
     @GetMapping("employees")
-    public ResponseEntity<?> getEmployees() {
-        return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
+    public ResponseEntity<?> getEmployees(@RequestParam(required=false) Boolean isHavingDepartment) {
+        return new ResponseEntity<>(employeeService.getEmployees(isHavingDepartment), HttpStatus.OK);
     }
 
     @GetMapping("employee/{id}")

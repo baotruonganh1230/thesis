@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class LeaveEmployeeList {
-    private List<LeaveDetail> leaveEmployeeList;
+    private Page<LeaveDetail> leaveEmployeeList;
 }

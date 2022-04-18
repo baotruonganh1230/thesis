@@ -13,4 +13,9 @@ public interface ManageRepository extends JpaRepository<Manage, Long> {
     @Modifying
     @Query(value = "update manage set eid = ?2 where did = ?1", nativeQuery = true)
     int setEmployeeId(Long did, Long eid);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from manage where did = ?1", nativeQuery = true)
+    void deleteByDid(Long did);
 }

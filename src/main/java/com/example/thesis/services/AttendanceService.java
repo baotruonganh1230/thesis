@@ -63,7 +63,7 @@ public class AttendanceService {
             List<Attendance> attendances = attendanceList.stream()
                     .filter(attendance -> (subDepartmentIds.contains(attendance
                             .getEmployee()
-                            .getWorks_in()
+                            .getWorksIn()
                             .getDepartment()
                             .getId())))
                     .collect(Collectors.toList());
@@ -78,9 +78,9 @@ public class AttendanceService {
 
     private List<AttendanceResponse> convertListAttendanceToAttendanceResponse(List<Attendance> attendanceList) {
         return attendanceList.stream().map(attendance ->
-                new AttendanceResponse(attendance.getEmployee().getFirst_name() + " " +
-                        attendance.getEmployee().getLast_name(),
-                        attendance.getEmployee().getWorks_in() == null ? null : attendance.getEmployee().getWorks_in().getDepartment().getName(),
+                new AttendanceResponse(attendance.getEmployee().getFirstName() + " " +
+                        attendance.getEmployee().getLastName(),
+                        attendance.getEmployee().getWorksIn() == null ? null : attendance.getEmployee().getWorksIn().getDepartment().getName(),
                         attendance.getEmployee().getPosition() == null ? null : attendance.getEmployee().getPosition().getName(),
                         attendance.getCheckins().stream().map(checkin ->
                                 new CheckinResponse(

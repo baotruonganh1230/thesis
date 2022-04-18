@@ -23,9 +23,9 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String first_name;
+    private String firstName;
 
-    private String last_name;
+    private String lastName;
 
     private String email;
 
@@ -49,9 +49,9 @@ public class Employee {
     @Column(columnDefinition = "TEXT")
     private String avatar;
 
-    public Employee(String first_name, String last_name, String email, String permanent_address, String temporary_address, String phone, String sex, LocalDate date_of_birth) {
-        this.first_name = first_name;
-        this.last_name = last_name;
+    public Employee(String firstName, String lastName, String email, String permanent_address, String temporary_address, String phone, String sex, LocalDate date_of_birth) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.permanent_address = permanent_address;
         this.temporary_address = temporary_address;
@@ -60,9 +60,9 @@ public class Employee {
         this.date_of_birth = date_of_birth;
     }
 
-    public Employee(String first_name, String last_name, String email, String permanent_address, String temporary_address, String phone, BigDecimal gross_salary, LocalDate employed_date, String sex, LocalDate date_of_birth, String pit, String avatar, Position position) {
-        this.first_name = first_name;
-        this.last_name = last_name;
+    public Employee(String firstName, String lastName, String email, String permanent_address, String temporary_address, String phone, BigDecimal gross_salary, LocalDate employed_date, String sex, LocalDate date_of_birth, String pit, String avatar, Position position) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.permanent_address = permanent_address;
         this.temporary_address = temporary_address;
@@ -141,7 +141,7 @@ public class Employee {
             mappedBy = "employee",
             cascade = CascadeType.ALL
     )
-    private Works_In works_in;
+    private Works_In worksIn;
 
     @JsonIgnore
     @OneToOne(

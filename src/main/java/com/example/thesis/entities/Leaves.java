@@ -31,9 +31,9 @@ public class Leaves {
     @JoinColumn(name="typeid", referencedColumnName="id")
     private Leave_Type type;
 
-    private LocalDate from_date;
+    private LocalDate fromDate;
 
-    private LocalDate to_date;
+    private LocalDate toDate;
 
     private LocalDate applicationDate;
 
@@ -44,11 +44,11 @@ public class Leaves {
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    public Leaves(Employee employee, Leave_Type type, LocalDate from_date, LocalDate to_date, LocalDate applicationDate, Integer total, Integer status, String reason) {
+    public Leaves(Employee employee, Leave_Type type, LocalDate fromDate, LocalDate toDate, LocalDate applicationDate, Integer total, Integer status, String reason) {
         this.employee = employee;
         this.type = type;
-        this.from_date = from_date;
-        this.to_date = to_date;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
         this.applicationDate = applicationDate;
         this.total = total;
         this.status = status;
