@@ -13,7 +13,7 @@ public class ThymeleafConfiguration {
         pdfTemplateResolver.setPrefix("pdf-templates/");
         pdfTemplateResolver.setSuffix(".html");
         pdfTemplateResolver.setTemplateMode("HTML5");
-        pdfTemplateResolver.setCharacterEncoding("UTF-8");
+        pdfTemplateResolver.setCharacterEncoding("UTF-16");
         pdfTemplateResolver.setOrder(1);
         return pdfTemplateResolver;
     }
