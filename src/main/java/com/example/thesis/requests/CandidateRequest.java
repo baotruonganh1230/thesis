@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -18,4 +19,11 @@ public class CandidateRequest {
     private LocalDate dateOfBirth;
     private String email;
     private String contact;
+
+    public void setDateOfBirth(String dateOfBirthString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        this.dateOfBirth = LocalDate.parse(dateOfBirthString, formatter);
+    }
 }

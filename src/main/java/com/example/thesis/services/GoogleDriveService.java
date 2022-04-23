@@ -22,6 +22,12 @@ public class GoogleDriveService {
     @Value("${google.service_account_email}")
     private String serviceAccountEmail;
 
+    @Value("${aws.server.key_path}")
+    private String serverKeyPath;
+
+//    @Value("${local.key_path}")
+//    private String localKeyPath;
+
     @Value("${google.application_name}")
     private String applicationName;
 
@@ -31,18 +37,10 @@ public class GoogleDriveService {
     @Value("${google.folder_id}")
     private String folderID;
 
-    private static boolean firstExec = true;
-
     public Drive getDriveService() {
         Drive service = null;
         try {
-            java.io.File key = new java.io.File("/var/app/current/BOOT-INF/classes/" + this.serviceAccountKey);
-            System.out.println("Path of key is: " + key.getAbsolutePath());
-            System.out.println("Key is null: " + (key == null));
-            System.out.println("Key's length is: " + key.length());
-            if(key.exists() && !key.isDirectory()) {
-                System.out.println("Key exists with length: " + key.length());
-            }
+            java.io.File key = new java.io.File(serverKeyPath + this.serviceAccountKey);
             HttpTransport httpTransport = new NetHttpTransport();
             JacksonFactory jsonFactory = new JacksonFactory();
 
@@ -66,21 +64,17 @@ public class GoogleDriveService {
         File file = new File();
         try {
             java.io.File fileUpload = new java.io.File(filePath);
-            System.out.println("The path of file upload is: " + fileUpload.getAbsolutePath());
             com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
             fileMetadata.setMimeType(mimeType);
             fileMetadata.setName(fileName);
             fileMetadata.setParents(Collections.singletonList(folderID));
-            System.out.println("The parent id of file metadata is: " + fileMetadata.getParents());
             com.google.api.client.http.FileContent fileContent = new FileContent(mimeType, fileUpload);
-            System.out.println("The length of file content is: " + fileContent.getLength());
             Drive.Files files = getDriveService().files();
             Drive.Files.Create create = files.create(fileMetadata, fileContent);
             Drive.Files.Create create1 = create.setFields("webContentLink");
             file = create1.execute();
 //            file = getDriveService().files().create(fileMetadata, fileContent)
 //                    .setFields("webContentLink").execute();
-            System.out.println("The file is null? " + (file == null));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }

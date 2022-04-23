@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -79,7 +81,7 @@ public class DepartmentService {
 
     private boolean idExistedInSet(Set<DepartmentResponse> departmentResponses, Long id) {
         for (DepartmentResponse departmentResponse : departmentResponses) {
-            if (departmentResponse.getId() == id) {
+            if (departmentResponse.getId().equals(id)) {
                 return true;
             }
         }
@@ -100,9 +102,8 @@ public class DepartmentService {
 
             });
         } else {
-            Lists.newArrayList(departmentRepository.findAll()).forEach((Department department) -> {
-                addToDepartmentResponseSetNoNested(departmentResponses, department);
-            });
+            Lists.newArrayList(departmentRepository.findAll()).forEach((Department department) ->
+                    addToDepartmentResponseSetNoNested(departmentResponses, department));
         }
 
         return departmentResponses;
@@ -218,4 +219,27 @@ public class DepartmentService {
         departmentRepository.deleteById(id);
 
     }
+
+    public List<Long> getAllSubDepartmentIdsIncludeThis(Long departmentId) {
+        Department department = departmentRepository.getById(departmentId);
+        List<Long> subDepartmentIds =
+                departmentRepository.findAllByHeadOfUnit(department)
+                        .stream()
+                        .map(
+                                Department::getId
+                        ).collect(Collectors.toList());
+        List<Long> returnListIds = new ArrayList<>();
+
+        for (Long id : subDepartmentIds) {
+            List<Long> subOfSubDepartmentIds = getAllSubDepartmentIdsIncludeThis(id);
+            if (subOfSubDepartmentIds != null) {
+                returnListIds.addAll(subOfSubDepartmentIds);
+            }
+        }
+
+        returnListIds.add(department.getId());
+
+        return returnListIds;
+    }
+
 }

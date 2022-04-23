@@ -25,7 +25,7 @@ public class UnauthorizedController {
     }
 
     @PostMapping("candidate")
-    public ResponseEntity<?> insertCandidateUnauthorized(@RequestParam("avatar") MultipartFile file,
+    public ResponseEntity<?> insertCandidateUnauthorized(@RequestParam("file") MultipartFile file,
                                                          @RequestParam("data") String candidateRequestString) {
         ObjectMapper mapper = new ObjectMapper();
         CandidateRequest candidateRequest = null;

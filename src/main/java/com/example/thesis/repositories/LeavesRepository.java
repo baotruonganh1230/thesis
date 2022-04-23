@@ -19,4 +19,11 @@ public interface LeavesRepository extends JpaRepository<Leaves, Long> {
 
     @Query(value = "select * from leaves where eid = ?1 AND from_date <= ?2 AND to_date >= ?2", nativeQuery = true)
     List<Leaves> findAllByEmployeeAndDate(Long eid, LocalDate date);
+
+    @Query(value = "select * from leaves where eid = ?1 AND (from_date <= ?3 AND to_date >= ?2)", nativeQuery = true)
+    List<Leaves> findAllByEmployeeAndPeriod(Long eid, LocalDate fromDate, LocalDate toDate);
+
+
+//    @Query(value = "select * from leaves where id = ?1", nativeQuery = true)
+//    List<Leaves> testSelectLeaves(Long id);
 }

@@ -1,5 +1,10 @@
 server:
   port: 5000
+aws:
+  server:
+    key_path: '/var/app/current/BOOT-INF/classes/'
+local:
+  key_path: 'D:\thesis\src\main\resources\hrms-drive-c2daac40864c.p12'
 jwt:
   auth:
     app: Hrms-App
@@ -61,4 +66,5 @@ log4j:
         type: trace
 pdf:
   directory: '/tmp/'
+
 

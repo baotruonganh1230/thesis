@@ -1,27 +1,34 @@
 package com.example.thesis.services;
 
-import com.example.thesis.entities.Bonus_List;
-import com.example.thesis.entities.Payment;
-import com.example.thesis.repositories.PaymentRepository;
+import com.example.thesis.entities.*;
+import com.example.thesis.repositories.*;
 import com.example.thesis.responses.Bonus;
 import com.example.thesis.responses.MonthlyInfo;
 import com.example.thesis.responses.PaymentResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Set;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 @AllArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final LeavesRepository leavesRepository;
+    private final PayrollRepository payrollRepository;
 
+    @Transactional
     public PaymentResponse getPayment(String month, Long employeeId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
@@ -33,10 +40,102 @@ public class PaymentService {
 
         Payment payment = paymentRepository.findPaymentByMonthAndEid(firstDate, lastDate, employeeId);
         if (payment == null) {
-            return null;
+            Optional<Employee> employeeOptional = employeeRepository.findById(employeeId);
+            if (employeeOptional.isEmpty()) {
+                throw new IllegalStateException("Employee not exist");
+            }
+            Employee employee = employeeOptional.get();
+            List<Attendance> attendancesInMonth =
+                    attendanceRepository.findAllAttendancesOfEmployeeFromdateTodate(
+                            employeeId,
+                            firstDate.toString(),
+                            lastDate.toString());
+
+            String actualDay = String.valueOf(attendancesInMonth.size());
+            String standardDay = String.valueOf(countWorkingDaysOfMonth(firstDate, lastDate));
+
+            BigDecimal basicSalary = employee.getGross_salary();
+
+            List<Leaves> listLeavesOverlap = leavesRepository.findAllByEmployeeAndPeriod(employeeId, firstDate, lastDate);
+            long paidLeave = 0;
+            long unpaidLeave = 0;
+            for (Leaves leaves : listLeavesOverlap) {
+                LocalDate laterStart = Collections.max(Arrays.asList(leaves.getFromDate(), firstDate));
+                LocalDate earlierEnd = Collections.min(Arrays.asList(leaves.getToDate(), lastDate));
+                long overlappingDays = ChronoUnit.DAYS.between(laterStart, earlierEnd) + 1;
+                if (leaves.getType().getIs_paid()) {
+                    paidLeave += overlappingDays;
+                } else {
+                    unpaidLeave += overlappingDays;
+                }
+            }
+
+            Payroll payroll = payrollRepository.findPayrollByMonth(firstDate, lastDate);
+
+            if (payroll == null) {
+                payroll = payrollRepository.save(
+                        new Payroll(
+                                null,
+                                "Payroll_For_" + dayPassed,
+                                dayPassed,
+                                null
+                        )
+                );
+            }
+            BigDecimal lunch;
+            Optional<Bonus_List> optionalLunch = employee.getBonus_lists()
+                    .stream()
+                    .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Lunch"))
+                    .findFirst();
+            if (optionalLunch.isPresent()) {
+                lunch = optionalLunch.get().getAmount();
+            } else {
+                lunch = BigDecimal.valueOf(0.00);
+            }
+
+            BigDecimal parking;
+            Optional<Bonus_List> optionalParking = employee.getBonus_lists()
+                    .stream()
+                    .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Parking"))
+                    .findFirst();
+            if (optionalParking.isPresent()) {
+                parking = optionalParking.get().getAmount();
+            } else {
+                parking = BigDecimal.valueOf(0.00);
+            }
+
+            BigDecimal allowanceNotSubjectedToTax = BigDecimal.valueOf(730000.00);
+            BigDecimal personalRelief = BigDecimal.valueOf(11000000.00);
+            BigDecimal dependentRelief = BigDecimal.valueOf(0.00);
+
+            payment = paymentRepository.save(
+                    new Payment(
+                            null,
+                            employee,
+                            basicSalary,
+                            dayPassed,
+                            actualDay,
+                            standardDay,
+                            String.valueOf(paidLeave),
+                            String.valueOf(unpaidLeave),
+                            lunch,
+                            parking,
+                            allowanceNotSubjectedToTax,
+                            personalRelief,
+                            dependentRelief,
+                            payroll
+                    )
+            );
         }
+
         List<Bonus> bonuses = convertListBonus_listToListBonus(payment.getEmployee().getBonus_lists());
-        BigDecimal totalBonus = calculateTotalBonus(bonuses);
+        List<Bonus> bonusesExcludeLunchAndParking = bonuses
+                .stream()
+                .filter(bonus ->
+                        ((!bonus.getBonusName().equalsIgnoreCase("Lunch"))
+                                && (!bonus.getBonusName().equalsIgnoreCase("Parking"))))
+                .collect(Collectors.toList());
+        BigDecimal totalBonus = calculateTotalBonus(bonusesExcludeLunchAndParking);
         BigDecimal derivedSalary = payment.getBasicSalary()
                 .add(totalBonus)
                 .divide(new BigDecimal(payment.getStandardDay()), RoundingMode.HALF_UP)
@@ -75,12 +174,13 @@ public class PaymentService {
                 taxableIncome,
                 personalIncomeTax,
                 netIncome);
+
     }
 
     private List<Bonus> convertListBonus_listToListBonus(Set<Bonus_List> bonus_lists) {
         return bonus_lists.stream().map(bonus_list ->
                 new Bonus(bonus_list.getId(),
-                        bonus_list.getName(),
+                        bonus_list.getBonusName(),
                         bonus_list.getAmount()))
                 .collect(Collectors.toList());
     }
@@ -89,5 +189,18 @@ public class PaymentService {
         return bonuses.stream()
                 .map(Bonus::getBonusAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private int countWorkingDaysOfMonth(LocalDate firstDate, LocalDate lastDate) {
+        int totalDays = Math.toIntExact(DAYS.between(firstDate, lastDate) + 1);
+        int returnCount = 0;
+        for (int i = 0; i < totalDays; i++) {
+            if (!firstDate.plusDays(i)
+                    .getDayOfWeek()
+                    .toString().equalsIgnoreCase("SUNDAY")) {
+                returnCount++;
+            }
+        }
+        return returnCount;
     }
 }

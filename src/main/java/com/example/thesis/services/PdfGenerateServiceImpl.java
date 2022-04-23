@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Service
 public class PdfGenerateServiceImpl implements PdfGenerateService {
-    private Logger logger = LoggerFactory.getLogger(PdfGenerateServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(PdfGenerateServiceImpl.class);
 
     @Autowired
     private TemplateEngine templateEngine;

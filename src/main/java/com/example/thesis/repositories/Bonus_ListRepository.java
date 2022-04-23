@@ -23,11 +23,6 @@ public interface Bonus_ListRepository extends JpaRepository<Bonus_List, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "insert into bonus_list (amount, `name`, eid) values (?1, ?2, ?3)", nativeQuery = true)
-    int insertNewBonus(BigDecimal amount, String name, Long eid);
-
-    @Transactional
-    @Modifying
-    @Query(value = "update bonus_list set name = ?2, amount = ?3, eid = ?4 where id = ?1", nativeQuery = true)
+    @Query(value = "update bonus_list set bonus_name = ?2, amount = ?3, eid = ?4 where id = ?1", nativeQuery = true)
     int updateBonus(Long id,String name,BigDecimal amount, Long eid);
 }

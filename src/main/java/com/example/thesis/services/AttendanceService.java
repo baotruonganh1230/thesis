@@ -1,9 +1,8 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Attendance;
-import com.example.thesis.entities.Department;
+import com.example.thesis.entities.Employee;
 import com.example.thesis.repositories.AttendanceRepository;
-import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.responses.AttendanceResponse;
 import com.example.thesis.responses.CheckinResponse;
 import lombok.AllArgsConstructor;
@@ -23,11 +22,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
-    private final DepartmentRepository departmentRepository;
+    private final EmployeeService employeeService;
+    private final DepartmentService departmentService;
 
     @Transactional
     public List<AttendanceResponse> getAllAttendances(String week, Long departmentId) {
-        List<Attendance> attendanceList = null;
+        List<Attendance> attendanceList;
         List<String> workingDays = null;
 
         if (week != null) {
@@ -40,7 +40,7 @@ public class AttendanceService {
             LocalDate fromDate = dayPassed.with(DayOfWeek.MONDAY);
             LocalDate toDate = fromDate.plusDays(5);
             for (int i = 0; i < 6; i++) {
-                workingDays.add(fromDate.plusDays(i).toString() + "T00:00:00.000Z");
+                workingDays.add(fromDate.plusDays(i) + "T00:00:00.000Z");
             }
 
             attendanceList = attendanceRepository.findAllAttendancesFromdateTodate(fromDate.toString(), toDate.toString());
@@ -49,16 +49,7 @@ public class AttendanceService {
         }
 
         if (departmentId != null) {
-
-            Department department = departmentRepository.getById(departmentId);
-            List<Long> subDepartmentIds =
-                    departmentRepository.findAllByHeadOfUnit(department)
-                            .stream()
-                            .map(
-                                    Department::getId
-                            ).collect(Collectors.toList());
-
-            subDepartmentIds.add(department.getId());
+            List<Long> subDepartmentIds = departmentService.getAllSubDepartmentIdsIncludeThis(departmentId);
 
             List<Attendance> attendances = attendanceList.stream()
                     .filter(attendance -> (subDepartmentIds.contains(attendance
@@ -67,13 +58,31 @@ public class AttendanceService {
                             .getDepartment()
                             .getId())))
                     .collect(Collectors.toList());
-            List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendances);
-
-            return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
+            List<Employee> employeeList = employeeService.findAllEmployeeByDepartmentIncludeSub(departmentId);
+            return getAttendanceResponses(attendances, workingDays, employeeList);
         } else {
-            List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendanceList);
-            return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
+            List<Employee> employeeList = employeeService.findAll();
+            return getAttendanceResponses(attendanceList, workingDays, employeeList);
         }
+    }
+
+    private List<AttendanceResponse> getAttendanceResponses(List<Attendance> attendanceList, List<String> workingDays, List<Employee> employeeList) {
+        List<Employee> employeesHaveAttendance = attendanceList.stream()
+                .map(Attendance::getEmployee)
+                .collect(Collectors.toList());
+
+        for (Employee employee : employeeList) {
+            if (!employeesHaveAttendance.contains(employee)) {
+                attendanceList.add(new Attendance(
+                        null,
+                        employee,
+                        LocalDate.parse(workingDays.get(0).substring(0,10)),
+                        null
+                ));
+            }
+        }
+        List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendanceList);
+        return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
     }
 
     private List<AttendanceResponse> convertListAttendanceToAttendanceResponse(List<Attendance> attendanceList) {
@@ -82,14 +91,19 @@ public class AttendanceService {
                         attendance.getEmployee().getLastName(),
                         attendance.getEmployee().getWorksIn() == null ? null : attendance.getEmployee().getWorksIn().getDepartment().getName(),
                         attendance.getEmployee().getPosition() == null ? null : attendance.getEmployee().getPosition().getName(),
-                        attendance.getCheckins().stream().map(checkin ->
+                        attendance.getCheckins() != null ? attendance.getCheckins().stream().map(checkin ->
                                 new CheckinResponse(
                                         checkin.getStatus(),
                                         checkin.getDate(),
                                         checkin.getTime_in(),
                                         checkin.getTime_out()
                                 )
-                        ).collect(Collectors.toList()))).collect(Collectors.toList());
+                        ).collect(Collectors.toList()) : new ArrayList<>(List.of(new CheckinResponse(
+                                2,
+                                attendance.getDate(),
+                                null,
+                                null
+                        ))))).collect(Collectors.toList());
     }
 
     private List<AttendanceResponse> addNullAndGroupAttendanceInWeek(
@@ -108,7 +122,7 @@ public class AttendanceService {
             AttendanceResponse prototype = empAttendance.get(0);
             List<String> avaiableDays = empAttendance
                     .stream()
-                    .map(attendanceResponse -> attendanceResponse.getCheckins().get(0).getDate().toString())
+                    .map(attendanceResponse -> attendanceResponse.getCheckins().get(0).getDate())
                     .collect(Collectors.toList());
             for (int i = 1; i < empAttendance.size(); i++) {
                 prototype.getCheckins().add(empAttendance.get(i).getCheckins().get(0));
@@ -117,7 +131,7 @@ public class AttendanceService {
                 for (String day : workingDays) {
                     if (!avaiableDays.contains(day)){
                         prototype.getCheckins().add(new CheckinResponse(
-                                prototype.getCheckins().get(0).getStatus(),
+                                2,
                                 day,
                                 null,
                                 null

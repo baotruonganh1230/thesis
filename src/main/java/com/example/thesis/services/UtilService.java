@@ -16,7 +16,6 @@ import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -139,7 +138,7 @@ public class UtilService {
         );
     }
 
-    @Transactional
+
     public PayrollResponsePdf getPayrollPdf(String month) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
@@ -149,6 +148,12 @@ public class UtilService {
         LocalDate lastDate = dayPassed.withDayOfMonth(
                 dayPassed.getMonth().length(dayPassed.isLeapYear()));
 
+        List<Employee> allEmployees = employeeRepository.findAll();
+
+        for (Employee employee : allEmployees) {
+            paymentService.getPayment(month, employee.getId());
+        }
+
         Payroll payroll = payrollRepository.findPayrollByMonth(firstDate, lastDate);
         List<PayrollEntity> payrollEntities =
                 payroll.getPayments()
@@ -156,13 +161,13 @@ public class UtilService {
                         .map(payment ->
                         {
                             PaymentResponse paymentResponse =
-                                    paymentService.getPayment(month, payment.getEid());
+                                    paymentService.getPayment(month, payment.getEmployee().getId());
 
                             return new PayrollEntity(
-                                    payment.getEid(),
+                                    payment.getEmployee().getId(),
                                     payment.getEmployee().getFirstName(),
                                     payment.getEmployee().getLastName(),
-                                    payment.getPayment_date().format(DateTimeFormatter.ofPattern("MM/yyyy")),
+                                    payment.getPaymentDate().format(DateTimeFormatter.ofPattern("MM/yyyy")),
                                     paymentResponse.getNetIncome()
                             );
                         })

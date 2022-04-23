@@ -52,7 +52,7 @@ public class CheckinService {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinRequest.getDate());
         checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut().toString());
-        Integer status;
+        int status;
         Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
         if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) <= 0 && checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) >= 0) {
             status = 0;

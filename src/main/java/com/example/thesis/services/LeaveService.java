@@ -1,11 +1,9 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Account;
-import com.example.thesis.entities.Department;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.entities.Leaves;
 import com.example.thesis.repositories.AccountRepository;
-import com.example.thesis.repositories.DepartmentRepository;
 import com.example.thesis.repositories.Leave_TypeRepository;
 import com.example.thesis.repositories.LeavesRepository;
 import com.example.thesis.requests.LeaveRequest;
@@ -25,21 +23,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @Service
 @AllArgsConstructor
 public class LeaveService {
     private final LeavesRepository leavesRepository;
     private final AccountRepository accountRepository;
     private final Leave_TypeRepository leave_typeRepository;
-    private final DepartmentRepository departmentRepository;
+    private final DepartmentService departmentService;
 
     public Page<LeaveDetail> getAllLeaves(Long departmentId, String date, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
-        if (sortBy.get().equals("employeeName")) {
+        if (sortBy.isPresent() && sortBy.get().equals("employeeName")) {
             sortBy = Optional.of("employee.firstName");
-        } else if (sortBy.get().equals("departmentName") || sortBy.get().equals("unitName")) {
+        } else if (sortBy.isPresent() && (sortBy.get().equals("departmentName") || sortBy.get().equals("unitName"))) {
             sortBy = Optional.of("employee.worksIn.department.name");
         }
-        Page<Leaves> leavesPage = null;
+        Page<Leaves> leavesPage;
 
         if (date != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -63,16 +63,7 @@ public class LeaveService {
         }
 
         if (departmentId != null) {
-            Department department = departmentRepository.getById(departmentId);
-            List<Long> subDepartmentIds =
-                    departmentRepository.findAllByHeadOfUnit(department)
-                            .stream()
-                            .map(
-                                    department1 ->
-                                            department1.getId()
-                            ).collect(Collectors.toList());
-
-            subDepartmentIds.add(department.getId());
+            List<Long> subDepartmentIds = departmentService.getAllSubDepartmentIdsIncludeThis(departmentId);
 
             List<Leaves> filteredLeavesList = leavesPage.stream()
                     .filter(leave -> (subDepartmentIds.contains(leave
@@ -113,6 +104,16 @@ public class LeaveService {
 
     public void insertRequestLeave(LeaveRequest leaveRequest) {
         Employee employee = accountRepository.getById(leaveRequest.getUserId()).getEmployee();
+        List<Leaves> listLeavesOverlap =
+                leavesRepository.findAllByEmployeeAndPeriod(
+                        employee.getId(),
+                        leaveRequest.getFromDate(),
+                        leaveRequest.getToDate());
+
+        if (listLeavesOverlap.size() > 0) {
+            throw new IllegalStateException("Leave period overlap for this employee!!");
+        }
+
         leavesRepository.save(
                 new Leaves(
                         employee,
@@ -120,7 +121,8 @@ public class LeaveService {
                         leaveRequest.getFromDate(),
                         leaveRequest.getToDate(),
                         LocalDate.now(),
-                        leaveRequest.getAmount(),
+                        leaveRequest.getAmount() != null ? leaveRequest.getAmount() :
+                                Math.toIntExact(DAYS.between(leaveRequest.getFromDate(), leaveRequest.getToDate()) + 1),
                         2,
                         leaveRequest.getReason()
                 )

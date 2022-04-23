@@ -1,9 +1,9 @@
 package com.example.thesis.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,12 +14,15 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @EqualsAndHashCode(exclude = {"employee"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class Payment implements Serializable {
     @Id
-    private Long eid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @JsonIgnore
-    @MapsId
+    @Fetch(FetchMode.JOIN)
     @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;
@@ -27,7 +30,7 @@ public class Payment implements Serializable {
     @Column(precision = 16, scale = 2)
     private BigDecimal basicSalary;
 
-    private LocalDate payment_date;
+    private LocalDate paymentDate;
 
     private String actualDay;
 
@@ -53,7 +56,8 @@ public class Payment implements Serializable {
     private BigDecimal dependentRelief;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Payroll.class)
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Payroll.class)
     @JoinColumn(name="payroll_id", referencedColumnName="id")
     private Payroll payroll;
 

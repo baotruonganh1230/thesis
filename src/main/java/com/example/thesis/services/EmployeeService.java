@@ -35,6 +35,7 @@ public class EmployeeService {
     private final PositionRepository positionRepository;
     private final InsuranceRepository insuranceRepository;
     private final Insurance_TypeRepository insurance_typeRepository;
+    private final DepartmentService departmentService;
 
     private InsuranceOutputParams getInsuranceOutputParams(Employee employee) {
         InsuranceOutputParams insuranceOutputParams = new InsuranceOutputParams();
@@ -116,7 +117,7 @@ public class EmployeeService {
                                         .stream()
                                         .map(bonus_list -> new Bonus(
                                                 bonus_list.getId(),
-                                                bonus_list.getName(),
+                                                bonus_list.getBonusName(),
                                                 bonus_list.getAmount()
                                         )).collect(Collectors.toList())
                         ),
@@ -176,7 +177,7 @@ public class EmployeeService {
                                     .stream()
                                     .map(bonus_list -> new Bonus(
                                             bonus_list.getId(),
-                                            bonus_list.getName(),
+                                            bonus_list.getBonusName(),
                                             bonus_list.getAmount()
                                     )).collect(Collectors.toList())
                     ),
@@ -255,6 +256,11 @@ public class EmployeeService {
                 ));
             }
 
+            List<Long> idList = employeeRequest.getJobDetail().getBonus()
+                    .stream()
+                    .map(Bonus::getId)
+                    .collect(Collectors.toList());
+
             for (Bonus bonus : employeeRequest.getJobDetail().getBonus()) {
                 if (bonus.getId() != null && bonus_listRepository.existsById(bonus.getId())) {
                     bonus_listRepository.updateBonus(
@@ -264,7 +270,12 @@ public class EmployeeService {
                             id
                     );
                 } else {
-                    bonus_listRepository.insertNewBonus(bonus.getBonusAmount(), bonus.getBonusName(), id);
+                    Bonus_List savedBonus_list = bonus_listRepository.save(
+                            new Bonus_List(null,
+                                    bonus.getBonusName(),
+                                    bonus.getBonusAmount(),
+                                    employeeRepository.getById(id)));
+                    idList.add(savedBonus_list.getId());
                 }
 
             }
@@ -273,12 +284,7 @@ public class EmployeeService {
             List<Long> bonus_listIds = bonus_listRepository.findAllByEmployee(employee)
                     .stream()
                     .map(Bonus_List::getId)
-                    .collect(Collectors.toList());
-            Collections.sort(bonus_listIds, Collections.reverseOrder());
-
-            List<Long> idList = employeeRequest.getJobDetail().getBonus()
-                    .stream()
-                    .map(Bonus::getId)
+                    .sorted(Collections.reverseOrder())
                     .collect(Collectors.toList());
 
             for (Long bonus_listId : bonus_listIds) {
@@ -455,5 +461,22 @@ public class EmployeeService {
 
     public long count() {
         return employeeRepository.count();
+    }
+
+    public List<Employee> findAllEmployeeByDepartmentIncludeSub(Long departmentId) {
+        List<Long> subDepartmentIds = departmentService.getAllSubDepartmentIdsIncludeThis(departmentId);
+
+        List<Employee> employeeList = employeeRepository.findAll();
+        List<Employee> employees = employeeList
+                .stream()
+                .filter(employee ->
+                        subDepartmentIds.contains(
+                                employee.getWorksIn().getDepartment().getId()))
+                .collect(Collectors.toList());
+        return employees;
+    }
+
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
     }
 }

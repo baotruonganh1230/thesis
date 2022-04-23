@@ -44,24 +44,24 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
-    public String signUpAccount(Account account) {
-        boolean usernameExists = (accountRepository.findByUsername(account.getUsername()) != null);
-
-        if (usernameExists) {
-            throw new IllegalStateException("username already taken");
-        }
-
-        save(account);
-
-
-        // TODO: SEND EMAIL
-
-        return "";
-    }
-
-    public int enableAccount(String username) {
-        return accountRepository.enableAccount(username);
-    }
+//    public String signUpAccount(Account account) {
+//        boolean usernameExists = (accountRepository.findByUsername(account.getUsername()) != null);
+//
+//        if (usernameExists) {
+//            throw new IllegalStateException("username already taken");
+//        }
+//
+//        save(account);
+//
+//
+//        // TODO: SEND EMAIL
+//
+//        return "";
+//    }
+//
+//    public int enableAccount(String username) {
+//        return accountRepository.enableAccount(username);
+//    }
 
     public Account save(Account account) {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
@@ -75,13 +75,13 @@ public class AccountService implements UserDetailsService {
             Lists.newArrayList(accountRepository.findAll())
                     .stream()
                     .filter(account -> (account.getEmployee() == null))
-                    .forEach(account -> {
-                        accountResponses.add(convertAccountToAccountResponse(account));
-                    });
+                    .forEach(account ->
+                        accountResponses.add(convertAccountToAccountResponse(account))
+                    );
         } else {
-            Lists.newArrayList(accountRepository.findAll()).forEach(account -> {
-                accountResponses.add(convertAccountToAccountResponse(account));
-            });
+            Lists.newArrayList(accountRepository.findAll()).forEach(account ->
+                accountResponses.add(convertAccountToAccountResponse(account))
+            );
         }
 
         return accountResponses;
@@ -150,10 +150,6 @@ public class AccountService implements UserDetailsService {
 
     public Account findByUsername(String username){
         return accountRepository.findByUsername(username);
-    }
-
-    public Account getById(Long id) {
-        return accountRepository.getById(id);
     }
 
     public int updateEidById(Long id, Long eid){

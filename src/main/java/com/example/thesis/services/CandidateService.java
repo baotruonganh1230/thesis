@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ public class CandidateService {
             candidateRepository.save(
                     new Candidate(candidateRequest.getLastName() + " " + candidateRequest.getFirstName(),
                             upLoadedFile.getWebContentLink(),
-                            null,
+                            LocalDate.now(),
                             candidateRequest.getDateOfBirth(),
                             candidateRequest.getEmail(),
                             candidateRequest.getContact(),
