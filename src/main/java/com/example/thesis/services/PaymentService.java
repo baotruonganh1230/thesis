@@ -151,9 +151,15 @@ public class PaymentService {
                 .subtract(payment.getAllowanceNotSubjectedToTax())
                 .subtract(payment.getPersonalRelief())
                 .subtract(payment.getDependentRelief());
+        if (taxableIncome.compareTo(BigDecimal.ZERO) < 0) {
+            taxableIncome = BigDecimal.valueOf(0.00);
+        }
         BigDecimal personalIncomeTax = taxableIncome.divide(new BigDecimal("10"), RoundingMode.HALF_UP);
         BigDecimal totalDeduction = mandatoryInsurance.add(personalIncomeTax);
         BigDecimal netIncome = totalDerivedIncome.subtract(totalDeduction);
+        if (netIncome.compareTo(BigDecimal.ZERO) < 0) {
+            netIncome = BigDecimal.valueOf(0.00);
+        }
         return new PaymentResponse(payment.getBasicSalary(),
                 bonuses,
                 totalBonus,
