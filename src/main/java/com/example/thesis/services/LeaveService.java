@@ -9,16 +9,16 @@ import com.example.thesis.repositories.LeavesRepository;
 import com.example.thesis.requests.LeaveRequest;
 import com.example.thesis.requests.UpdateLeaveRequest;
 import com.example.thesis.responses.LeaveDetail;
+import com.example.thesis.responses.LeaveEmployeeList;
 import com.example.thesis.responses.LeaveResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,39 +33,23 @@ public class LeaveService {
     private final Leave_TypeRepository leave_typeRepository;
     private final DepartmentService departmentService;
 
-    public Page<LeaveDetail> getAllLeaves(Long departmentId, String date, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
-        if (sortBy.isPresent() && sortBy.get().equals("employeeName")) {
-            sortBy = Optional.of("employee.firstName");
-        } else if (sortBy.isPresent() && (sortBy.get().equals("departmentName") || sortBy.get().equals("unitName"))) {
-            sortBy = Optional.of("employee.worksIn.department.name");
-        }
-        Page<Leaves> leavesPage;
+    public LeaveEmployeeList getAllLeaves(Long departmentId, String date, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
+        List<Leaves> leavesList;
 
         if (date != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
             //convert String to LocalDate
             LocalDate applicationDate = LocalDate.parse(date, formatter);
-            leavesPage = leavesRepository.findAllByApplicationDate(applicationDate,
-                    PageRequest.of(
-                            page.orElse(0),
-                            10,
-                            Sort.Direction.fromString(sortOrder.orElse("asc")),
-                            sortBy.orElse("id")
-                    ));
+            leavesList = leavesRepository.findAllByApplicationDate(applicationDate);
         } else {
-            leavesPage = leavesRepository.findAll(PageRequest.of(
-                    page.orElse(0),
-                    10,
-                    Sort.Direction.fromString(sortOrder.orElse("asc")),
-                    sortBy.orElse("id")
-            ));
+            leavesList = leavesRepository.findAll();
         }
 
         if (departmentId != null) {
             List<Long> subDepartmentIds = departmentService.getAllSubDepartmentIdsIncludeThis(departmentId);
 
-            List<Leaves> filteredLeavesList = leavesPage.stream()
+            List<Leaves> filteredLeavesList = leavesList.stream()
                     .filter(leave -> (subDepartmentIds.contains(leave
                             .getEmployee()
                             .getWorksIn()
@@ -73,15 +57,42 @@ public class LeaveService {
                             .getId())))
                     .collect(Collectors.toList());
 
-            Page<Leaves> filteredLeavesPage = new PageImpl<>(filteredLeavesList);
-            return convertListLeaveToLeaveDetail(filteredLeavesPage);
+            return getLeaveEmployeeList(page, sortBy, sortOrder, filteredLeavesList);
         } else {
-            return convertListLeaveToLeaveDetail(leavesPage);
+            return getLeaveEmployeeList(page, sortBy, sortOrder, leavesList);
         }
     }
 
-    private Page<LeaveDetail> convertListLeaveToLeaveDetail(Page<Leaves> leavesPage) {
-        return leavesPage.map(leave ->
+    private LeaveEmployeeList getLeaveEmployeeList(Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder, List<Leaves> leavesList) {
+        List<LeaveDetail> leaveDetails = convertListLeaveToLeaveDetail(leavesList);
+        PagedListHolder<LeaveDetail> pages = new PagedListHolder<>(
+                leaveDetails,
+                new MutableSortDefinition(
+                        sortBy.orElse("id"),
+                        true,
+                        sortOrder.orElse("asc").equalsIgnoreCase("asc")
+                ));
+        pages.resort();
+        pages.setPage(page.orElse(0)); //set current page number
+        pages.setPageSize(10); // set the size of page
+
+        List<LeaveDetail> pageList = pages.getPageList();
+
+        return new LeaveEmployeeList(
+                page.orElse(0) >= pages.getPageCount() ? new ArrayList<>() : pageList,
+                page.orElse(0).equals(pages.getPageCount() - 1),
+                pages.getPageCount(),
+                pages.getNrOfElements(),
+                pages.getPageSize(),
+                page.orElse(0),
+                page.orElse(0).equals(0),
+                page.orElse(0) >= pages.getPageCount() ? 0 : pages.getPageList().size(),
+                pages.getPageList().size() == 0
+        );
+    }
+
+    private List<LeaveDetail> convertListLeaveToLeaveDetail(List<Leaves> leavesList) {
+        return leavesList.stream().map(leave ->
                 new LeaveDetail(leave.getId(),
                         leave.getEmployee().getFirstName() + " " + leave.getEmployee().getLastName(),
                         leave.getEmployee().getWorksIn().getDepartment().getName(),
@@ -89,7 +100,8 @@ public class LeaveService {
                         leave.getFromDate(),
                         leave.getToDate(),
                         leave.getTotal(),
-                        leave.getStatus()));
+                        leave.getStatus()))
+                .collect(Collectors.toList());
     }
 
     public void updateLeavesStatusByIds(UpdateLeaveRequest updateLeaveRequest) {

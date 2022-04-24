@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("api/v1/")
@@ -16,8 +18,10 @@ public class Job_RecruitmentController {
     private final Job_RecruitmentService jobRecruitmentService;
 
     @GetMapping("job_recruitments")
-    public ResponseEntity<?> getJob_Recruitments() {
-        return new ResponseEntity<>(jobRecruitmentService.getJob_Recruitments(), HttpStatus.OK);
+    public ResponseEntity<?> getJob_Recruitments(@RequestParam Optional<Integer> pagination,
+                                                 @RequestParam Optional<String> sortBy,
+                                                 @RequestParam Optional<String> sortOrder) {
+        return new ResponseEntity<>(jobRecruitmentService.getJob_Recruitments(pagination, sortBy, sortOrder), HttpStatus.OK);
     }
 
     @PutMapping("job_recruitment/{id}")

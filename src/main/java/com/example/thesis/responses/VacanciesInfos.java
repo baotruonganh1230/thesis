@@ -13,4 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 public class VacanciesInfos {
     private List<VacanciesInfo> vacanciesInfos;
+    private Boolean last;
+    private Integer totalPages;
+    private Integer totalElements;
+    private Integer size;
+    private Integer number;
+    private Boolean first;
+    private Integer numberOfElements;
+    private Boolean empty;
 }

@@ -7,14 +7,18 @@ import com.example.thesis.repositories.HasRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
 import com.example.thesis.responses.UnauthorizedJob_RecruitmentResponse;
 import com.example.thesis.responses.VacanciesInfo;
+import com.example.thesis.responses.VacanciesInfos;
 import com.google.common.collect.Lists;
 import com.mysql.cj.exceptions.DataReadException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -42,7 +46,7 @@ public class Job_RecruitmentService {
         return unauthorizedJob_recruitmentResponses;
     }
 
-    public List<VacanciesInfo> getJob_Recruitments() {
+    public VacanciesInfos getJob_Recruitments(Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
         List<VacanciesInfo> vacanciesInfos = new ArrayList<>();
 
         Lists.newArrayList(repository.findAll()).forEach((Job_Recruitment job) -> {
@@ -60,7 +64,30 @@ public class Job_RecruitmentService {
             vacanciesInfos.add(vacanciesInfo);
         });
 
-        return vacanciesInfos;
+        PagedListHolder<VacanciesInfo> pages = new PagedListHolder<>(
+                vacanciesInfos,
+                new MutableSortDefinition(
+                        sortBy.orElse("id"),
+                        true,
+                        sortOrder.orElse("asc").equalsIgnoreCase("asc")
+                ));
+        pages.resort();
+        pages.setPage(page.orElse(0)); //set current page number
+        pages.setPageSize(10); // set the size of page
+
+        List<VacanciesInfo> pageList = pages.getPageList();
+
+        return new VacanciesInfos(
+                page.orElse(0) >= pages.getPageCount() ? new ArrayList<>() : pageList,
+                page.orElse(0).equals(pages.getPageCount() - 1),
+                pages.getPageCount(),
+                pages.getNrOfElements(),
+                pages.getPageSize(),
+                page.orElse(0),
+                page.orElse(0).equals(0),
+                page.orElse(0) >= pages.getPageCount() ? 0 : pages.getPageList().size(),
+                pages.getPageList().size() == 0
+        );
     }
 
     public void updateJob_RecruitmentById(Long id, VacanciesInfo vacanciesInfo) {

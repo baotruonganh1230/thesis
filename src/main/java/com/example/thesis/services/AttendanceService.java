@@ -3,19 +3,19 @@ package com.example.thesis.services;
 import com.example.thesis.entities.Attendance;
 import com.example.thesis.entities.Employee;
 import com.example.thesis.repositories.AttendanceRepository;
+import com.example.thesis.responses.AttendanceList;
 import com.example.thesis.responses.AttendanceResponse;
 import com.example.thesis.responses.CheckinResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +26,7 @@ public class AttendanceService {
     private final DepartmentService departmentService;
 
     @Transactional
-    public List<AttendanceResponse> getAllAttendances(String week, Long departmentId) {
+    public AttendanceList getAllAttendances(String week, Long departmentId, Optional<Integer> page) {
         List<Attendance> attendanceList;
         List<String> workingDays = null;
 
@@ -59,11 +59,39 @@ public class AttendanceService {
                             .getId())))
                     .collect(Collectors.toList());
             List<Employee> employeeList = employeeService.findAllEmployeeByDepartmentIncludeSub(departmentId);
-            return getAttendanceResponses(attendances, workingDays, employeeList);
+            return getAttendanceList(page, attendances, workingDays, employeeList);
         } else {
             List<Employee> employeeList = employeeService.findAll();
-            return getAttendanceResponses(attendanceList, workingDays, employeeList);
+            return getAttendanceList(page, attendanceList, workingDays, employeeList);
         }
+    }
+
+    private AttendanceList getAttendanceList(Optional<Integer> page, List<Attendance> attendanceList, List<String> workingDays, List<Employee> employeeList) {
+        List<AttendanceResponse> attendanceResponses = getAttendanceResponses(attendanceList, workingDays, employeeList);
+        PagedListHolder<AttendanceResponse> pages = new PagedListHolder<>(
+                attendanceResponses,
+                new MutableSortDefinition(
+                        "name",
+                        true,
+                        true
+                ));
+        pages.resort();
+        pages.setPage(page.orElse(0)); //set current page number
+        pages.setPageSize(10); // set the size of page
+
+        List<AttendanceResponse> pageList = pages.getPageList();
+
+        return new AttendanceList(
+                page.orElse(0) >= pages.getPageCount() ? new ArrayList<>() : pageList,
+                page.orElse(0).equals(pages.getPageCount() - 1),
+                pages.getPageCount(),
+                pages.getNrOfElements(),
+                pages.getPageSize(),
+                page.orElse(0),
+                page.orElse(0).equals(0),
+                page.orElse(0) >= pages.getPageCount() ? 0 : pages.getPageList().size(),
+                pages.getPageList().size() == 0
+        );
     }
 
     private List<AttendanceResponse> getAttendanceResponses(List<Attendance> attendanceList, List<String> workingDays, List<Employee> employeeList) {

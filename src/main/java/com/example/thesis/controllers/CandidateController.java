@@ -1,11 +1,12 @@
 package com.example.thesis.controllers;
 
-import com.example.thesis.responses.Candidates;
 import com.example.thesis.services.CandidateService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -16,9 +17,12 @@ public class CandidateController {
     private final CandidateService candidateService;
 
     @GetMapping("candidates")
-    public ResponseEntity<?> getCandidates(@RequestParam(required=false) Long jobRecruitmentId) {
+    public ResponseEntity<?> getCandidates(@RequestParam(required=false) Long jobRecruitmentId,
+                                           @RequestParam Optional<Integer> pagination,
+                                           @RequestParam Optional<String> sortBy,
+                                           @RequestParam Optional<String> sortOrder) {
         return new ResponseEntity<>(
-                new Candidates(candidateService.getCandidatesByJob_RecruitmentId(jobRecruitmentId)),
+                candidateService.getCandidatesByJob_RecruitmentId(jobRecruitmentId, pagination, sortBy, sortOrder),
                 HttpStatus.OK);
     }
 }

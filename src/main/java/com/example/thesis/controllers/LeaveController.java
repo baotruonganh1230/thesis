@@ -2,7 +2,6 @@ package com.example.thesis.controllers;
 
 import com.example.thesis.requests.LeaveRequest;
 import com.example.thesis.requests.UpdateLeaveRequest;
-import com.example.thesis.responses.LeaveEmployeeList;
 import com.example.thesis.services.LeaveService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +20,10 @@ public class LeaveController {
     @GetMapping("leaves")
     public ResponseEntity<?> getLeaves(@RequestParam(required=false) Long departmentId,
                                        @RequestParam(required=false) String date,
-                                       @RequestParam Optional<Integer> page,
+                                       @RequestParam Optional<Integer> pagination,
                                        @RequestParam Optional<String> sortBy,
                                        @RequestParam Optional<String> sortOrder) {
-        return new ResponseEntity<>(new LeaveEmployeeList(leaveService.getAllLeaves(departmentId, date, page, sortBy, sortOrder)),
+        return new ResponseEntity<>(leaveService.getAllLeaves(departmentId, date, pagination, sortBy, sortOrder),
                 HttpStatus.OK);
     }
 

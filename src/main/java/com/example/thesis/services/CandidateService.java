@@ -6,15 +6,20 @@ import com.example.thesis.repositories.CandidateRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
 import com.example.thesis.requests.CandidateRequest;
 import com.example.thesis.responses.CandidateResponse;
+import com.example.thesis.responses.Candidates;
 import lombok.AllArgsConstructor;
 import org.apache.tika.Tika;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,10 +30,11 @@ public class CandidateService {
     private final GoogleDriveService googleDriveService;
     private final Job_RecruitmentRepository job_recruitmentRepository;
 
-    public List<CandidateResponse> getCandidatesByJob_RecruitmentId(Long job_recruitmentId) {
+    public Candidates getCandidatesByJob_RecruitmentId(Long job_recruitmentId, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
+        List<CandidateResponse> candidateList;
         if (job_recruitmentId != null) {
             List<Candidate> candidates = candidateRepository.findAllByJob_RecruitmentId(job_recruitmentId);
-            return candidates.stream().map(candidate ->
+            candidateList = candidates.stream().map(candidate ->
                             new CandidateResponse(candidate.getId(),
                                     candidate.getJobRecruitment().getId(),
                                     candidate.getName(),
@@ -38,8 +44,10 @@ public class CandidateService {
                                     candidate.getEmail(),
                                     candidate.getContact()))
                     .collect(Collectors.toList());
+
+
         } else {
-            return candidateRepository.findAll().stream().map(candidate ->
+            candidateList = candidateRepository.findAll().stream().map(candidate ->
                             new CandidateResponse(candidate.getId(),
                                     candidate.getJobRecruitment().getId(),
                                     candidate.getName(),
@@ -50,6 +58,31 @@ public class CandidateService {
                                     candidate.getContact()))
                     .collect(Collectors.toList());
         }
+
+        PagedListHolder<CandidateResponse> pages = new PagedListHolder<>(
+                candidateList,
+                new MutableSortDefinition(
+                        sortBy.orElse("id"),
+                        true,
+                        sortOrder.orElse("asc").equalsIgnoreCase("asc")
+                ));
+        pages.resort();
+        pages.setPage(page.orElse(0)); //set current page number
+        pages.setPageSize(10); // set the size of page
+
+        List<CandidateResponse> pageList = pages.getPageList();
+
+        return new Candidates(
+                page.orElse(0) >= pages.getPageCount() ? new ArrayList<>() : pageList,
+                page.orElse(0).equals(pages.getPageCount() - 1),
+                pages.getPageCount(),
+                pages.getNrOfElements(),
+                pages.getPageSize(),
+                page.orElse(0),
+                page.orElse(0).equals(0),
+                page.orElse(0) >= pages.getPageCount() ? 0 : pages.getPageList().size(),
+                pages.getPageList().size() == 0
+        );
     }
 
     public void insertCandidateUnauthorized(MultipartFile file, CandidateRequest candidateRequest) {
