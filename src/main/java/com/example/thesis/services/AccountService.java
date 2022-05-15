@@ -140,7 +140,8 @@ public class AccountService implements UserDetailsService {
                         roleRepository.getById(accountRequest.getRoleid()),
                         accountRequest.getUsername(),
                         accountRequest.getPassword(),
-                        accountRequest.getStatus())
+                        accountRequest.getStatus(),
+                        null)
         );
     }
 

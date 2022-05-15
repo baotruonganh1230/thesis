@@ -237,9 +237,26 @@ public class DepartmentService {
             }
         }
 
-        returnListIds.add(department.getId());
+        returnListIds.add(departmentId);
 
         return returnListIds;
+    }
+
+    public List<Department> getAllSubDepartmentsIncludeThis(Department department) {
+        List<Department> subDepartments =
+                departmentRepository.findAllByHeadOfUnit(department);
+        List<Department> returnList = new ArrayList<>();
+
+        for (Department subDepartment : subDepartments) {
+            List<Department> subOfSubDepartments = getAllSubDepartmentsIncludeThis(subDepartment);
+            if (subOfSubDepartments != null) {
+                returnList.addAll(subOfSubDepartments);
+            }
+        }
+
+        returnList.add(department);
+
+        return returnList;
     }
 
 }

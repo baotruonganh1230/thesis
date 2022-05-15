@@ -20,4 +20,9 @@ public interface Job_RecruitmentRepository extends JpaRepository<Job_Recruitment
     @Modifying
     @Query(value = "delete from job_recruitment where department_id = ?1", nativeQuery = true)
     void deleteByDid(Long did);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update job_recruitment set status = ?2 where id = ?1", nativeQuery = true)
+    void updateJobStatus(Long id, Integer status);
 }

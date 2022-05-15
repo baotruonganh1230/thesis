@@ -78,17 +78,10 @@ public class EmployeeService {
     }
 
 
-    public List<EmployeeResponse> getEmployees(Boolean isHavingDepartment) {
+    public List<EmployeeResponse> getEmployees() {
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         List<Employee> employeeList = employeeRepository.findAll();
-
-        if (isHavingDepartment != null && isHavingDepartment) {
-            employeeList = employeeList.stream().filter(
-                    employee -> (employee.getWorksIn() != null
-                            && employee.getWorksIn().getDepartment() != null)
-            ).collect(Collectors.toList());
-        }
 
         Lists.newArrayList(employeeList).forEach((Employee employee) -> {
             EmployeeResponse employeeResponse = null;

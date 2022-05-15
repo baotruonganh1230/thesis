@@ -144,7 +144,7 @@ public class PaymentService {
         BigDecimal anotherIncome = payment.getLunch().add(payment.getParking());
         BigDecimal totalDerivedIncome = derivedSalary.add(anotherIncome);
         BigDecimal mandatoryInsurance = totalDerivedIncome
-                .multiply(new BigDecimal("10.5"))
+                .multiply(new BigDecimal("11.5"))
                 .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
         BigDecimal taxableIncome = totalDerivedIncome
                 .subtract(mandatoryInsurance)

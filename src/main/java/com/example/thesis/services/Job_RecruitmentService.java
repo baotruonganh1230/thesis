@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +33,11 @@ public class Job_RecruitmentService {
         List<UnauthorizedJob_RecruitmentResponse> unauthorizedJob_recruitmentResponses
                 = new ArrayList<>();
 
-        Lists.newArrayList(repository.findAll()).forEach((Job_Recruitment job) -> {
+        Lists.newArrayList(repository.findAll()
+                .stream()
+                .filter(job -> job.getStatus().equals(0))
+                .collect(Collectors.toList()))
+                .forEach((Job_Recruitment job) -> {
             UnauthorizedJob_RecruitmentResponse unauthorizedJob_recruitmentResponse =
                     new UnauthorizedJob_RecruitmentResponse(
                     job.getId(),
@@ -50,6 +55,20 @@ public class Job_RecruitmentService {
         List<VacanciesInfo> vacanciesInfos = new ArrayList<>();
 
         Lists.newArrayList(repository.findAll()).forEach((Job_Recruitment job) -> {
+            Integer newStatus;
+
+            if (job.getExpired_date().isBefore(LocalDate.now())) {
+                newStatus = 1;
+            } else if (job.getQuantity() <= 0) {
+                newStatus = 2;
+            } else {
+                newStatus = 0;
+            }
+
+            if (!newStatus.equals(job.getStatus())) {
+                repository.updateJobStatus(job.getId(), newStatus);
+            }
+
             VacanciesInfo vacanciesInfo = new VacanciesInfo(
                     job.getId(),
                     job.getEmployee().getId(),
@@ -58,7 +77,7 @@ public class Job_RecruitmentService {
                     job.getPublished_date(),
                     job.getExpired_date(),
                     job.getQuantity(),
-                    job.getStatus(),
+                    newStatus,
                     job.getPostContent());
 
             vacanciesInfos.add(vacanciesInfo);
@@ -94,6 +113,17 @@ public class Job_RecruitmentService {
         if (!repository.existsById(id)) {
             throw new DataReadException("There is no job_recruitment with that id");
         }
+
+        int status;
+
+        if (LocalDate.parse(vacanciesInfo.getExpiredDate()).isBefore(LocalDate.now())) {
+            status = 1;
+        } else if (vacanciesInfo.getQuantity() <= 0) {
+            status = 2;
+        } else {
+            status = 0;
+        }
+
         repository.updateJob_Recruitment(
                 id,
                 LocalDate.parse(vacanciesInfo.getExpiredDate()),
@@ -101,7 +131,7 @@ public class Job_RecruitmentService {
                 vacanciesInfo.getPostContent(),
                 LocalDate.parse(vacanciesInfo.getPublishedDate()),
                 vacanciesInfo.getQuantity(),
-                vacanciesInfo.getStatus(),
+                status,
                 vacanciesInfo.getDepartmentId(),
                 vacanciesInfo.getHiringManagerId()
         );
@@ -114,13 +144,23 @@ public class Job_RecruitmentService {
     }
 
     public void insertJob_Recruitment(VacanciesInfo vacanciesInfo) {
+        int status;
+
+        if (LocalDate.parse(vacanciesInfo.getExpiredDate()).isBefore(LocalDate.now())) {
+            status = 1;
+        } else if (vacanciesInfo.getQuantity() <= 0) {
+            status = 2;
+        } else {
+            status = 0;
+        }
+
         Job_Recruitment savedJob_recruitment = repository.save(new Job_Recruitment(
                 null,
                 vacanciesInfo.getPostContent(),
                 null,
                 LocalDate.parse(vacanciesInfo.getPublishedDate()),
                 LocalDate.parse(vacanciesInfo.getExpiredDate()),
-                vacanciesInfo.getStatus(),
+                status,
                 vacanciesInfo.getQuantity(),
                 employeeRepository.getById(vacanciesInfo.getHiringManagerId()),
                 departmentRepository.getById(vacanciesInfo.getDepartmentId()),

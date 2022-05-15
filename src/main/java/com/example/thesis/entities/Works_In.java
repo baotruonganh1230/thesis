@@ -19,6 +19,7 @@ public class Works_In implements Serializable {
     private Long eid;
 
     @MapsId
+    @Fetch(FetchMode.JOIN)
     @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name="eid", referencedColumnName="id")
     private Employee employee;

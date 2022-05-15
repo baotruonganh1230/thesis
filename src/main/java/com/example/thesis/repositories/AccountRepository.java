@@ -19,6 +19,9 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "SET eid = ?2 WHERE id = ?1", nativeQuery = true)
     int updateEidById(Long id, Long eid);
 
+    @Query(value = "SELECT * FROM account WHERE eid = ?1 order by id desc limit 1", nativeQuery = true)
+    Account getAccountByEid(Long eid);
+
     @Transactional
     @Modifying
     @Query("UPDATE Account a " +

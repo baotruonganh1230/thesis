@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -42,6 +43,14 @@ public class Account implements UserDetails {
 
     @Enumerated(value = EnumType.STRING)
     private AccountStatus status;
+
+    @JsonIgnore
+    @Fetch(FetchMode.JOIN)
+    @OneToMany(
+            mappedBy = "account",
+            cascade = CascadeType.ALL
+    )
+    private Set<AccountEventRel> accountEventRels;
 
     public Account(Employee employee, Role role, String username, String password, AccountStatus status) {
         this.employee = employee;

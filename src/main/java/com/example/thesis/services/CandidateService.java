@@ -41,6 +41,7 @@ public class CandidateService {
                                     candidate.getJobRecruitment().getHas().getPosition().getName(),
                                     candidate.getJobRecruitment().getDepartment().getName(),
                                     candidate.getAppliedDate(),
+                                    candidate.getCv_file(),
                                     candidate.getEmail(),
                                     candidate.getContact()))
                     .collect(Collectors.toList());
@@ -54,6 +55,7 @@ public class CandidateService {
                                     candidate.getJobRecruitment().getHas().getPosition().getName(),
                                     candidate.getJobRecruitment().getDepartment().getName(),
                                     candidate.getAppliedDate(),
+                                    candidate.getCv_file(),
                                     candidate.getEmail(),
                                     candidate.getContact()))
                     .collect(Collectors.toList());
@@ -107,7 +109,7 @@ public class CandidateService {
                 " " +
                 candidateRequest.getFirstName(), job_recruitment)) {
             candidateRepository.save(
-                    new Candidate(candidateRequest.getLastName() + " " + candidateRequest.getFirstName(),
+                    new Candidate(candidateRequest.getFirstName() + " " + candidateRequest.getLastName(),
                             upLoadedFile.getWebContentLink(),
                             LocalDate.now(),
                             candidateRequest.getDateOfBirth(),

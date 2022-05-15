@@ -2,7 +2,6 @@ package com.example.thesis.controllers;
 
 import com.example.thesis.requests.EmployeeRequest;
 import com.example.thesis.services.EmployeeService;
-import com.example.thesis.services.GoogleDriveService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -17,11 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class EmployeeController {
     private final EmployeeService employeeService;
-    private final GoogleDriveService googleDriveService;
 
     @GetMapping("employees")
-    public ResponseEntity<?> getEmployees(@RequestParam(required=false) Boolean isHavingDepartment) {
-        return new ResponseEntity<>(employeeService.getEmployees(isHavingDepartment), HttpStatus.OK);
+    public ResponseEntity<?> getEmployees() {
+        return new ResponseEntity<>(employeeService.getEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("employee/{id}")
