@@ -3,6 +3,7 @@ package com.example.thesis.controllers;
 import com.example.thesis.config.JWTTokenHelper;
 import com.example.thesis.entities.Account;
 import com.example.thesis.requests.AuthenticationRequest;
+import com.example.thesis.responses.ForbiddenResponse;
 import com.example.thesis.responses.LoginResponse;
 import com.example.thesis.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -41,6 +46,17 @@ public class AuthenticationController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
+            return new ResponseEntity<>(new ForbiddenResponse(
+                    LocalDateTime.now(),
+                    403L,
+                    "Forbidden",
+                    "Forbidden",
+                    "/api/v1//auth/login"
+            ), HttpStatus.FORBIDDEN);
+        }
+
         String jwtToken=jwtTokenHelper.generateToken(authentication.getName());
 
         LoginResponse loginResponse=new LoginResponse();
@@ -59,6 +75,36 @@ public class AuthenticationController {
         response.addCookie(cookie);
         response.addHeader("Body", "username=" + authenticationRequest.getUsername() +
                         "; password=" + authenticationRequest.getPassword());
+
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/mobile/login")
+    public ResponseEntity<?> mobileLogin(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws InvalidKeySpecException, NoSuchAlgorithmException {
+
+        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwtToken=jwtTokenHelper.generateToken(authentication.getName());
+
+        LoginResponse loginResponse=new LoginResponse();
+        loginResponse.setToken(jwtToken);
+        Account account = accountService.findByUsername(authenticationRequest.getUsername());
+        loginResponse.setId(account.getId());
+        loginResponse.setEid((account.getEmployee() == null) ? null : account.getEmployee().getId());
+
+        Cookie cookie = new Cookie("jwt_token", jwtToken);
+        cookie.setMaxAge(1440 * 60);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/"); // global cookie accessible every where
+
+        //add cookie to response
+        response.addCookie(cookie);
+        response.addHeader("Body", "username=" + authenticationRequest.getUsername() +
+                "; password=" + authenticationRequest.getPassword());
 
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
