@@ -1,8 +1,13 @@
+jwt:
+  auth:
+    app: Hrms-App
+    secret_key: thesecretreveal#Abc1230g
+    expires_in: 300
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sfg_prod
-    username: sfg_prod_user
-    password: guru
+    url: jdbc:mysql://localhost:3306/hrms_prod
+    username: hrms_prod
+    password: Abc1230g
   jpa:
     hibernate:
       ddl-auto: validate
