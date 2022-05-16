@@ -460,13 +460,12 @@ public class EmployeeService {
         List<Long> subDepartmentIds = departmentService.getAllSubDepartmentIdsIncludeThis(departmentId);
 
         List<Employee> employeeList = employeeRepository.findAll();
-        List<Employee> employees = employeeList
+        return employeeList
                 .stream()
                 .filter(employee ->
                         subDepartmentIds.contains(
                                 employee.getWorksIn().getDepartment().getId()))
                 .collect(Collectors.toList());
-        return employees;
     }
 
     public List<Employee> findAll() {

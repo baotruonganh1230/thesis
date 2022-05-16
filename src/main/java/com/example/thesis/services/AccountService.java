@@ -108,7 +108,7 @@ public class AccountService implements UserDetailsService {
                 account.getStatus() == null ? null : account.getStatus().toString());
     }
 
-    public int updateAccountById(Long id, AccountRequest accountRequest) {
+    public void updateAccountById(Long id, AccountRequest accountRequest) {
         Account oldAccount = accountRepository.getByid(id);
         if (oldAccount == null) {
             throw new DataReadException("There is no account with that id");
@@ -118,7 +118,7 @@ public class AccountService implements UserDetailsService {
         if (usernameExists) {
             throw new IllegalStateException("username already taken");
         }
-        return accountRepository.setAccountById(
+        accountRepository.setAccountById(
                 id,
                 accountRequest.getEid(),
                 accountRequest.getRoleid(),
@@ -153,7 +153,7 @@ public class AccountService implements UserDetailsService {
         return accountRepository.findByUsername(username);
     }
 
-    public int updateEidById(Long id, Long eid){
-        return accountRepository.updateEidById(id, eid);
+    public void updateEidById(Long id, Long eid){
+        accountRepository.updateEidById(id, eid);
     }
 }
