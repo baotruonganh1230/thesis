@@ -21,6 +21,36 @@
     }
   ],
   "paths": {
+    "/api/v1/updateEvent": {
+      "put": {
+        "tags": [
+          "event-controller"
+        ],
+        "operationId": "updateEvent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/position/{id}": {
       "get": {
         "tags": [
@@ -414,6 +444,36 @@
         }
       }
     },
+    "/api/v1/sendEvent": {
+      "post": {
+        "tags": [
+          "event-controller"
+        ],
+        "operationId": "insertEvent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEventRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/position": {
       "post": {
         "tags": [
@@ -642,6 +702,36 @@
         }
       }
     },
+    "/api/v1/auth/mobile/login": {
+      "post": {
+        "tags": [
+          "authentication-controller"
+        ],
+        "operationId": "mobileLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "tags": [
@@ -723,11 +813,11 @@
             "application/json": {
               "schema": {
                 "required": [
-                  "avatar"
+                  "file"
                 ],
                 "type": "object",
                 "properties": {
-                  "avatar": {
+                  "file": {
                     "type": "string",
                     "format": "binary"
                   }
@@ -848,26 +938,6 @@
         }
       }
     },
-    "/api/v1/upload": {
-      "get": {
-        "tags": [
-          "employee-controller"
-        ],
-        "operationId": "uploadFile",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/positions": {
       "get": {
         "tags": [
@@ -927,6 +997,56 @@
         }
       }
     },
+    "/api/v1/notiexpotokens": {
+      "get": {
+        "tags": [
+          "noti-expo-tokens-controller"
+        ],
+        "operationId": "getNotiExpoTokens",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/link": {
+      "get": {
+        "tags": [
+          "util-controller"
+        ],
+        "operationId": "getPayrollPdf",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/leaves": {
       "get": {
         "tags": [
@@ -945,6 +1065,31 @@
           },
           {
             "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
             "in": "query",
             "required": false,
             "schema": {
@@ -972,6 +1117,33 @@
           "job-_-recruitment-controller"
         ],
         "operationId": "getJob_Recruitments",
+        "parameters": [
+          {
+            "name": "pagination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1039,6 +1211,53 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/getEvents": {
+      "get": {
+        "tags": [
+          "event-controller"
+        ],
+        "operationId": "getEvents",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "toDateTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromDateTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1181,6 +1400,31 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "pagination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1220,6 +1464,15 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "pagination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -1242,6 +1495,16 @@
           "account-controller"
         ],
         "operationId": "getAccounts",
+        "parameters": [
+          {
+            "name": "avaiable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1279,6 +1542,25 @@
   },
   "components": {
     "schemas": {
+      "UpdateEventRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Position": {
         "type": "object",
         "properties": {
@@ -1415,6 +1697,25 @@
           },
           "reason": {
             "type": "string"
+          }
+        }
+      },
+      "SendEventRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
