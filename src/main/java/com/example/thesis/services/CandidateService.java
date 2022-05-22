@@ -12,6 +12,7 @@ import org.apache.tika.Tika;
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -87,6 +88,7 @@ public class CandidateService {
         );
     }
 
+    @Transactional
     public void insertCandidateUnauthorized(MultipartFile file, CandidateRequest candidateRequest) {
         File filetoUpload = employeeService.convertMultiPartFiletoFile(file);
         Tika tika = new Tika();
@@ -105,9 +107,8 @@ public class CandidateService {
         }
         Job_Recruitment job_recruitment = job_recruitmentRepository.getById(candidateRequest.getJobRecruitmentId());
 
-        if (!candidateRepository.existsByNameAndJobRecruitment(candidateRequest.getLastName() +
-                " " +
-                candidateRequest.getFirstName(), job_recruitment)) {
+        if (!candidateRepository.existsByNameAndJobRecruitment(candidateRequest.getFirstName() + " " +
+                        candidateRequest.getLastName(), job_recruitment)) {
             candidateRepository.save(
                     new Candidate(candidateRequest.getFirstName() + " " + candidateRequest.getLastName(),
                             upLoadedFile.getWebContentLink(),
@@ -118,6 +119,14 @@ public class CandidateService {
                             job_recruitment
                             )
             );
+
+            long candidateCountForJob = candidateRepository.countByJobRecruitment(job_recruitment);
+            if (!job_recruitment.getExpired_date().isBefore(LocalDate.now()) &&
+                    candidateCountForJob >= job_recruitment.getQuantity() &&
+                    !job_recruitment.getStatus().equals(2)) {
+                job_recruitmentRepository.updateJobStatus(job_recruitment.getId(), 2);
+            }
+            
         }
     }
 

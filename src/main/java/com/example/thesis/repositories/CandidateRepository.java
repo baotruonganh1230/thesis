@@ -15,4 +15,6 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     List<Candidate> findAllByJob_RecruitmentId(Long job_recruitment_id);
 
     boolean existsByNameAndJobRecruitment(String name, Job_Recruitment jobRecruitment);
+
+    long countByJobRecruitment(Job_Recruitment job_recruitment);
 }

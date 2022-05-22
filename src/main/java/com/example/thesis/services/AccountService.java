@@ -113,11 +113,7 @@ public class AccountService implements UserDetailsService {
         if (oldAccount == null) {
             throw new DataReadException("There is no account with that id");
         }
-        boolean usernameExists = (accountRepository.findByUsername(accountRequest.getUsername()) != null);
 
-        if (usernameExists) {
-            throw new IllegalStateException("username already taken");
-        }
         accountRepository.setAccountById(
                 id,
                 accountRequest.getEid(),

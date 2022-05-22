@@ -23,6 +23,11 @@ public interface Job_RecruitmentRepository extends JpaRepository<Job_Recruitment
 
     @Transactional
     @Modifying
+    @Query(value = "update job_recruitment set department_id = ?2 where id = ?1", nativeQuery = true)
+    void updateToBiggerDepartmentByDid(Long id, Long did);
+
+    @Transactional
+    @Modifying
     @Query(value = "update job_recruitment set status = ?2 where id = ?1", nativeQuery = true)
     void updateJobStatus(Long id, Integer status);
 }

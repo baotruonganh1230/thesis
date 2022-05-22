@@ -27,4 +27,9 @@ public class UtilController {
     public ResponseEntity<?> getPayrollPdf(@RequestParam(required=false) String month) {
         return new ResponseEntity<>(utilService.getPayrollPdf(month), HttpStatus.OK);
     }
+
+    @GetMapping("link/payment/{id}")
+    public ResponseEntity<?> getPaymentPdf(@PathVariable Long id, @RequestParam String month) {
+        return new ResponseEntity<>(utilService.getPaymentPdf(id, month), HttpStatus.OK);
+    }
 }

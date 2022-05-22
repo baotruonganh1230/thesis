@@ -1,9 +1,6 @@
 package com.example.thesis.services;
 
-import com.example.thesis.entities.Department;
-import com.example.thesis.entities.Job_Recruitment;
-import com.example.thesis.entities.Manage;
-import com.example.thesis.entities.Works_In;
+import com.example.thesis.entities.*;
 import com.example.thesis.repositories.*;
 import com.example.thesis.requests.DepartmentRequest;
 import com.example.thesis.responses.DepartmentResponse;
@@ -27,6 +24,7 @@ public class DepartmentService {
     private final EmployeeRepository employeeRepository;
     private final Works_InRepository works_inRepository;
     private final Job_RecruitmentRepository job_recruitmentRepository;
+    private final HasRepository hasRepository;
 
     private DepartmentResponse convertFromDepartmentToDepartmentResponse(Set<Long> idSet, Department department) {
         if (department != null) {
@@ -127,7 +125,12 @@ public class DepartmentService {
                 departmentRequest.getDescription());
 
         if (manageRepository.existsById(id)) {
-            manageRepository.setEmployeeId(id, departmentRequest.getManagerOfUnitId());
+            Manage manage = manageRepository.getManageByDid(id);
+            if (!manage.getEmployee().getId().equals(departmentRequest.getManagerOfUnitId())) {
+                departmentRepository.decreasePeopleCount(manage.getDepartment().getId());
+                manageRepository.setEmployeeId(id, departmentRequest.getManagerOfUnitId());
+                departmentRepository.increasePeopleCount(id);
+            }
         } else {
             manageRepository.save(new Manage(
                     id,
@@ -174,6 +177,15 @@ public class DepartmentService {
             if (manageRepository.existsById(savedDepartment.getId())) {
                 manageRepository.setEmployeeId(savedDepartment.getId(), departmentRequest.getManagerOfUnitId());
             } else {
+                Employee employee = employeeRepository.getById(departmentRequest.getManagerOfUnitId());
+
+                if (manageRepository.existsByEmployee(employee)) {
+                    Manage manage = manageRepository.getManageByEid(departmentRequest.getManagerOfUnitId());
+                    departmentRepository.decreasePeopleCount(manage.getDepartment().getId());
+                    departmentRepository.increasePeopleCount(savedDepartment.getId());
+                    manageRepository.deleteByEmployee(employee);
+                }
+
                 manageRepository.save(new Manage(
                         savedDepartment.getId(),
                         savedDepartment,
@@ -203,7 +215,9 @@ public class DepartmentService {
         Department headOfUnit = department.getHeadOfUnit();
 
         for (Job_Recruitment job_recruitment : department.getJob_recruitments()) {
-            job_recruitmentRepository.deleteByDid(job_recruitment.getId());
+            job_recruitmentRepository.updateToBiggerDepartmentByDid(
+                    job_recruitment.getId(),
+                    headOfUnit.getId());
         }
 
         manageRepository.deleteByDid(id);

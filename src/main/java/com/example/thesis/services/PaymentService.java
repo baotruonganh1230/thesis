@@ -39,12 +39,15 @@ public class PaymentService {
                 dayPassed.getMonth().length(dayPassed.isLeapYear()));
 
         Payment payment = paymentRepository.findPaymentByMonthAndEid(firstDate, lastDate, employeeId);
+
+        Optional<Employee> employeeOptional = employeeRepository.findById(employeeId);
+        if (employeeOptional.isEmpty()) {
+            throw new IllegalStateException("Employee not exist");
+        }
+        Employee employee = employeeOptional.get();
+
         if (payment == null) {
-            Optional<Employee> employeeOptional = employeeRepository.findById(employeeId);
-            if (employeeOptional.isEmpty()) {
-                throw new IllegalStateException("Employee not exist");
-            }
-            Employee employee = employeeOptional.get();
+
             List<Attendance> attendancesInMonth =
                     attendanceRepository.findAllAttendancesOfEmployeeFromdateTodate(
                             employeeId,
@@ -58,17 +61,18 @@ public class PaymentService {
 
             List<Leaves> listLeavesOverlap = leavesRepository.findAllByEmployeeAndPeriod(employeeId, firstDate, lastDate);
             long paidLeave = 0;
-            long unpaidLeave = 0;
             for (Leaves leaves : listLeavesOverlap) {
                 LocalDate laterStart = Collections.max(Arrays.asList(leaves.getFromDate(), firstDate));
                 LocalDate earlierEnd = Collections.min(Arrays.asList(leaves.getToDate(), lastDate));
                 long overlappingDays = ChronoUnit.DAYS.between(laterStart, earlierEnd) + 1;
                 if (leaves.getType().getIs_paid()) {
                     paidLeave += overlappingDays;
-                } else {
-                    unpaidLeave += overlappingDays;
                 }
             }
+
+            long unpaidLeave = Long.parseLong(standardDay) -
+                    Long.parseLong(actualDay) -
+                    paidLeave;
 
             Payroll payroll = payrollRepository.findPayrollByMonth(firstDate, lastDate);
 
@@ -128,6 +132,12 @@ public class PaymentService {
             );
         }
 
+        BigDecimal basicSalary = payment.getBasicSalary();
+        if (!employee.getGross_salary().equals(payment.getBasicSalary())) {
+            paymentRepository.updateBasic_salaryById(payment.getId(), employee.getGross_salary());
+            basicSalary = employee.getGross_salary();
+        }
+
         List<Bonus> bonuses = convertListBonus_listToListBonus(payment.getEmployee().getBonus_lists());
         List<Bonus> bonusesExcludeLunchAndParking = bonuses
                 .stream()
@@ -136,21 +146,51 @@ public class PaymentService {
                                 && (!bonus.getBonusName().equalsIgnoreCase("Parking"))))
                 .collect(Collectors.toList());
         BigDecimal totalBonus = calculateTotalBonus(bonusesExcludeLunchAndParking);
-        BigDecimal derivedSalary = payment.getBasicSalary()
+        BigDecimal derivedSalary = basicSalary
                 .add(totalBonus)
-                .divide(new BigDecimal(payment.getStandardDay()), RoundingMode.HALF_UP)
-                .multiply(new BigDecimal(payment.getActualDay()));
+                .multiply(new BigDecimal(payment.getActualDay()).add(new BigDecimal(payment.getPaidLeave())))
+                .divide(new BigDecimal(payment.getStandardDay()), RoundingMode.HALF_UP);
 
-        BigDecimal anotherIncome = payment.getLunch().add(payment.getParking());
+        BigDecimal lunch = payment.getLunch();
+        Optional<Bonus_List> optionalLunch = employee.getBonus_lists()
+                .stream()
+                .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Lunch"))
+                .findFirst();
+        if (optionalLunch.isPresent() && !optionalLunch.get().getAmount().equals(payment.getLunch())) {
+            paymentRepository.updateLunchById(payment.getId(), optionalLunch.get().getAmount());
+            lunch = optionalLunch.get().getAmount();
+        }
+
+        BigDecimal parking = payment.getParking();
+        Optional<Bonus_List> optionalParking = employee.getBonus_lists()
+                .stream()
+                .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Parking"))
+                .findFirst();
+        if (optionalParking.isPresent() && !optionalParking.get().getAmount().equals(payment.getParking())) {
+            paymentRepository.updateParkingById(payment.getId(), optionalParking.get().getAmount());
+            parking = optionalParking.get().getAmount();
+        }
+
+        BigDecimal anotherIncome = lunch.add(parking);
         BigDecimal totalDerivedIncome = derivedSalary.add(anotherIncome);
         BigDecimal mandatoryInsurance = totalDerivedIncome
                 .multiply(new BigDecimal("11.5"))
                 .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
-        BigDecimal taxableIncome = totalDerivedIncome
+
+        BigDecimal temporalValue = anotherIncome.subtract(payment.getAllowanceNotSubjectedToTax());
+        BigDecimal taxableIncome;
+
+        if (temporalValue.compareTo(BigDecimal.ZERO) > 0) {
+            taxableIncome = totalDerivedIncome
                 .subtract(mandatoryInsurance)
                 .subtract(payment.getAllowanceNotSubjectedToTax())
                 .subtract(payment.getPersonalRelief())
                 .subtract(payment.getDependentRelief());
+        } else {
+            taxableIncome = derivedSalary
+                    .subtract(payment.getPersonalRelief())
+                    .subtract(payment.getDependentRelief());
+        }
         if (taxableIncome.compareTo(BigDecimal.ZERO) < 0) {
             taxableIncome = BigDecimal.valueOf(0.00);
         }
@@ -160,7 +200,7 @@ public class PaymentService {
         if (netIncome.compareTo(BigDecimal.ZERO) < 0) {
             netIncome = BigDecimal.valueOf(0.00);
         }
-        return new PaymentResponse(payment.getBasicSalary(),
+        return new PaymentResponse(basicSalary,
                 bonuses,
                 totalBonus,
                 new MonthlyInfo(payment.getActualDay(),
@@ -170,12 +210,12 @@ public class PaymentService {
                 totalDerivedIncome,
                 derivedSalary,
                 anotherIncome,
-                payment.getLunch(),
-                payment.getParking(),
+                lunch,
+                parking,
                 totalDeduction,
                 mandatoryInsurance,
                 payment.getAllowanceNotSubjectedToTax(),
-                payment.getPersonalRelief(),
+                payment.getPersonalRelief().setScale(2),
                 payment.getDependentRelief(),
                 taxableIncome,
                 personalIncomeTax,

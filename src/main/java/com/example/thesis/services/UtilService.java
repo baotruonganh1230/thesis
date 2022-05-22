@@ -8,25 +8,20 @@ import com.example.thesis.repositories.AttendanceRepository;
 import com.example.thesis.repositories.CheckinRepository;
 import com.example.thesis.repositories.EmployeeRepository;
 import com.example.thesis.repositories.PayrollRepository;
-import com.example.thesis.responses.AttendStatusResponse;
-import com.example.thesis.responses.PaymentResponse;
-import com.example.thesis.responses.PayrollEntity;
-import com.example.thesis.responses.PayrollResponsePdf;
+import com.example.thesis.responses.*;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.HOURS;
@@ -198,6 +193,69 @@ public class UtilService {
         }
 
         return new PayrollResponsePdf(
+                upLoadedFile.getWebContentLink()
+        );
+
+    }
+
+    public PaymentResponsePdf getPaymentPdf(Long id, String month) {
+
+        Optional<Employee> employeeOptional = employeeRepository.findById(id);
+        if (employeeOptional.isEmpty()) {
+            throw new EntityNotFoundException("There is no employee with that id!");
+        }
+
+        Employee employee = employeeOptional.get();
+
+        PaymentResponse paymentResponse = paymentService.getPayment(month, employee.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("item", new PaymentPdfEntity(
+                employee.getId(),
+                employee.getFirstName() + " " + employee.getLastName(),
+                employee.getWorksIn().getDepartment().getName(),
+                LocalDate.parse(month.substring(0,10)).format(DateTimeFormatter.ofPattern("MM/yyyy")),
+                paymentResponse.getBasicSalary(),
+                paymentResponse.getTotalBonus(),
+                paymentResponse.getMonthlyInfo().getStandardDay(),
+                paymentResponse.getMonthlyInfo().getActualDay(),
+                paymentResponse.getMonthlyInfo().getUnpaidLeave(),
+                paymentResponse.getMonthlyInfo().getPaidLeave(),
+                paymentResponse.getTotalDerivedIncome(),
+                paymentResponse.getDerivedSalary(),
+                paymentResponse.getAnotherIncome(),
+                paymentResponse.getLunch(),
+                paymentResponse.getParking(),
+                paymentResponse.getTotalDeduction(),
+                paymentResponse.getMandatoryInsurance(),
+                paymentResponse.getPersonalIncomeTax(),
+                paymentResponse.getAllowanceNotSubjectedToTax(),
+                paymentResponse.getPersonalRelief(),
+                paymentResponse.getDependentRelief(),
+                paymentResponse.getTaxableIncome(),
+                paymentResponse.getNetIncome()
+        ));
+
+        pdfGenerateService.generatePdfFile("payment", data, "payment.pdf");
+        File filetoUpload = new File(pdfDirectory + "payment.pdf");
+
+        Tika tika = new Tika();
+        String mimeType = null;
+        try {
+            mimeType = tika.detect(filetoUpload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        com.google.api.services.drive.model.File upLoadedFile =
+                googleDriveService.upLoadFile(filetoUpload.getName(),
+                        filetoUpload.getAbsolutePath(), mimeType);
+
+        if (!filetoUpload.delete()) {
+            throw new IllegalStateException("Cannot delete file!");
+        }
+
+        return new PaymentResponsePdf(
                 upLoadedFile.getWebContentLink()
         );
 

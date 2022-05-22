@@ -1,10 +1,7 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Job_Recruitment;
-import com.example.thesis.repositories.DepartmentRepository;
-import com.example.thesis.repositories.EmployeeRepository;
-import com.example.thesis.repositories.HasRepository;
-import com.example.thesis.repositories.Job_RecruitmentRepository;
+import com.example.thesis.repositories.*;
 import com.example.thesis.responses.UnauthorizedJob_RecruitmentResponse;
 import com.example.thesis.responses.VacanciesInfo;
 import com.example.thesis.responses.VacanciesInfos;
@@ -19,7 +16,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,26 +23,42 @@ public class Job_RecruitmentService {
     private final Job_RecruitmentRepository repository;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final CandidateRepository candidateRepository;
     private final HasRepository hasRepository;
 
     public List<UnauthorizedJob_RecruitmentResponse> getJob_RecruitmentsUnauthorized() {
+
         List<UnauthorizedJob_RecruitmentResponse> unauthorizedJob_recruitmentResponses
                 = new ArrayList<>();
 
-        Lists.newArrayList(repository.findAll()
-                .stream()
-                .filter(job -> job.getStatus().equals(0))
-                .collect(Collectors.toList()))
+        repository.findAll()
                 .forEach((Job_Recruitment job) -> {
-            UnauthorizedJob_RecruitmentResponse unauthorizedJob_recruitmentResponse =
-                    new UnauthorizedJob_RecruitmentResponse(
-                    job.getId(),
-                    job.getHas().getPosition().getName(),
-                    job.getDepartment().getName(),
-                    job.getPostContent());
+                    Integer newStatus;
+                    long candidateCount = candidateRepository.countByJobRecruitment(job);
 
-            unauthorizedJob_recruitmentResponses.add(unauthorizedJob_recruitmentResponse);
-        });
+                    if (job.getExpired_date().isBefore(LocalDate.now())) {
+                        newStatus = 1;
+                    } else if (candidateCount >= job.getQuantity()) {
+                        newStatus = 2;
+                    } else {
+                        newStatus = 0;
+                    }
+
+                    if (!newStatus.equals(job.getStatus())) {
+                        repository.updateJobStatus(job.getId(), newStatus);
+                    }
+
+                    if (newStatus == 0) {
+                        UnauthorizedJob_RecruitmentResponse unauthorizedJob_recruitmentResponse =
+                                new UnauthorizedJob_RecruitmentResponse(
+                                        job.getId(),
+                                        job.getHas().getPosition().getName(),
+                                        job.getDepartment().getName(),
+                                        job.getPostContent());
+
+                        unauthorizedJob_recruitmentResponses.add(unauthorizedJob_recruitmentResponse);
+                    }
+                });
 
         return unauthorizedJob_recruitmentResponses;
     }
@@ -56,10 +68,11 @@ public class Job_RecruitmentService {
 
         Lists.newArrayList(repository.findAll()).forEach((Job_Recruitment job) -> {
             Integer newStatus;
+            long candidateCount = candidateRepository.countByJobRecruitment(job);
 
             if (job.getExpired_date().isBefore(LocalDate.now())) {
                 newStatus = 1;
-            } else if (job.getQuantity() <= 0) {
+            } else if (candidateCount >= job.getQuantity()) {
                 newStatus = 2;
             } else {
                 newStatus = 0;

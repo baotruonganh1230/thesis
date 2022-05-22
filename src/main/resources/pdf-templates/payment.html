@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <style>
+        h1{
+            color: brown;
+        }
+        .payment {
+            width: 100%;
+        }
+        .payment, .payment th, .payment td {
+            border: 1px solid brown;
+            border-collapse: collapse;
+        }
+        .payment th {
+            background-color: brown;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<h1>Payment</h1>
+<table>
+    <tr>
+        <td th:text="'Employee Id: ' + ${item.employeeId}"></td>
+    </tr>
+    <tr>
+        <td th:text="'Employee Name: ' + ${item.employeeName}"></td>
+    </tr>
+    <tr>
+        <td th:text="'Department: ' + ${item.department}"></td>
+    </tr>
+    <tr>
+        <td th:text="'Month: ' + ${item.month}"></td>
+    </tr>
+</table>
+<br />
+<br />
+<table class="payment">
+    <tr>
+        <th>Basic Salary</th>
+        <td th:text="${item.basicSalary}"></td>
+    </tr>
+    <tr>
+        <th>Bonus</th>
+        <td th:text="${item.bonus}"></td>
+    </tr>
+    <tr>
+        <th>Standard Working Days</th>
+        <td th:text="${item.standardDays}"></td>
+    </tr>
+    <tr>
+        <th>Actual Working Days</th>
+        <td th:text="${item.actualDays}"></td>
+    </tr>
+    <tr>
+        <th>Unpaid Leave</th>
+        <td th:text="${item.unpaidLeave}"></td>
+    </tr>
+    <tr>
+        <th>Paid Leave</th>
+        <td th:text="${item.paidLeave}"></td>
+    </tr>
+    <tr>
+        <th>Total Derived Income</th>
+        <td th:text="${item.totalDerivedIncome}"></td>
+    </tr>
+    <tr>
+        <th>Derived Salary</th>
+        <td th:text="${item.derivedSalary}"></td>
+    </tr>
+    <tr>
+        <th>Another Income</th>
+        <td th:text="${item.anotherIncome}"></td>
+    </tr>
+    <tr>
+        <th>Lunch</th>
+        <td th:text="${item.lunch}"></td>
+    </tr>
+    <tr>
+        <th>Parking</th>
+        <td th:text="${item.parking}"></td>
+    </tr>
+    <tr>
+        <th>Total Deduction</th>
+        <td th:text="${item.totalDeduction}"></td>
+    </tr>
+    <tr>
+        <th>Mandatory Insurance</th>
+        <td th:text="${item.mandatoryInsurance}"></td>
+    </tr>
+    <tr>
+        <th>Personal Income Tax</th>
+        <td th:text="${item.personalIncomeTax}"></td>
+    </tr>
+    <tr>
+        <th>Allowance Not Subjected To Tax</th>
+        <td th:text="${item.allowanceNotSubjectedToTax}"></td>
+    </tr>
+    <tr>
+        <th>Personal Relief</th>
+        <td th:text="${item.personalRelief}"></td>
+    </tr>
+    <tr>
+        <th>Dependent Relief</th>
+        <td th:text="${item.dependentRelief}"></td>
+    </tr>
+    <tr>
+        <th>Taxable Income</th>
+        <td th:text="${item.taxableIncome}"></td>
+    </tr>
+    <tr>
+        <th>Net Income</th>
+        <td th:text="${item.netIncome}"></td>
+    </tr>
+</table>
+</body>
+</html>
