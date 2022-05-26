@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class PaymentPdfEntity {
     private String department;
     private String month;
     private BigDecimal basicSalary;
-    private BigDecimal bonus;
+    private List<Bonus> bonuses;
     private String standardDays;
     private String actualDays;
     private String unpaidLeave;

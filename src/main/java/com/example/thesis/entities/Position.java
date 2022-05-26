@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,11 +33,11 @@ public class Position {
     private String note;
 
     @JsonIgnore
-    @OneToOne(
+    @OneToMany(
             mappedBy = "position",
             cascade = CascadeType.ALL
     )
-    private Has has;
+    private Set<Has> has;
 
     @JsonIgnore
     @OneToMany(

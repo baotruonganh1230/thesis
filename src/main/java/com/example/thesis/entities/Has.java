@@ -1,26 +1,35 @@
 package com.example.thesis.entities;
 
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
-@EqualsAndHashCode
-public class Has implements Serializable {
-    @Id
-    private Long posid;
+@NoArgsConstructor
+@AllArgsConstructor
+public class Has {
 
-    @MapsId
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Position.class)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Fetch(FetchMode.JOIN)
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Position.class)
     @JoinColumn(name="posid", referencedColumnName="id")
     private Position position;
 
-    @OneToOne(cascade = CascadeType.REMOVE, targetEntity = Job_Recruitment.class)
+    @Fetch(FetchMode.JOIN)
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Job_Recruitment.class)
     @JoinColumn(name="jrecruitid", referencedColumnName="id")
     private Job_Recruitment job_recruitment;
 }

@@ -7,13 +7,10 @@ import com.example.thesis.responses.DepartmentResponse;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.transaction.Transactional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +21,6 @@ public class DepartmentService {
     private final EmployeeRepository employeeRepository;
     private final Works_InRepository works_inRepository;
     private final Job_RecruitmentRepository job_recruitmentRepository;
-    private final HasRepository hasRepository;
 
     private DepartmentResponse convertFromDepartmentToDepartmentResponse(Set<Long> idSet, Department department) {
         if (department != null) {
@@ -86,9 +82,15 @@ public class DepartmentService {
         return false;
     }
 
-    @Transactional
+
     public Set<DepartmentResponse> getDepartments(Boolean nested) {
         Set<DepartmentResponse> departmentResponses = new HashSet<>();
+        departmentRepository.findAll().forEach(department -> {
+            long newCount = recalculatePeopleCount(department);
+            if (newCount != department.getPeopleNumber()) {
+                department.setPeopleNumber((int) newCount);
+            }
+        });
 
         if (nested) {
             Set<Long> idSet = new HashSet<>();
@@ -100,21 +102,34 @@ public class DepartmentService {
 
             });
         } else {
-            Lists.newArrayList(departmentRepository.findAll()).forEach((Department department) ->
-                    addToDepartmentResponseSetNoNested(departmentResponses, department));
+            List<Department> allDepartments = departmentRepository.findAll();
+            Lists.newArrayList(allDepartments).forEach((Department department) -> {
+                addToDepartmentResponseSetNoNested(departmentResponses, department);
+            });
         }
 
         return departmentResponses;
     }
 
     public DepartmentResponse getDepartment(Long id) {
-        Department department = departmentRepository.getById(id);
-        Set<Long> idSet = new HashSet<>();
-        idSet.add(department.getId());
-        return convertFromDepartmentToDepartmentResponse(idSet, department);
+        Optional<Department> optionalDepartment = departmentRepository.findById(id);
+
+        if (optionalDepartment.isPresent()) {
+            Department department = optionalDepartment.get();
+            long newCount = recalculatePeopleCount(department);
+            if (newCount != department.getPeopleNumber()) {
+                department.setPeopleNumber((int) newCount);
+            }
+
+            Set<Long> idSet = new HashSet<>();
+            idSet.add(department.getId());
+            return convertFromDepartmentToDepartmentResponse(idSet, department);
+        } else {
+            return null;
+        }
     }
 
-    @Transactional
+
     public void updateDepartmentById(Long id, DepartmentRequest departmentRequest) {
         if (!departmentRepository.existsById(id)) {
             throw new IllegalStateException("There is no department with that id");
@@ -160,6 +175,9 @@ public class DepartmentService {
     public void insertDepartmentById(DepartmentRequest departmentRequest) {
         if (departmentRepository.findByName(departmentRequest.getName()) == null) {
 
+            Optional<Employee> optionalEmployee = employeeRepository.findById(departmentRequest.getManagerOfUnitId());
+            Employee manager = optionalEmployee.orElse(null);
+
             Department savedDepartment = departmentRepository.save(new Department(
                     null,
                     null,
@@ -183,13 +201,13 @@ public class DepartmentService {
                     Manage manage = manageRepository.getManageByEid(departmentRequest.getManagerOfUnitId());
                     departmentRepository.decreasePeopleCount(manage.getDepartment().getId());
                     departmentRepository.increasePeopleCount(savedDepartment.getId());
-                    manageRepository.deleteByEmployee(employee);
+                    manageRepository.deleteByEmployee(employee.getId());
                 }
 
                 manageRepository.save(new Manage(
                         savedDepartment.getId(),
                         savedDepartment,
-                        employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get()
+                        manager
                 ));
             }
 
@@ -201,6 +219,10 @@ public class DepartmentService {
                         employeeRepository.findById(departmentRequest.getManagerOfUnitId()).get(),
                         savedDepartment
                 ));
+            }
+
+            if (departmentRequest.getHeadOfUnitId() != null && departmentRequest.getManagerOfUnitId() != null) {
+                departmentRepository.increasePeopleCount(departmentRequest.getHeadOfUnitId());
             }
 
         }
@@ -273,4 +295,12 @@ public class DepartmentService {
         return returnList;
     }
 
+    private long recalculatePeopleCount(Department department) {
+        long peopleCount = works_inRepository.getCountByDid(department.getId());
+        if (peopleCount != department.getPeopleNumber()) {
+            departmentRepository.setPeopleCount(department.getId(), (int) peopleCount);
+            return peopleCount;
+        }
+        return department.getPeopleNumber();
+    }
 }

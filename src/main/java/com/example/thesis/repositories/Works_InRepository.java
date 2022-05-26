@@ -13,6 +13,9 @@ public interface Works_InRepository extends JpaRepository<Works_In, Long> {
     @Query(value = "update works_in set did = ?2 where eid = ?1", nativeQuery = true)
     int setDepartmentId(Long eid, Long did);
 
+    @Query(value = "select count(*) as count from works_in where did = ?1", nativeQuery = true)
+    long getCountByDid(Long did);
+
     @Transactional
     @Modifying
     @Query(value = "delete from works_in where did = ?1", nativeQuery = true)

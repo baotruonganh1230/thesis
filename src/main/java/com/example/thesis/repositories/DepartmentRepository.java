@@ -21,6 +21,11 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "update department set people_number = ?2 where id = ?1", nativeQuery = true)
+    int setPeopleCount(Long id, Integer peopleNumber);
+
+    @Transactional
+    @Modifying
     @Query(value = "update department set people_number = people_number + 1 where id = ?1", nativeQuery = true)
     int increasePeopleCount(Long id);
 

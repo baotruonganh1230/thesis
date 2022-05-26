@@ -14,8 +14,8 @@
             border-collapse: collapse;
         }
         .payment th {
-            background-color: brown;
-            color: white;
+            background-color: #f39f9f;
+            color: black;
         }
     </style>
 </head>
@@ -41,10 +41,6 @@
     <tr>
         <th>Basic Salary</th>
         <td th:text="${item.basicSalary}"></td>
-    </tr>
-    <tr>
-        <th>Bonus</th>
-        <td th:text="${item.bonus}"></td>
     </tr>
     <tr>
         <th>Standard Working Days</th>
@@ -74,13 +70,9 @@
         <th>Another Income</th>
         <td th:text="${item.anotherIncome}"></td>
     </tr>
-    <tr>
-        <th>Lunch</th>
-        <td th:text="${item.lunch}"></td>
-    </tr>
-    <tr>
-        <th>Parking</th>
-        <td th:text="${item.parking}"></td>
+    <tr th:each="bonus: ${item.bonuses}">
+        <th th:text="${bonus.bonusName}"></th>
+        <td th:text="${bonus.bonusAmount}"></td>
     </tr>
     <tr>
         <th>Total Deduction</th>

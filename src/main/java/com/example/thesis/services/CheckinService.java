@@ -27,6 +27,8 @@ public class CheckinService {
     public void checkin_in(CheckinRequest checkinRequest) {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
 
+        Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinRequest.getDate());
+
         if (!attendanceRepository.existsByEmployeeAndDate(employee, checkinRequest.getDate())) {
             Attendance savedAttendance = attendanceRepository.save(new Attendance(
                     null,
@@ -51,12 +53,14 @@ public class CheckinService {
     public void checkin_out(CheckinRequest checkinRequest) {
         Employee employee = accountRepository.getById(checkinRequest.getUserId()).getEmployee();
         Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, checkinRequest.getDate());
-        checkinRepository.setTimeout(attendance.getId(), checkinRequest.getTimeOut().toString());
-        int status;
         Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
-        if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) <= 0 && checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) >= 0) {
+        checkin.setTime_out(checkinRequest.getTimeOut());
+        Checkin savedCheckin = checkinRepository.save(checkin);
+        int status;
+
+        if (savedCheckin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) <= 0 && checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) >= 0) {
             status = 0;
-        } else if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) > 0 || checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) < 0) {
+        } else if (savedCheckin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) > 0 || checkinRequest.getTimeOut().compareTo(LocalTime.parse("18:00:00.000")) < 0) {
             status = 1;
         } else {
             status = 2;

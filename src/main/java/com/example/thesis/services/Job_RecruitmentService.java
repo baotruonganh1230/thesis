@@ -1,6 +1,7 @@
 package com.example.thesis.services;
 
 import com.example.thesis.entities.Job_Recruitment;
+import com.example.thesis.entities.Position;
 import com.example.thesis.repositories.*;
 import com.example.thesis.responses.UnauthorizedJob_RecruitmentResponse;
 import com.example.thesis.responses.VacanciesInfo;
@@ -25,6 +26,7 @@ public class Job_RecruitmentService {
     private final DepartmentRepository departmentRepository;
     private final CandidateRepository candidateRepository;
     private final HasRepository hasRepository;
+    private final PositionRepository positionRepository;
 
     public List<UnauthorizedJob_RecruitmentResponse> getJob_RecruitmentsUnauthorized() {
 
@@ -149,7 +151,9 @@ public class Job_RecruitmentService {
                 vacanciesInfo.getHiringManagerId()
         );
 
-        if (hasRepository.existsByPosid(vacanciesInfo.getPositionId())) {
+        Position position = positionRepository.getById(vacanciesInfo.getPositionId());
+
+        if (hasRepository.existsByPosition(position)) {
             hasRepository.updateJob_RecuitmentIdByPosId(vacanciesInfo.getPositionId(), id);
         } else {
             hasRepository.insertHas(vacanciesInfo.getPositionId(), id);
@@ -180,7 +184,9 @@ public class Job_RecruitmentService {
                 null,
                 null));
 
-        if (hasRepository.existsByPosid(vacanciesInfo.getPositionId())) {
+        Position position = positionRepository.getById(vacanciesInfo.getPositionId());
+
+        if (hasRepository.existsByPosition(position)) {
             hasRepository.updateJob_RecuitmentIdByPosId(vacanciesInfo.getPositionId(), savedJob_recruitment.getId());
         } else {
             hasRepository.insertHas(vacanciesInfo.getPositionId(), savedJob_recruitment.getId());

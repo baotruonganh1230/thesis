@@ -139,13 +139,7 @@ public class PaymentService {
         }
 
         List<Bonus> bonuses = convertListBonus_listToListBonus(payment.getEmployee().getBonus_lists());
-        List<Bonus> bonusesExcludeLunchAndParking = bonuses
-                .stream()
-                .filter(bonus ->
-                        ((!bonus.getBonusName().equalsIgnoreCase("Lunch"))
-                                && (!bonus.getBonusName().equalsIgnoreCase("Parking"))))
-                .collect(Collectors.toList());
-        BigDecimal totalBonus = calculateTotalBonus(bonusesExcludeLunchAndParking);
+        BigDecimal totalBonus = calculateTotalBonus(bonuses);
         BigDecimal derivedSalary = basicSalary
                 .add(totalBonus)
                 .multiply(new BigDecimal(payment.getActualDay()).add(new BigDecimal(payment.getPaidLeave())))
@@ -171,7 +165,7 @@ public class PaymentService {
             parking = optionalParking.get().getAmount();
         }
 
-        BigDecimal anotherIncome = lunch.add(parking);
+        BigDecimal anotherIncome = new BigDecimal(totalBonus.setScale(2, RoundingMode.HALF_UP).toString());
         BigDecimal totalDerivedIncome = derivedSalary.add(anotherIncome);
         BigDecimal mandatoryInsurance = totalDerivedIncome
                 .multiply(new BigDecimal("11.5"))

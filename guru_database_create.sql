@@ -7,7 +7,7 @@ create table checkin (attendance_id bigint not null, date date, device_id varcha
 create table department (id bigint not null auto_increment, description TEXT, location varchar(255), name varchar(255), people_number integer, type varchar(255), head_of_unit_id bigint, primary key (id)) engine=InnoDB;
 create table employee (id bigint not null auto_increment, avatar TEXT, date_of_birth date, email varchar(255), employed_date date, first_name varchar(255), gross_salary decimal(16,2), last_name varchar(255), permanent_address varchar(255), phone varchar(255), pit varchar(255), sex varchar(255), temporary_address varchar(255), position_id bigint, primary key (id)) engine=InnoDB;
 create table event (id bigint not null auto_increment, notes TEXT, time datetime(6), title varchar(255), primary key (id)) engine=InnoDB;
-create table has (posid bigint not null, jrecruitid bigint, primary key (posid)) engine=InnoDB;
+create table has (id bigint not null auto_increment, jrecruitid bigint, posid bigint, primary key (id)) engine=InnoDB;
 create table insurance (eid bigint not null, typeid bigint not null, city_id bigint, from_date date, issue_date date, kcb_id bigint, number varchar(255), to_date date, primary key (eid, typeid)) engine=InnoDB;
 create table insurance_type (id bigint not null auto_increment, name varchar(255), rate_of_payment decimal(16,2), primary key (id)) engine=InnoDB;
 create table job_recruitment (id bigint not null auto_increment, expired_date date, note TEXT, post_content TEXT, published_date date, quantity integer, status integer, department_id bigint, hiring_manager_id bigint, primary key (id)) engine=InnoDB;

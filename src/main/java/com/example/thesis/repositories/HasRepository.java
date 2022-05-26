@@ -1,6 +1,7 @@
 package com.example.thesis.repositories;
 
 import com.example.thesis.entities.Has;
+import com.example.thesis.entities.Position;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +20,5 @@ public interface HasRepository extends JpaRepository<Has, Long> {
     @Query(value = "insert into has (posid, jrecruitid) values (?1, ?2)", nativeQuery = true)
     int insertHas(Long posid, Long jrecruitid);
 
-    boolean existsByPosid(Long posId);
+    boolean existsByPosition(Position position);
 }

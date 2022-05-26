@@ -17,7 +17,10 @@ public interface ManageRepository extends JpaRepository<Manage, Long> {
     @Query(value = "select * from manage where eid = ?1 limit 1", nativeQuery = true)
     Manage getManageByEid(Long eid);
 
-    int deleteByEmployee(Employee employee);
+    @Transactional
+    @Modifying
+    @Query(value = "delete from manage where eid = ?1", nativeQuery = true)
+    int deleteByEmployee(Long eid);
 
     boolean existsByEmployee(Employee employee);
 

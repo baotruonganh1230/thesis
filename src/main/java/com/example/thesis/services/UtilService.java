@@ -57,30 +57,38 @@ public class UtilService {
 
         //convert String to LocalDate
         LocalDate dayPassed = LocalDate.parse(week, formatter);
+        List<LocalDate> workingDays = new ArrayList<>();
+
         LocalDate monday = dayPassed.with(DayOfWeek.MONDAY);
         LocalDate saturday = monday.plusDays(5);
+        for (int i = 0; i < 6; i++) {
+            workingDays.add(monday.plusDays(i));
+        }
 
-        List<Employee> employees = employeeRepository.findAll();
-        Map<Long, Double> averageHours = new HashMap<>();
-        for (Employee employee : employees) {
-            averageHours.put(employee.getId(), 0.0);
+        long employeeCount = employeeRepository.findAll().size();
+        Map<LocalDate, Double> averageHours = new TreeMap<>();
+        for (LocalDate date : workingDays) {
+            averageHours.put(date, 0.0);
         }
 
         List<Attendance> attendances = attendanceRepository.findAllAttendancesFromdateTodate(monday.toString(), saturday.toString());
 
-        Map<Employee, List<Attendance>> groupByEmployee =
+        Map<LocalDate, List<Attendance>> groupByDate =
                 attendances
                         .stream()
-                        .collect(Collectors.groupingBy(Attendance::getEmployee));
+                        .collect(Collectors.groupingBy(Attendance::getDate));
 
-        for (Map.Entry<Employee, List<Attendance>> entry : groupByEmployee.entrySet()) {
+        for (Map.Entry<LocalDate, List<Attendance>> entry : groupByDate.entrySet()) {
             long sumHours = 0L;
             for (Attendance attendance : entry.getValue()) {
                 Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
-                long workingHours = HOURS.between(checkin.getTime_in(), checkin.getTime_out());
+                long workingHours = 1;
+                if (checkin.getTime_out() != null) {
+                    workingHours = HOURS.between(checkin.getTime_in(), checkin.getTime_out());
+                }
                 sumHours += workingHours - 1;
             }
-            averageHours.put(entry.getKey().getId(), (double) sumHours / (double) entry.getValue().size());
+            averageHours.put(entry.getKey(), (double) sumHours / (double) employeeCount);
         }
 
         return new ArrayList<>(averageHours.values());
@@ -216,7 +224,7 @@ public class UtilService {
                 employee.getWorksIn().getDepartment().getName(),
                 LocalDate.parse(month.substring(0,10)).format(DateTimeFormatter.ofPattern("MM/yyyy")),
                 paymentResponse.getBasicSalary(),
-                paymentResponse.getTotalBonus(),
+                paymentResponse.getBonus(),
                 paymentResponse.getMonthlyInfo().getStandardDay(),
                 paymentResponse.getMonthlyInfo().getActualDay(),
                 paymentResponse.getMonthlyInfo().getUnpaidLeave(),
