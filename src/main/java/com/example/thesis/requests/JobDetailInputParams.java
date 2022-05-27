@@ -23,6 +23,7 @@ public class JobDetailInputParams {
     private Long departmentId;
     private Integer salaryGroup;
     private BigDecimal salary;
+    private Long shiftId;
     @JsonProperty("bonus")
     private List<Bonus> bonus;
 

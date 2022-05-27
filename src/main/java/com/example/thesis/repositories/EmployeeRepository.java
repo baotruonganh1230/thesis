@@ -24,9 +24,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Modifying
     @Query(value = "update employee set employed_date = ?2, " +
             "gross_salary = ?3, " +
-            "pit = ?4, position_id = ?5 where id = ?1", nativeQuery = true)
+            "pit = ?4, shift_id = ?5, position_id = ?6 where id = ?1", nativeQuery = true)
     int setEmployeeJobById(Long id, LocalDate employed_date,
-                        BigDecimal gross_salary, String pit, Long position_id);
+                        BigDecimal gross_salary, String pit, Long shiftId, Long position_id);
 
 
 }

@@ -46,6 +46,12 @@ public class Employee {
 
     private String pit;
 
+    @Fetch(FetchMode.JOIN)
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.REMOVE, targetEntity = Shift.class)
+    @JoinColumn(name="shift_id", referencedColumnName="id")
+    private Shift shift;
+
     @Column(columnDefinition = "TEXT")
     private String avatar;
 
@@ -60,7 +66,7 @@ public class Employee {
         this.date_of_birth = date_of_birth;
     }
 
-    public Employee(String firstName, String lastName, String email, String permanent_address, String temporary_address, String phone, BigDecimal gross_salary, LocalDate employed_date, String sex, LocalDate date_of_birth, String pit, String avatar, Position position) {
+    public Employee(String firstName, String lastName, String email, String permanent_address, String temporary_address, String phone, BigDecimal gross_salary, LocalDate employed_date, String sex, LocalDate date_of_birth, String pit, Shift shift, String avatar, Position position) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -72,6 +78,7 @@ public class Employee {
         this.sex = sex;
         this.date_of_birth = date_of_birth;
         this.pit = pit;
+        this.shift = shift;
         this.avatar = avatar;
         this.position = position;
     }

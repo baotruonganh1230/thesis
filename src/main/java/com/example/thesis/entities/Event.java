@@ -37,9 +37,18 @@ public class Event {
 
     private LocalDateTime time;
 
-    public Event(String notes, String title, LocalDateTime time) {
+    private LocalDateTime timeEnd;
+
+    private String type;
+
+    private String location;
+
+    public Event(String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location) {
         this.notes = notes;
         this.title = title;
         this.time = time;
+        this.timeEnd = timeEnd;
+        this.type = type;
+        this.location = location;
     }
 }

@@ -17,9 +17,10 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -120,7 +121,7 @@ public class UtilService {
                 Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, LocalDate.parse(date.substring(0,10)));
                 if (attendance != null) {
                     Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
-                    if (checkin.getTime_in().compareTo(LocalTime.parse("09:00:00.000")) > 0) {
+                    if (checkin.getTime_in().compareTo(employee.getShift().getTimeIn()) > 0) {
                         lateThatDay += 1;
                     } else {
                         onTimeThatDay += 1;
@@ -139,6 +140,37 @@ public class UtilService {
                 late,
                 off
         );
+    }
+
+    public List<BigDecimal> getTotalPaymentValues(String year) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        //convert String to LocalDate
+        LocalDate dayPassed = LocalDate.parse(year, formatter);
+
+        LocalDate firstDayOfYear = LocalDate.of(dayPassed.getYear(), Month.JANUARY, 1);
+        List<LocalDate> months = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            months.add(firstDayOfYear.plusMonths(i));
+        }
+        Map<LocalDate, BigDecimal> sortedMap = new TreeMap<>();
+        for (LocalDate month : months) {
+            sortedMap.put(month, BigDecimal.ZERO);
+        }
+
+        for (LocalDate month : months) {
+            List<Employee> employees = employeeRepository.findAll();
+            BigDecimal totalNetIncome = BigDecimal.ZERO;
+            for (Employee employee : employees) {
+                PaymentResponse paymentResponse =
+                        paymentService.getPayment(month.toString() + "T00:00:00.000Z",
+                                employee.getId());
+                totalNetIncome = totalNetIncome.add(paymentResponse.getNetIncome());
+            }
+            sortedMap.put(month, totalNetIncome);
+        }
+
+        return new ArrayList<>(sortedMap.values());
     }
 
 

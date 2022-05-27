@@ -25,4 +25,10 @@ public class CandidateController {
                 candidateService.getCandidatesByJob_RecruitmentId(jobRecruitmentId, pagination, sortBy, sortOrder),
                 HttpStatus.OK);
     }
+
+    @PostMapping("promote")
+    public ResponseEntity<?> promoteCandidate(@PathVariable Long candidateId) {
+        candidateService.promoteCandidate(candidateId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

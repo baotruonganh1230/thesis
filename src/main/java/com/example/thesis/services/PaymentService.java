@@ -27,6 +27,7 @@ public class PaymentService {
     private final AttendanceRepository attendanceRepository;
     private final LeavesRepository leavesRepository;
     private final PayrollRepository payrollRepository;
+    private final CheckinRepository checkinRepository;
 
     @Transactional
     public PaymentResponse getPayment(String month, Long employeeId) {
@@ -48,13 +49,31 @@ public class PaymentService {
 
         if (payment == null) {
 
-            List<Attendance> attendancesInMonth =
-                    attendanceRepository.findAllAttendancesOfEmployeeFromdateTodate(
-                            employeeId,
+//            List<Attendance> attendancesInMonth =
+//                    attendanceRepository.findAllAttendancesOfEmployeeFromdateTodate(
+//                            employeeId,
+//                            firstDate.toString(),
+//                            lastDate.toString());
+            List<Checkin> checkinsOfEmployeeInMonth =
+                    checkinRepository.findAllCheckinsFromdateTodate(
                             firstDate.toString(),
-                            lastDate.toString());
+                            lastDate.toString()
+                    )
+                    .stream()
+                    .filter(checkin ->
+                            checkin.getAttendance().getEmployee().getId().equals(employeeId))
+                    .collect(Collectors.toList());
 
-            String actualDay = String.valueOf(attendancesInMonth.size());
+
+            List<Checkin> countedCheckins =
+                    checkinsOfEmployeeInMonth
+                            .stream()
+                            .filter(checkin ->
+                                            (checkin.getStatus().equals(0) ||
+                                                    checkin.getStatus().equals(1)))
+                            .collect(Collectors.toList());
+
+            String actualDay = String.valueOf(countedCheckins.size());
             String standardDay = String.valueOf(countWorkingDaysOfMonth(firstDate, lastDate));
 
             BigDecimal basicSalary = employee.getGross_salary();
@@ -133,7 +152,10 @@ public class PaymentService {
         }
 
         BigDecimal basicSalary = payment.getBasicSalary();
-        if (!employee.getGross_salary().equals(payment.getBasicSalary())) {
+        if ((dayPassed.getYear() > LocalDate.now().getYear() ||
+                (dayPassed.getYear() == LocalDate.now().getYear() &&
+                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0)) &&
+                !employee.getGross_salary().equals(payment.getBasicSalary())) {
             paymentRepository.updateBasic_salaryById(payment.getId(), employee.getGross_salary());
             basicSalary = employee.getGross_salary();
         }
@@ -146,23 +168,28 @@ public class PaymentService {
                 .divide(new BigDecimal(payment.getStandardDay()), RoundingMode.HALF_UP);
 
         BigDecimal lunch = payment.getLunch();
-        Optional<Bonus_List> optionalLunch = employee.getBonus_lists()
-                .stream()
-                .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Lunch"))
-                .findFirst();
-        if (optionalLunch.isPresent() && !optionalLunch.get().getAmount().equals(payment.getLunch())) {
-            paymentRepository.updateLunchById(payment.getId(), optionalLunch.get().getAmount());
-            lunch = optionalLunch.get().getAmount();
-        }
-
         BigDecimal parking = payment.getParking();
-        Optional<Bonus_List> optionalParking = employee.getBonus_lists()
-                .stream()
-                .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Parking"))
-                .findFirst();
-        if (optionalParking.isPresent() && !optionalParking.get().getAmount().equals(payment.getParking())) {
-            paymentRepository.updateParkingById(payment.getId(), optionalParking.get().getAmount());
-            parking = optionalParking.get().getAmount();
+
+        if ((dayPassed.getYear() > LocalDate.now().getYear() ||
+                (dayPassed.getYear() == LocalDate.now().getYear() &&
+                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0))) {
+            Optional<Bonus_List> optionalLunch = employee.getBonus_lists()
+                    .stream()
+                    .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Lunch"))
+                    .findFirst();
+            if (optionalLunch.isPresent() && !optionalLunch.get().getAmount().equals(payment.getLunch())) {
+                paymentRepository.updateLunchById(payment.getId(), optionalLunch.get().getAmount());
+                lunch = optionalLunch.get().getAmount();
+            }
+
+            Optional<Bonus_List> optionalParking = employee.getBonus_lists()
+                    .stream()
+                    .filter(bonus_list -> bonus_list.getBonusName().equalsIgnoreCase("Parking"))
+                    .findFirst();
+            if (optionalParking.isPresent() && !optionalParking.get().getAmount().equals(payment.getParking())) {
+                paymentRepository.updateParkingById(payment.getId(), optionalParking.get().getAmount());
+                parking = optionalParking.get().getAmount();
+            }
         }
 
         BigDecimal anotherIncome = new BigDecimal(totalBonus.setScale(2, RoundingMode.HALF_UP).toString());

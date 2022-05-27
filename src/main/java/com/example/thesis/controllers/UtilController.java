@@ -23,6 +23,11 @@ public class UtilController {
         return new ResponseEntity<>(utilService.getEmployeeAttendStatus(week), HttpStatus.OK);
     }
 
+    @GetMapping("chart/totalPaymentValues")
+    public ResponseEntity<?> getTotalPaymentValues(@RequestParam String year) {
+        return new ResponseEntity<>(utilService.getTotalPaymentValues(year), HttpStatus.OK);
+    }
+
     @GetMapping("link")
     public ResponseEntity<?> getPayrollPdf(@RequestParam(required=false) String month) {
         return new ResponseEntity<>(utilService.getPayrollPdf(month), HttpStatus.OK);

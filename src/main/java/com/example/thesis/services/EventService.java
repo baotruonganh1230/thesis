@@ -43,7 +43,10 @@ public class EventService {
                     new EventResponse(
                             event.getNotes(),
                             event.getTitle(),
-                            event.getTime()
+                            event.getTime(),
+                            event.getTimeEnd(),
+                            event.getType(),
+                            event.getLocation()
                     )
                 )
                 .collect(Collectors.toList());
@@ -58,7 +61,10 @@ public class EventService {
                 updateEventRequest.getId(),
                 updateEventRequest.getNotes(),
                 updateEventRequest.getTitle(),
-                updateEventRequest.getTime()
+                updateEventRequest.getTime(),
+                updateEventRequest.getTimeEnd(),
+                updateEventRequest.getType(),
+                updateEventRequest.getLocation()
         );
     }
 
@@ -70,26 +76,22 @@ public class EventService {
 
         Account account = accountRepository.getByid(sendEventRequest.getUserId());
 
-        if (account.getEmployee() == null) return;
-
-        Department department = account.getEmployee().getWorksIn().getDepartment();
-
-        List<Department> allSubDepartmentsIncludeThis =
-                departmentService.getAllSubDepartmentsIncludeThis(department);
-
         Event savedEvent = eventRepository.save(
                 new Event(
                         sendEventRequest.getNotes(),
                         sendEventRequest.getTitle(),
-                        sendEventRequest.getTime()
+                        sendEventRequest.getTime(),
+                        sendEventRequest.getTimeEnd(),
+                        sendEventRequest.getType(),
+                        sendEventRequest.getLocation()
                 )
         );
 
-        for (Department subDepartment : allSubDepartmentsIncludeThis) {
-            for (Works_In works_in : subDepartment.getWorks_ins()) {
-                Employee employe = works_in.getEmployee();
-                Account account1 = accountRepository.getAccountByEid(employe.getId());
+        if (account.getEmployee() == null) return;
 
+        if (sendEventRequest.getEid() != null) {
+            for (Long employeeId : sendEventRequest.getEid()) {
+                Account account1 = accountRepository.getAccountByEid(employeeId);
                 if (account1 == null) continue;
 
                 if (!accountEventRelRepository.existsByEventAndAccount(savedEvent, account1)) {
@@ -97,6 +99,27 @@ public class EventService {
                             account1.getId(),
                             savedEvent.getId()
                     );
+                }
+            }
+        } else {
+            Department department = account.getEmployee().getWorksIn().getDepartment();
+
+            List<Department> allSubDepartmentsIncludeThis =
+                    departmentService.getAllSubDepartmentsIncludeThis(department);
+
+            for (Department subDepartment : allSubDepartmentsIncludeThis) {
+                for (Works_In works_in : subDepartment.getWorks_ins()) {
+                    Employee employe = works_in.getEmployee();
+                    Account account1 = accountRepository.getAccountByEid(employe.getId());
+
+                    if (account1 == null) continue;
+
+                    if (!accountEventRelRepository.existsByEventAndAccount(savedEvent, account1)) {
+                        accountEventRelRepository.insertAccountEventRel(
+                                account1.getId(),
+                                savedEvent.getId()
+                        );
+                    }
                 }
             }
         }

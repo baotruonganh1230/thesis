@@ -18,8 +18,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update event set notes = ?2, title = ?3, time = ?4 where id = ?1", nativeQuery = true)
-    int updateEventById(Long id, String notes, String title, LocalDateTime time);
+    @Query(value = "update event set notes = ?2, title = ?3, time = ?4, time_end = ?5, type = ?6, location = ?7 where id = ?1", nativeQuery = true)
+    int updateEventById(Long id, String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location);
 
 
 }

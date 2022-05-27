@@ -22,16 +22,18 @@ public class JobDetailOutputParams {
     private Long departmentId;
     private Integer salaryGroup;
     private BigDecimal salary;
+    private Long shiftId;
     @JsonProperty("bonus")
     private List<Bonus> bonus;
 
-    public JobDetailOutputParams(LocalDate joinDate, Long jobId, String pit, Long departmentId, Integer salaryGroup, BigDecimal salary, List<Bonus> bonus) {
+    public JobDetailOutputParams(LocalDate joinDate, Long jobId, String pit, Long departmentId, Integer salaryGroup, BigDecimal salary, Long shiftId, List<Bonus> bonus) {
         this.joinDate = joinDate.toString() + "T00:00:00.000Z";
         this.jobId = jobId;
         this.pit = pit;
         this.departmentId = departmentId;
         this.salaryGroup = salaryGroup;
         this.salary = salary;
+        this.shiftId = shiftId;
         this.bonus = bonus;
     }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface CheckinRepository extends JpaRepository<Checkin, Long> {
@@ -19,6 +20,9 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     @Modifying
     @Query(value = "update checkin set time_out = ?2 where attendance_id = ?1", nativeQuery = true)
     int setTimeout(Long attendance_id, String time_out);
+
+    @Query(value = "select * from checkin where date >= ?1 AND date <= ?2", nativeQuery = true)
+    List<Checkin> findAllCheckinsFromdateTodate(String fromDate, String toDate);
 
     @Transactional
     @Modifying

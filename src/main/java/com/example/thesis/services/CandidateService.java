@@ -5,6 +5,9 @@ import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.repositories.CandidateRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
 import com.example.thesis.requests.CandidateRequest;
+import com.example.thesis.requests.EmployeeRequest;
+import com.example.thesis.requests.JobDetailInputParams;
+import com.example.thesis.requests.PersonalDetailInputParams;
 import com.example.thesis.responses.CandidateResponse;
 import com.example.thesis.responses.Candidates;
 import lombok.AllArgsConstructor;
@@ -12,9 +15,9 @@ import org.apache.tika.Tika;
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -130,4 +133,40 @@ public class CandidateService {
         }
     }
 
+    @Transactional
+    public void promoteCandidate(Long candidateId) {
+        if (!candidateRepository.existsById(candidateId)) {
+            throw new IllegalStateException("There is no Candidate with that id");
+        }
+        Candidate candidate = candidateRepository.getById(candidateId);
+        employeeService.insertEmployeeById(
+                null,
+                new EmployeeRequest(
+                        new JobDetailInputParams(
+                                LocalDate.now(),
+                                candidate.getJobRecruitment().getHas().getPosition().getId(),
+                                "25%",
+                                candidate.getJobRecruitment().getDepartment().getId(),
+                                candidate.getJobRecruitment().getHas().getPosition().getSalaryGroup(),
+                                candidate.getJobRecruitment().getHas().getPosition().getMin_salary(),
+                                1L,
+                                null
+                        ),
+                        new PersonalDetailInputParams(
+                                candidate.getName().substring(0, candidate.getName().indexOf(' ') == -1 ? candidate.getName().length() : candidate.getName().indexOf(' ')),
+                                candidate.getName().substring(candidate.getName().indexOf(' ') == -1 ? candidate.getName().length() : candidate.getName().indexOf(' ') + 1),
+                                candidate.getEmail(),
+                                candidate.getContact(),
+                                "male",
+                                candidate.getDateOfBirth(),
+                                null,
+                                null
+                        ),
+                        null,
+                        null
+                )
+        );
+
+        candidateRepository.deleteCandidateById(candidateId);
+    }
 }

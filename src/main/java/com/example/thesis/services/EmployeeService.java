@@ -36,6 +36,7 @@ public class EmployeeService {
     private final InsuranceRepository insuranceRepository;
     private final Insurance_TypeRepository insurance_typeRepository;
     private final DepartmentService departmentService;
+    private final ShiftRepository shiftRepository;
 
     private InsuranceOutputParams getInsuranceOutputParams(Employee employee) {
         InsuranceOutputParams insuranceOutputParams = new InsuranceOutputParams();
@@ -106,6 +107,7 @@ public class EmployeeService {
                                 employee.getWorksIn() == null ? null : employee.getWorksIn().getDepartment().getId(),
                                 employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
                                 employee.getGross_salary(),
+                                employee.getShift().getId(),
                                 employee.getBonus_lists() == null ? null : employee.getBonus_lists()
                                         .stream()
                                         .map(bonus_list -> new Bonus(
@@ -166,6 +168,7 @@ public class EmployeeService {
                             employee.getWorksIn() == null ? null : employee.getWorksIn().getDepartment().getId(),
                             employee.getPosition() == null ? null : employee.getPosition().getSalaryGroup(),
                             employee.getGross_salary(),
+                            employee.getShift().getId(),
                             employee.getBonus_lists() == null ? null : employee.getBonus_lists()
                                     .stream()
                                     .map(bonus_list -> new Bonus(
@@ -229,6 +232,7 @@ public class EmployeeService {
             employeeRepository.setEmployeeJobById(id, employeeRequest.getJobDetail().getJoinDate(),
                     employeeRequest.getJobDetail().getSalary(),
                     employeeRequest.getJobDetail().getPit(),
+                    employeeRequest.getJobDetail().getShiftId(),
                     employeeRequest.getJobDetail().getJobId());
             positionRepository.setSalaryGroupById(employeeRequest.getJobDetail().getJobId(),
                     employeeRequest.getJobDetail().getSalaryGroup());
@@ -358,21 +362,29 @@ public class EmployeeService {
 
     @Transactional
     public void insertEmployeeById(MultipartFile file, EmployeeRequest employeeRequest) {
-        File filetoUpload = convertMultiPartFiletoFile(file);
-        Tika tika = new Tika();
-        String mimeType = null;
-        try {
-            mimeType = tika.detect(filetoUpload);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        com.google.api.services.drive.model.File upLoadedFile =
-                googleDriveService.upLoadFile(filetoUpload.getName(),
-                        filetoUpload.getAbsolutePath(), mimeType);
 
-        if (!filetoUpload.delete()) {
-            throw new IllegalStateException("Cannot delete file!");
+        com.google.api.services.drive.model.File upLoadedFile = null;
+
+        if (file != null) {
+            File filetoUpload = convertMultiPartFiletoFile(file);
+            Tika tika = new Tika();
+            String mimeType = null;
+            try {
+                mimeType = tika.detect(filetoUpload);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            upLoadedFile =
+                    googleDriveService.upLoadFile(filetoUpload.getName(),
+                            filetoUpload.getAbsolutePath(), mimeType);
+
+            if (!filetoUpload.delete()) {
+                throw new IllegalStateException("Cannot delete file!");
+            }
         }
+
+        Shift shift = shiftRepository.findById(
+                employeeRequest.getJobDetail().getShiftId()).orElse(null);
 
         Employee savedEmployee = employeeRepository.save(
                 new Employee(employeeRequest.getPersonalDetail().getFirstName(),
@@ -386,7 +398,11 @@ public class EmployeeService {
                         employeeRequest.getPersonalDetail().getSex(),
                         employeeRequest.getPersonalDetail().getDateOfBirth(),
                         employeeRequest.getJobDetail().getPit(),
-                        "https://drive.google.com/thumbnail?authuser=0&sz=w320&id=" + upLoadedFile.getWebContentLink().replace("https://drive.google.com/uc?id=", "").replace("&export=download", ""),
+                        shift,
+                        upLoadedFile != null ? "https://drive.google.com/thumbnail?authuser=0&sz=w320&id=" +
+                                upLoadedFile.getWebContentLink().replace("https://drive.google.com/uc?id=", "")
+                                        .replace("&export=download", "") :
+                        "https://drive.google.com/thumbnail?authuser=0&sz=w320&id=1LAYOd7bdfjGeAHOiCo2mgMLnLqP9lThB",
                         positionRepository.getById(employeeRequest.getJobDetail().getJobId())
                 )
         );
