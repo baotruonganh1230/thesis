@@ -16,7 +16,7 @@ public class CandidateController {
 
     private final CandidateService candidateService;
 
-    @GetMapping("candidates")
+    @GetMapping("candidates}")
     public ResponseEntity<?> getCandidates(@RequestParam(required=false) Long jobRecruitmentId,
                                            @RequestParam Optional<Integer> pagination,
                                            @RequestParam Optional<String> sortBy,
@@ -26,7 +26,7 @@ public class CandidateController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("promote")
+    @PostMapping("promote/{candidateId}")
     public ResponseEntity<?> promoteCandidate(@PathVariable Long candidateId) {
         candidateService.promoteCandidate(candidateId);
         return new ResponseEntity<>(HttpStatus.OK);
