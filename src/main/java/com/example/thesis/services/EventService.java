@@ -41,6 +41,7 @@ public class EventService {
                 })
                 .map(event ->
                     new EventResponse(
+                            event.getId(),
                             event.getNotes(),
                             event.getTitle(),
                             event.getTime(),

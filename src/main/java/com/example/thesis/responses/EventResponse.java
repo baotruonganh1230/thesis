@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 public class EventResponse {
+    private Long id;
     private String notes;
     private String title;
     private String time;
@@ -17,7 +18,8 @@ public class EventResponse {
     private String type;
     private String location;
 
-    public EventResponse(String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location) {
+    public EventResponse(Long id, String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location) {
+        this.id = id;
         this.notes = notes;
         this.title = title;
         this.time = time.toString() + "Z";
