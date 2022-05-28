@@ -240,7 +240,7 @@ public class PaymentService {
                 payment.getDependentRelief(),
                 taxableIncome,
                 personalIncomeTax,
-                netIncome);
+                netIncome.setScale(0, RoundingMode.HALF_UP));
 
     }
 

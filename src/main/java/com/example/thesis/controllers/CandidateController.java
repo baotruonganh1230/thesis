@@ -16,7 +16,7 @@ public class CandidateController {
 
     private final CandidateService candidateService;
 
-    @GetMapping("candidates}")
+    @GetMapping("candidates")
     public ResponseEntity<?> getCandidates(@RequestParam(required=false) Long jobRecruitmentId,
                                            @RequestParam Optional<Integer> pagination,
                                            @RequestParam Optional<String> sortBy,

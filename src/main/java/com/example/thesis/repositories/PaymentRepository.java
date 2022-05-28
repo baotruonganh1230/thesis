@@ -33,4 +33,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query(value = "UPDATE payment " +
             "SET basic_salary = ?2 WHERE id = ?1", nativeQuery = true)
     int updateBasic_salaryById(Long id, BigDecimal basic_salary);
+
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO `hrmsdev`.`payment` (`eid`, `actual_day`, `basic_salary`, `paid_leave`, `payment_date`, `standard_day`, `unpaid_leave`, `payroll_id`, `lunch`, `parking`, `allowance_not_subjected_to_tax`, `personal_relief`, `dependent_relief`) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)", nativeQuery = true)
+    int insertPaymentId(Long eid, String actualDay, BigDecimal basicSalary, String paidLeave, LocalDate paymentDate, String standardDay, String unpaidLeave, Long payrollId, BigDecimal lunch, BigDecimal parking, BigDecimal allowanceNotSubjectedToTax, BigDecimal personalRelief, BigDecimal dependentRelief);
 }
