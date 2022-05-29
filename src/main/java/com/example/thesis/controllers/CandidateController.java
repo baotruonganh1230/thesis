@@ -31,4 +31,10 @@ public class CandidateController {
         candidateService.promoteCandidate(candidateId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("reject/{candidateId}")
+    public ResponseEntity<?> rejectCandidate(@PathVariable Long candidateId) {
+        candidateService.rejectCandidate(candidateId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

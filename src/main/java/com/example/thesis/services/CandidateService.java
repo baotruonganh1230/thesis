@@ -168,4 +168,15 @@ public class CandidateService {
         job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
         candidateRepository.deleteCandidateById(candidateId);
     }
+
+    @Transactional
+    public void rejectCandidate(Long candidateId) {
+        if (!candidateRepository.existsById(candidateId)) {
+            throw new IllegalStateException("There is no Candidate with that id");
+        }
+        Candidate candidate = candidateRepository.getById(candidateId);
+
+        job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
+        candidateRepository.deleteCandidateById(candidateId);
+    }
 }

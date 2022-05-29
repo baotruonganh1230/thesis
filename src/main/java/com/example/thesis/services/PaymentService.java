@@ -24,10 +24,10 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final EmployeeRepository employeeRepository;
-    private final AttendanceRepository attendanceRepository;
     private final LeavesRepository leavesRepository;
     private final PayrollRepository payrollRepository;
     private final CheckinRepository checkinRepository;
+    private final PaymentBonusRelRepository paymentBonusRelRepository;
 
     @Transactional
     public PaymentResponse getPayment(String month, Long employeeId) {
@@ -153,6 +153,10 @@ public class PaymentService {
                             payroll
                     )
             );
+
+            for (Bonus_List bonusList : employee.getBonus_lists()) {
+                paymentBonusRelRepository.insertPaymentBonusRel(bonusList.getId(), payment.getId());
+            }
         }
 
         BigDecimal basicSalary = payment.getBasicSalary();
@@ -165,15 +169,23 @@ public class PaymentService {
         }
 
         BigDecimal totalBonus = payment.getTotalBonus();
-        List<Bonus> bonuses = convertListBonus_listToListBonus(employee.getBonus_lists());
-        BigDecimal newTotalBonus = calculateTotalBonus(bonuses);
+        List<PaymentBonusRel> paymentBonusRels = paymentBonusRelRepository.getPaymentBonusRelsByPaymentId(payment.getId());
+        List<Bonus> bonuses = convertListBonus_listToListBonus(paymentBonusRels.stream().map(PaymentBonusRel::getBonusList).collect(Collectors.toSet()));
 
         if ((dayPassed.getYear() > LocalDate.now().getYear() ||
                 (dayPassed.getYear() == LocalDate.now().getYear() &&
-                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0)) &&
-                !newTotalBonus.equals(payment.getTotalBonus())) {
-            totalBonus = new BigDecimal(newTotalBonus.setScale(2, RoundingMode.HALF_UP).toString());
+                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0))) {
+            List<Bonus> newBonuses = convertListBonus_listToListBonus(employee.getBonus_lists());
+            BigDecimal newTotalBonus = calculateTotalBonus(newBonuses);
+
+            if (!newTotalBonus.equals(payment.getTotalBonus())) {
+                totalBonus = new BigDecimal(newTotalBonus.setScale(2, RoundingMode.HALF_UP).toString());
+            }
+            if (!newBonuses.equals(bonuses)) {
+                bonuses = newBonuses;
+            }
         }
+
         BigDecimal derivedSalary = basicSalary
                 .add(totalBonus)
                 .multiply(new BigDecimal(payment.getActualDay()).add(new BigDecimal(payment.getPaidLeave())))
