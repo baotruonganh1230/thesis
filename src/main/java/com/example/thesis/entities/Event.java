@@ -43,12 +43,15 @@ public class Event {
 
     private String location;
 
-    public Event(String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location) {
+    private String senderName;
+
+    public Event(String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location, String senderName) {
         this.notes = notes;
         this.title = title;
         this.time = time;
         this.timeEnd = timeEnd;
         this.type = type;
         this.location = location;
+        this.senderName = senderName;
     }
 }

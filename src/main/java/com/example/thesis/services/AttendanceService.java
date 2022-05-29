@@ -2,7 +2,9 @@ package com.example.thesis.services;
 
 import com.example.thesis.entities.Attendance;
 import com.example.thesis.entities.Employee;
+import com.example.thesis.entities.Leaves;
 import com.example.thesis.repositories.AttendanceRepository;
+import com.example.thesis.repositories.LeavesRepository;
 import com.example.thesis.responses.AttendanceList;
 import com.example.thesis.responses.AttendanceResponse;
 import com.example.thesis.responses.CheckinResponse;
@@ -24,6 +26,7 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final EmployeeService employeeService;
     private final DepartmentService departmentService;
+    private final LeavesRepository leavesRepository;
 
     @Transactional
     public AttendanceList getAllAttendances(String week, Long departmentId, Optional<Integer> page) {
@@ -108,6 +111,7 @@ public class AttendanceService {
                         null
                 ));
             }
+
         }
         List<AttendanceResponse> attendanceResponses = convertListAttendanceToAttendanceResponse(attendanceList);
         return addNullAndGroupAttendanceInWeek(attendanceResponses, workingDays);
@@ -115,7 +119,9 @@ public class AttendanceService {
 
     private List<AttendanceResponse> convertListAttendanceToAttendanceResponse(List<Attendance> attendanceList) {
         return attendanceList.stream().map(attendance ->
-                new AttendanceResponse(attendance.getEmployee().getFirstName() + " " +
+                new AttendanceResponse(
+                        attendance.getEmployee().getId(),
+                        attendance.getEmployee().getFirstName() + " " +
                         attendance.getEmployee().getLastName(),
                         attendance.getEmployee().getWorksIn() == null ? null : attendance.getEmployee().getWorksIn().getDepartment().getName(),
                         attendance.getEmployee().getPosition() == null ? null : attendance.getEmployee().getPosition().getName(),
@@ -158,8 +164,18 @@ public class AttendanceService {
             if (avaiableDays.size() < 6 && workingDays != null) {
                 for (String day : workingDays) {
                     if (!avaiableDays.contains(day)){
+                        int status = 2;
+                        LocalDate missingDay = LocalDate.parse(day.substring(0,10));
+                        Leaves leaves = leavesRepository.findByEmployeeAndDate(prototype.getEmployeeId(), missingDay);
+                        if (leaves != null) {
+                            if (leaves.getType().getIs_paid()) {
+                                status = 3;
+                            } else {
+                                status = 4;
+                            }
+                        }
                         prototype.getCheckins().add(new CheckinResponse(
-                                2,
+                                status,
                                 day,
                                 null,
                                 null

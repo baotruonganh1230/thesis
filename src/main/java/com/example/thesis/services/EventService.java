@@ -47,7 +47,8 @@ public class EventService {
                             event.getTime(),
                             event.getTimeEnd(),
                             event.getType(),
-                            event.getLocation()
+                            event.getLocation(),
+                            event.getSenderName()
                     )
                 )
                 .collect(Collectors.toList());
@@ -65,7 +66,8 @@ public class EventService {
                 updateEventRequest.getTime(),
                 updateEventRequest.getTimeEnd(),
                 updateEventRequest.getType(),
-                updateEventRequest.getLocation()
+                updateEventRequest.getLocation(),
+                updateEventRequest.getSenderName()
         );
     }
 
@@ -84,7 +86,8 @@ public class EventService {
                         sendEventRequest.getTime(),
                         sendEventRequest.getTimeEnd(),
                         sendEventRequest.getType(),
-                        sendEventRequest.getLocation()
+                        sendEventRequest.getLocation(),
+                        sendEventRequest.getSenderName()
                 )
         );
 

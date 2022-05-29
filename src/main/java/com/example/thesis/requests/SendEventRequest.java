@@ -21,6 +21,7 @@ public class SendEventRequest {
     private LocalDateTime timeEnd;
     private String type;
     private String location;
+    private String senderName;
     private List<Long> eid;
 
     public void setTime(String timeString) {

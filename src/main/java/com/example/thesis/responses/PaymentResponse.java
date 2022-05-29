@@ -15,6 +15,8 @@ import java.util.List;
 public class PaymentResponse {
     private BigDecimal basicSalary;
 
+    private BigDecimal bonus_v;
+
     private List<Bonus> bonus;
 
     private BigDecimal totalBonus;

@@ -105,7 +105,7 @@ public class LeaveService {
 
     public void updateLeavesStatusByIds(UpdateLeaveRequest updateLeaveRequest) {
         for (Long id : updateLeaveRequest.getListIds()) {
-            Leaves leave = leavesRepository.getById(id);
+            Leaves leave = leavesRepository.getLeaveById(id);
             if (leave != null) {
                 leave.setStatus(updateLeaveRequest.getStatus());
                 leavesRepository.save(leave);
@@ -113,11 +113,16 @@ public class LeaveService {
             int i = 0;
             while (!leave.getFromDate().plusDays(i).isAfter(leave.getToDate())) {
                 Attendance attendance = attendanceRepository.findAttendanceOfEmployeeByDate(leave.getEmployee().getId(), leave.getFromDate().plusDays(i));
-                Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
-                int newStatus = leave.getType().getId() == 1 ? 3 : 4;
-                if (checkin.getStatus() != newStatus) {
-                    checkinRepository.setStatus(checkin.getAttendanceId(), newStatus);
+                if (attendance != null) {
+                    Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
+                    if (checkin != null) {
+                        int newStatus = leave.getType().getId() == 1 ? 3 : 4;
+                        if (checkin.getStatus() != newStatus) {
+                            checkinRepository.setStatus(checkin.getAttendanceId(), newStatus);
+                        }
+                    }
                 }
+                i++;
             }
         }
     }

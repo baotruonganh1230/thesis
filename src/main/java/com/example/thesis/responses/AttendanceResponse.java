@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttendanceResponse {
+    private Long employeeId;
     private String name;
     private String departmentName;
     private String jobTitle;

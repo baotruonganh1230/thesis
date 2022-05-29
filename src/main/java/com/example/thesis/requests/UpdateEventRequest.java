@@ -19,6 +19,7 @@ public class UpdateEventRequest {
     private LocalDateTime time;
     private LocalDateTime timeEnd;
     private String type;
+    private String senderName;
     private String location;
 
     public void setTime(String timeString) {

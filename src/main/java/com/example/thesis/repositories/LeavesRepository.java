@@ -11,7 +11,8 @@ import java.util.List;
 
 @Repository
 public interface LeavesRepository extends JpaRepository<Leaves, Long> {
-    Leaves getById(Long id);
+    @Query(value = "select * from leaves where id = ?1", nativeQuery = true)
+    Leaves getLeaveById(Long id);
     List<Leaves> getAllByEmployee(Employee employee);
     List<Leaves> findAllByApplicationDate(LocalDate applicationDate);
 

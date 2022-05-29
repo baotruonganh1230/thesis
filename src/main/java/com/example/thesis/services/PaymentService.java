@@ -158,6 +158,52 @@ public class PaymentService {
                 paymentBonusRelRepository.insertPaymentBonusRel(bonusList.getId(), payment.getId());
             }
         }
+        String actualDay = payment.getActualDay();
+        String paidLeaveString = payment.getPaidLeave();
+        String unpaidLeaveString = payment.getUnpaidLeave();
+
+        if ((dayPassed.getYear() > LocalDate.now().getYear() ||
+                (dayPassed.getYear() == LocalDate.now().getYear() &&
+                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0))) {
+            List<Checkin> checkinsOfEmployeeInMonth =
+                    checkinRepository.findAllCheckinsFromdateTodate(
+                                    firstDate.toString(),
+                                    lastDate.toString()
+                            )
+                            .stream()
+                            .filter(checkin ->
+                                    checkin.getAttendance().getEmployee().getId().equals(employeeId))
+                            .collect(Collectors.toList());
+
+
+            List<Checkin> countedCheckins =
+                    checkinsOfEmployeeInMonth
+                            .stream()
+                            .filter(checkin ->
+                                    (checkin.getStatus().equals(0) ||
+                                            checkin.getStatus().equals(1)))
+                            .collect(Collectors.toList());
+
+            actualDay = String.valueOf(countedCheckins.size());
+
+            List<Leaves> listLeavesOverlap = leavesRepository.findAllByEmployeeAndPeriod(employeeId, firstDate, lastDate);
+            long paidLeave = 0;
+            for (Leaves leaves : listLeavesOverlap) {
+                LocalDate laterStart = Collections.max(Arrays.asList(leaves.getFromDate(), firstDate));
+                LocalDate earlierEnd = Collections.min(Arrays.asList(leaves.getToDate(), lastDate));
+                long overlappingDays = ChronoUnit.DAYS.between(laterStart, earlierEnd) + 1;
+                if (leaves.getType().getIs_paid()) {
+                    paidLeave += overlappingDays;
+                }
+            }
+
+            long unpaidLeave = Long.parseLong(payment.getStandardDay()) -
+                    Long.parseLong(actualDay) -
+                    paidLeave;
+
+            paidLeaveString = String.valueOf(paidLeave);
+            unpaidLeaveString = String.valueOf(unpaidLeave);
+        }
 
         BigDecimal basicSalary = payment.getBasicSalary();
         if ((dayPassed.getYear() > LocalDate.now().getYear() ||
@@ -167,6 +213,12 @@ public class PaymentService {
             paymentRepository.updateBasic_salaryById(payment.getId(), employee.getGross_salary());
             basicSalary = employee.getGross_salary();
         }
+
+        BigDecimal sevenTenthBasicSalary = basicSalary
+                .multiply(BigDecimal.valueOf(7.00))
+                .divide(BigDecimal.valueOf(10.00), RoundingMode.HALF_UP);
+
+        BigDecimal bonus_v = basicSalary.subtract(sevenTenthBasicSalary);
 
         BigDecimal totalBonus = payment.getTotalBonus();
         List<PaymentBonusRel> paymentBonusRels = paymentBonusRelRepository.getPaymentBonusRelsByPaymentId(payment.getId());
@@ -218,9 +270,10 @@ public class PaymentService {
 
         BigDecimal anotherIncome = new BigDecimal(totalBonus.setScale(2, RoundingMode.HALF_UP).toString());
         BigDecimal totalDerivedIncome = derivedSalary.add(anotherIncome);
-        BigDecimal mandatoryInsurance = totalDerivedIncome
-                .multiply(new BigDecimal("11.5"))
-                .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
+        BigDecimal mandatoryInsurance = sevenTenthBasicSalary
+                .multiply((new BigDecimal(actualDay)).setScale(2, RoundingMode.HALF_UP))
+                .multiply(new BigDecimal("10.5"))
+                .divide((new BigDecimal(payment.getStandardDay())).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP);
 
         BigDecimal temporalValue = anotherIncome.subtract(payment.getAllowanceNotSubjectedToTax());
         BigDecimal taxableIncome;
@@ -239,19 +292,58 @@ public class PaymentService {
         if (taxableIncome.compareTo(BigDecimal.ZERO) < 0) {
             taxableIncome = BigDecimal.valueOf(0.00);
         }
-        BigDecimal personalIncomeTax = taxableIncome.divide(new BigDecimal("10"), RoundingMode.HALF_UP);
+//        BigDecimal personalIncomeTax = taxableIncome.divide(new BigDecimal("10"), RoundingMode.HALF_UP);
+        BigDecimal personalIncomeTax = BigDecimal.ZERO;
+
+        if (taxableIncome.compareTo(BigDecimal.valueOf(5000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("5.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP);
+        } else if (taxableIncome.compareTo(BigDecimal.valueOf(5000000.00)) > 0 && taxableIncome.compareTo(BigDecimal.valueOf(10000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("10.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("250000.00"));
+        } else if (taxableIncome.compareTo(BigDecimal.valueOf(10000000.00)) > 0 && taxableIncome.compareTo(BigDecimal.valueOf(18000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("15.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("750000.00"));
+        } else if (taxableIncome.compareTo(BigDecimal.valueOf(18000000.00)) > 0 && taxableIncome.compareTo(BigDecimal.valueOf(32000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("20.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("1650000.00"));
+        } else if (taxableIncome.compareTo(BigDecimal.valueOf(32000000.00)) > 0 && taxableIncome.compareTo(BigDecimal.valueOf(52000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("25.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("3250000.00"));
+        } else if (taxableIncome.compareTo(BigDecimal.valueOf(52000000.00)) > 0 && taxableIncome.compareTo(BigDecimal.valueOf(80000000.00)) <= 0) {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("30.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("5850000.00"));
+        } else {
+            personalIncomeTax = taxableIncome
+                    .multiply(new BigDecimal("35.00"))
+                    .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
+                    .subtract(new BigDecimal("9850000.00"));
+        }
+
         BigDecimal totalDeduction = mandatoryInsurance.add(personalIncomeTax);
         BigDecimal netIncome = totalDerivedIncome.subtract(totalDeduction);
         if (netIncome.compareTo(BigDecimal.ZERO) < 0) {
             netIncome = BigDecimal.valueOf(0.00);
         }
-        return new PaymentResponse(basicSalary,
+        return new PaymentResponse(sevenTenthBasicSalary,
+                bonus_v,
                 bonuses,
                 totalBonus,
-                new MonthlyInfo(payment.getActualDay(),
+                new MonthlyInfo(actualDay,
                         payment.getStandardDay(),
-                        payment.getPaidLeave(),
-                        payment.getUnpaidLeave()),
+                        paidLeaveString,
+                        unpaidLeaveString),
                 totalDerivedIncome,
                 derivedSalary,
                 anotherIncome,
@@ -260,7 +352,7 @@ public class PaymentService {
                 totalDeduction,
                 mandatoryInsurance,
                 payment.getAllowanceNotSubjectedToTax(),
-                payment.getPersonalRelief().setScale(2),
+                payment.getPersonalRelief().setScale(2, RoundingMode.HALF_UP),
                 payment.getDependentRelief(),
                 taxableIncome,
                 personalIncomeTax,

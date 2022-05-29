@@ -17,8 +17,9 @@ public class EventResponse {
     private String timeEnd;
     private String type;
     private String location;
+    private String senderName;
 
-    public EventResponse(Long id, String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location) {
+    public EventResponse(Long id, String notes, String title, LocalDateTime time, LocalDateTime timeEnd, String type, String location, String senderName) {
         this.id = id;
         this.notes = notes;
         this.title = title;
@@ -26,5 +27,6 @@ public class EventResponse {
         this.timeEnd = timeEnd.toString() + "Z";
         this.type = type;
         this.location = location;
+        this.senderName = senderName;
     }
 }
