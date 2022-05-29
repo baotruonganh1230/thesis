@@ -1,11 +1,7 @@
 package com.example.thesis.services;
 
-import com.example.thesis.entities.Account;
-import com.example.thesis.entities.Employee;
-import com.example.thesis.entities.Leaves;
-import com.example.thesis.repositories.AccountRepository;
-import com.example.thesis.repositories.Leave_TypeRepository;
-import com.example.thesis.repositories.LeavesRepository;
+import com.example.thesis.entities.*;
+import com.example.thesis.repositories.*;
 import com.example.thesis.requests.LeaveRequest;
 import com.example.thesis.requests.UpdateLeaveRequest;
 import com.example.thesis.responses.LeaveDetail;
@@ -32,6 +28,8 @@ public class LeaveService {
     private final AccountRepository accountRepository;
     private final Leave_TypeRepository leave_typeRepository;
     private final DepartmentService departmentService;
+    private final CheckinRepository checkinRepository;
+    private final AttendanceRepository attendanceRepository;
 
     public LeaveEmployeeList getAllLeaves(Long departmentId, String date, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
         List<Leaves> leavesList;
@@ -100,7 +98,8 @@ public class LeaveService {
                         leave.getFromDate(),
                         leave.getToDate(),
                         leave.getTotal(),
-                        leave.getStatus()))
+                        leave.getStatus(),
+                        leave.getType().getName()))
                 .collect(Collectors.toList());
     }
 
@@ -110,6 +109,15 @@ public class LeaveService {
             if (leave != null) {
                 leave.setStatus(updateLeaveRequest.getStatus());
                 leavesRepository.save(leave);
+            }
+            int i = 0;
+            while (!leave.getFromDate().plusDays(i).isAfter(leave.getToDate())) {
+                Attendance attendance = attendanceRepository.findAttendanceOfEmployeeByDate(leave.getEmployee().getId(), leave.getFromDate().plusDays(i));
+                Checkin checkin = checkinRepository.findByAttendanceId(attendance.getId());
+                int newStatus = leave.getType().getId() == 1 ? 3 : 4;
+                if (checkin.getStatus() != newStatus) {
+                    checkinRepository.setStatus(checkin.getAttendanceId(), newStatus);
+                }
             }
         }
     }
@@ -154,7 +162,8 @@ public class LeaveService {
                                 leaves.getToDate(),
                                 userId,
                                 leaves.getReason(),
-                                leaves.getStatus()
+                                leaves.getStatus(),
+                                leaves.getType().getName()
                         )).collect(Collectors.toList());
     }
 }

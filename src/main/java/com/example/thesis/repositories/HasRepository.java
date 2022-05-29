@@ -20,5 +20,10 @@ public interface HasRepository extends JpaRepository<Has, Long> {
     @Query(value = "insert into has (posid, jrecruitid) values (?1, ?2)", nativeQuery = true)
     int insertHas(Long posid, Long jrecruitid);
 
+    @Transactional
+    @Modifying
+    @Query(value = "delete from has where jrecruitid = ?1", nativeQuery = true)
+    void deleteByJob_RecruitmentId(Long jrecruitid);
+
     boolean existsByPosition(Position position);
 }

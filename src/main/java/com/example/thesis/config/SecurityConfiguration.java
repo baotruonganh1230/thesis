@@ -109,10 +109,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .antMatchers("/api/v1/chart/attendHour").hasAnyRole("ADMIN", "SUPERUSER", "USER")
                         .antMatchers("/api/v1/chart/attendNumber").hasAnyRole("ADMIN", "SUPERUSER", "USER")
                         .antMatchers("/api/v1/link").hasAnyRole("ADMIN", "SUPERUSER", "USER")
-                        .antMatchers("/api/v1/departments").hasAnyRole("ADMIN", "SUPERUSER", "USER")
-                        .antMatchers(HttpMethod.GET,"/api/v1/department/**").hasAnyRole("ADMIN", "SUPERUSER", "USER")
-                        .antMatchers(HttpMethod.PUT,"/api/v1/department/**").hasAnyRole("ADMIN", "SUPERUSER")
-                        .antMatchers(HttpMethod.POST,"/api/v1/department").hasAnyRole("ADMIN", "SUPERUSER")
+                        .antMatchers("/api/v1/shifts").hasAnyRole("ADMIN", "SUPERUSER")
+                        .antMatchers(HttpMethod.GET,"/api/v1/shift/**").hasAnyRole("ADMIN", "SUPERUSER")
+                        .antMatchers(HttpMethod.PUT,"/api/v1/shift/**").hasAnyRole("ADMIN", "SUPERUSER")
+                        .antMatchers(HttpMethod.POST,"/api/v1/shift").hasAnyRole("ADMIN", "SUPERUSER")
                         .anyRequest().authenticated())
                 .addFilterBefore(new JWTAuthenticationFilter(accountService, jwtTokenHelper),
                         UsernamePasswordAuthenticationFilter.class);

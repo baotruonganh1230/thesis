@@ -3,6 +3,7 @@ package com.example.thesis.services;
 import com.example.thesis.entities.Candidate;
 import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.repositories.CandidateRepository;
+import com.example.thesis.repositories.HasRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
 import com.example.thesis.requests.*;
 import com.example.thesis.responses.CandidateResponse;
@@ -31,6 +32,7 @@ public class CandidateService {
     private final EmployeeService employeeService;
     private final GoogleDriveService googleDriveService;
     private final Job_RecruitmentRepository job_recruitmentRepository;
+    private final HasRepository hasRepository;
 
     public Candidates getCandidatesByJob_RecruitmentId(Long job_recruitmentId, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
         List<CandidateResponse> candidateList;
@@ -167,6 +169,11 @@ public class CandidateService {
 
         job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
         candidateRepository.deleteCandidateById(candidateId);
+        if (candidate.getJobRecruitment().getQuantity() == 0) {
+            hasRepository.deleteByJob_RecruitmentId(candidate.getJobRecruitment().getId());
+            job_recruitmentRepository.deleteById(candidate.getJobRecruitment().getId());
+        }
+
     }
 
     @Transactional
@@ -174,9 +181,7 @@ public class CandidateService {
         if (!candidateRepository.existsById(candidateId)) {
             throw new IllegalStateException("There is no Candidate with that id");
         }
-        Candidate candidate = candidateRepository.getById(candidateId);
 
-        job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
         candidateRepository.deleteCandidateById(candidateId);
     }
 }

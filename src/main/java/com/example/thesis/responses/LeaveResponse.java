@@ -21,8 +21,9 @@ public class LeaveResponse {
     private Long userId;
     private String reason;
     private Integer status;
+    private String typeName;
 
-    public LeaveResponse(Long leaveType, Integer amount, LocalDate applicationDate,LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status) {
+    public LeaveResponse(Long leaveType, Integer amount, LocalDate applicationDate,LocalDate fromDate, LocalDate toDate, Long userId, String reason, Integer status, String typeName) {
         this.leaveType = leaveType;
         this.amount = amount;
         this.applicationDate = applicationDate.toString() + "T00:00:00.000Z";
@@ -31,6 +32,7 @@ public class LeaveResponse {
         this.userId = userId;
         this.reason = reason;
         this.status = status;
+        this.typeName = typeName;
     }
 
     public void setFromDate(String fromDateString) {

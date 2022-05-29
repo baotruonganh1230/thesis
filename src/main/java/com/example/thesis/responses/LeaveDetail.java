@@ -28,7 +28,9 @@ public class LeaveDetail {
 
     private Integer status;
 
-    public LeaveDetail(Long id, String employeeName, String departmentName, LocalDate applicationDate, LocalDate fromDate, LocalDate toDate, Integer total, Integer status) {
+    private String typeName;
+
+    public LeaveDetail(Long id, String employeeName, String departmentName, LocalDate applicationDate, LocalDate fromDate, LocalDate toDate, Integer total, Integer status, String typeName) {
         this.id = id;
         this.employeeName = employeeName;
         this.departmentName = departmentName;
@@ -37,5 +39,6 @@ public class LeaveDetail {
         this.toDate = toDate.toString() + "T00:00:00.000Z";
         this.total = total;
         this.status = status;
+        this.typeName = typeName;
     }
 }
