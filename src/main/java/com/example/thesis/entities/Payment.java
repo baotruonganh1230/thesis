@@ -32,6 +32,9 @@ public class Payment implements Serializable {
 
     private LocalDate paymentDate;
 
+    @Column(precision = 16, scale = 2)
+    private BigDecimal totalBonus;
+
     private String actualDay;
 
     private String standardDay;

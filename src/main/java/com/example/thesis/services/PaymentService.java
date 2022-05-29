@@ -105,6 +105,9 @@ public class PaymentService {
                         )
                 );
             }
+            List<Bonus> bonuses = convertListBonus_listToListBonus(employee.getBonus_lists());
+            BigDecimal totalBonus = calculateTotalBonus(bonuses);
+
             BigDecimal lunch;
             Optional<Bonus_List> optionalLunch = employee.getBonus_lists()
                     .stream()
@@ -137,6 +140,7 @@ public class PaymentService {
                             employee,
                             basicSalary,
                             dayPassed,
+                            totalBonus,
                             actualDay,
                             standardDay,
                             String.valueOf(paidLeave),
@@ -160,8 +164,16 @@ public class PaymentService {
             basicSalary = employee.getGross_salary();
         }
 
-        List<Bonus> bonuses = convertListBonus_listToListBonus(payment.getEmployee().getBonus_lists());
-        BigDecimal totalBonus = calculateTotalBonus(bonuses);
+        BigDecimal totalBonus = payment.getTotalBonus();
+        List<Bonus> bonuses = convertListBonus_listToListBonus(employee.getBonus_lists());
+        BigDecimal newTotalBonus = calculateTotalBonus(bonuses);
+
+        if ((dayPassed.getYear() > LocalDate.now().getYear() ||
+                (dayPassed.getYear() == LocalDate.now().getYear() &&
+                        dayPassed.getMonth().compareTo(LocalDate.now().getMonth()) >= 0)) &&
+                !newTotalBonus.equals(payment.getTotalBonus())) {
+            totalBonus = new BigDecimal(newTotalBonus.setScale(2, RoundingMode.HALF_UP).toString());
+        }
         BigDecimal derivedSalary = basicSalary
                 .add(totalBonus)
                 .multiply(new BigDecimal(payment.getActualDay()).add(new BigDecimal(payment.getPaidLeave())))

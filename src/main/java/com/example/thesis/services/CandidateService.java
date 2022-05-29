@@ -4,10 +4,7 @@ import com.example.thesis.entities.Candidate;
 import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.repositories.CandidateRepository;
 import com.example.thesis.repositories.Job_RecruitmentRepository;
-import com.example.thesis.requests.CandidateRequest;
-import com.example.thesis.requests.EmployeeRequest;
-import com.example.thesis.requests.JobDetailInputParams;
-import com.example.thesis.requests.PersonalDetailInputParams;
+import com.example.thesis.requests.*;
 import com.example.thesis.responses.CandidateResponse;
 import com.example.thesis.responses.Candidates;
 import lombok.AllArgsConstructor;
@@ -20,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,9 +146,9 @@ public class CandidateService {
                                 "25%",
                                 candidate.getJobRecruitment().getDepartment().getId(),
                                 candidate.getJobRecruitment().getHas().getPosition().getSalaryGroup(),
-                                candidate.getJobRecruitment().getHas().getPosition().getMin_salary(),
+                                candidate.getJobRecruitment().getHas().getPosition().getMin_salary() != null ? candidate.getJobRecruitment().getHas().getPosition().getMin_salary() : BigDecimal.valueOf(20000000.00),
                                 1L,
-                                null
+                                new ArrayList<>()
                         ),
                         new PersonalDetailInputParams(
                                 candidate.getName().substring(0, candidate.getName().indexOf(' ') == -1 ? candidate.getName().length() : candidate.getName().indexOf(' ')),
@@ -159,14 +157,15 @@ public class CandidateService {
                                 candidate.getContact(),
                                 "male",
                                 candidate.getDateOfBirth(),
-                                null,
-                                null
+                                new Address(79L, 770L, 27133L, "268 Ly Thuong Kiet St."),
+                                new Address(79L, 770L, 27133L, "444/2/1A Cach Mang Thang 8 St.")
                         ),
                         null,
                         null
                 )
         );
 
+        job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
         candidateRepository.deleteCandidateById(candidateId);
     }
 }
