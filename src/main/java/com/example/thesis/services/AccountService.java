@@ -135,7 +135,7 @@ public class AccountService implements UserDetailsService {
                         accountRequest.getEid() == null ? null : employeeRepository.getById(accountRequest.getEid()),
                         roleRepository.getById(accountRequest.getRoleid()),
                         accountRequest.getUsername(),
-                        accountRequest.getPassword(),
+                        passwordEncoder.encode(accountRequest.getPassword()),
                         accountRequest.getStatus(),
                         null)
         );

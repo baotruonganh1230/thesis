@@ -1,5 +1,6 @@
 package com.example.thesis.services;
 
+import com.example.thesis.entities.AccountStatus;
 import com.example.thesis.entities.Candidate;
 import com.example.thesis.entities.Job_Recruitment;
 import com.example.thesis.repositories.CandidateRepository;
@@ -33,6 +34,7 @@ public class CandidateService {
     private final GoogleDriveService googleDriveService;
     private final Job_RecruitmentRepository job_recruitmentRepository;
     private final HasRepository hasRepository;
+    private final AccountService accountService;
 
     public Candidates getCandidatesByJob_RecruitmentId(Long job_recruitmentId, Optional<Integer> page, Optional<String> sortBy, Optional<String> sortOrder) {
         List<CandidateResponse> candidateList;
@@ -139,7 +141,7 @@ public class CandidateService {
             throw new IllegalStateException("There is no Candidate with that id");
         }
         Candidate candidate = candidateRepository.getById(candidateId);
-        employeeService.insertEmployeeById(
+        Long savedEmployeeId = employeeService.insertEmployeeById(
                 null,
                 new EmployeeRequest(
                         new JobDetailInputParams(
@@ -167,13 +169,20 @@ public class CandidateService {
                 )
         );
 
+        accountService.insertAccount(new AccountRequest(
+                savedEmployeeId,
+                1L,
+                "default_user" + savedEmployeeId,
+                "sfrlutsaewopdda" + savedEmployeeId,
+                AccountStatus.ENABLE
+        ));
+
         job_recruitmentRepository.decreaseQuantity(candidate.getJobRecruitment().getId());
         candidateRepository.deleteCandidateById(candidateId);
         if (candidate.getJobRecruitment().getQuantity() == 0) {
             hasRepository.deleteByJob_RecruitmentId(candidate.getJobRecruitment().getId());
             job_recruitmentRepository.deleteById(candidate.getJobRecruitment().getId());
         }
-
     }
 
     @Transactional

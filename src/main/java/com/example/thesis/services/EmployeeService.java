@@ -361,7 +361,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public void insertEmployeeById(MultipartFile file, EmployeeRequest employeeRequest) {
+    public Long insertEmployeeById(MultipartFile file, EmployeeRequest employeeRequest) {
 
         com.google.api.services.drive.model.File upLoadedFile = null;
 
@@ -462,6 +462,7 @@ public class EmployeeService {
                 accountService.updateEidById(employeeRequest.getAccountDetail().getId(), savedEmployee.getId());
             }
         }
+        return savedEmployee.getId();
     }
 
     public Employee save(Employee employee) {
