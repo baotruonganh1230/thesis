@@ -73,6 +73,7 @@ public class BootStrapMySQL implements ApplicationListener<ContextRefreshedEvent
             Process process2 = Runtime.getRuntime().exec("jar xf application.jar BOOT-INF/classes/hrms-drive-c2daac40864c.p12");
             process2.waitFor();
             Runtime.getRuntime().exec("cd ~");
+            Runtime.getRuntime().exec("sudo mkdir backup-db");
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

@@ -273,6 +273,7 @@ public class PaymentService {
         BigDecimal mandatoryInsurance = sevenTenthBasicSalary
                 .multiply((new BigDecimal(actualDay)).setScale(2, RoundingMode.HALF_UP))
                 .multiply(new BigDecimal("10.5"))
+                .divide(new BigDecimal("100.00"), RoundingMode.HALF_UP)
                 .divide((new BigDecimal(payment.getStandardDay())).setScale(2, RoundingMode.HALF_UP), RoundingMode.HALF_UP);
 
         BigDecimal temporalValue = anotherIncome.subtract(payment.getAllowanceNotSubjectedToTax());
